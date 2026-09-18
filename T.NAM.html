@@ -2,593 +2,782 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Mở Phiên TikTok LIVE</title>
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>T.NAM - TikTok LIVE</title>
 <style>
 *{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
 }
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  min-height:100%;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
-    "Helvetica Neue",Arial,sans-serif;
-  background:#080808;
-  color:#fff;
-  -webkit-font-smoothing:antialiased;
+html,
+body{
+    margin:0;
+    padding:0;
+    width:100%;
+    min-height:100%;
+    background:#050505;
+    color:#fff;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
 }
 body{
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:20px;
+    min-height:100vh;
+    overflow-x:hidden;
 }
-.container{
-  width:100%;
-  max-width:430px;
+button{
+    font:inherit;
+}
+.hidden{
+    display:none !important;
+}
+/* =========================
+   BACKGROUND
+========================= */
+.bg{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:0;
+}
+.glow{
+    position:absolute;
+    width:320px;
+    height:320px;
+    border-radius:50%;
+    filter:blur(100px);
+    opacity:.12;
+}
+.glow.one{
+    top:-100px;
+    left:-100px;
+    background:#ff2c55;
+}
+.glow.two{
+    right:-100px;
+    bottom:-100px;
+    background:#25f4ee;
+}
+/* =========================
+   MAIN
+========================= */
+.page{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
 }
 .card{
-  background:#111;
-  border:1px solid #292929;
-  border-radius:22px;
-  padding:28px 22px;
-  box-shadow:
-    0 0 35px rgba(255,44,85,.08),
-    0 0 60px rgba(37,244,238,.03);
-  text-align:center;
+    width:100%;
+    max-width:430px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.045),
+            rgba(255,255,255,.015)
+        );
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:24px;
+    padding:26px 20px;
+    box-shadow:
+        0 20px 80px rgba(0,0,0,.65),
+        inset 0 1px 0 rgba(255,255,255,.03);
+    backdrop-filter:blur(18px);
 }
+/* =========================
+   LOGO
+========================= */
 .logo{
-  width:64px;
-  height:64px;
-  margin:0 auto 18px;
-  border-radius:18px;
-  background:linear-gradient(135deg,#ff2c55,#ff0050 45%,#25f4ee);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:28px;
-  font-weight:900;
-}
-h1{
-  margin:0;
-  font-size:22px;
-  font-weight:800;
+    text-align:center;
+    font-size:42px;
+    line-height:1;
+    font-weight:950;
+    letter-spacing:7px;
+    background:
+        linear-gradient(
+            90deg,
+            #ff2c55,
+            #ff7a00,
+            #25f4ee
+        );
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
 }
 .subtitle{
-  margin-top:8px;
-  color:#999;
-  font-size:14px;
-  line-height:1.5;
+    text-align:center;
+    margin-top:9px;
+    color:#777;
+    font-size:11px;
+    letter-spacing:2px;
 }
-.status{
-  margin-top:22px;
-  padding:14px;
-  border-radius:14px;
-  background:#181818;
-  border:1px solid #292929;
-  font-size:14px;
-  line-height:1.5;
-  white-space:pre-line;
-}
-.status.success{
-  border-color:rgba(37,244,238,.4);
-  color:#25f4ee;
-}
-.status.error{
-  border-color:rgba(255,44,85,.4);
-  color:#ff5475;
-}
-.device-box{
-  margin-top:18px;
-  padding:15px;
-  background:#0b0b0b;
-  border:1px solid #252525;
-  border-radius:14px;
-  text-align:left;
-}
-.device-title{
-  color:#888;
-  font-size:12px;
-  margin-bottom:7px;
-}
-.device-id{
-  word-break:break-all;
-  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-  font-size:12px;
-  color:#fff;
-  line-height:1.5;
-  margin-bottom:12px;
-}
-.btn-copy{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:12px;
-  background:#1e3a8a;
-  color:#fff;
-  font-size:14px;
-  font-weight:700;
-  cursor:pointer;
-  display:none;
-}
-.btn-copy:active{
-  opacity:.85;
-}
-.open-area{
-  display:none;
-  margin-top:22px;
-}
-.open-button{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:100%;
-  min-height:56px;
-  padding:15px 20px;
-  border-radius:15px;
-  background:linear-gradient(135deg,#ff0050,#ff2c55);
-  color:#fff;
-  text-decoration:none;
-  font-size:17px;
-  font-weight:800;
-  box-shadow:0 8px 25px rgba(255,0,80,.25);
-}
-.open-button:active{
-  transform:scale(.97);
-  opacity:.85;
-}
-.hint{
-  margin-top:14px;
-  padding:12px;
-  border-radius:12px;
-  background:#171717;
-  color:#999;
-  font-size:12px;
-  line-height:1.5;
-}
-.hint strong{
-  color:#ddd;
-}
-.footer{
-  margin-top:22px;
-  color:#555;
-  font-size:11px;
-}
+/* =========================
+   LOADING
+========================= */
 .loading{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
+    text-align:center;
+    padding:20px 0 5px;
 }
 .spinner{
-  width:15px;
-  height:15px;
-  border:2px solid #333;
-  border-top-color:#ff2c55;
-  border-radius:50%;
-  animation:spin .8s linear infinite;
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    border:3px solid #252525;
+    border-top-color:#ff2c55;
+    animation:spin .8s linear infinite;
+    margin:0 auto 18px;
 }
 @keyframes spin{
-  to{transform:rotate(360deg);}
+    to{
+        transform:rotate(360deg);
+    }
+}
+/* =========================
+   STATUS
+========================= */
+.status-icon{
+    width:68px;
+    height:68px;
+    margin:18px auto;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    font-weight:900;
+}
+.status-icon.lock{
+    background:rgba(255,44,85,.10);
+    border:1px solid rgba(255,44,85,.30);
+}
+.status-icon.ok{
+    background:rgba(37,244,238,.08);
+    border:1px solid rgba(37,244,238,.25);
+}
+.title{
+    text-align:center;
+    font-size:22px;
+    font-weight:850;
+    margin-bottom:8px;
+}
+.desc{
+    text-align:center;
+    color:#999;
+    font-size:13px;
+    line-height:1.55;
+}
+/* =========================
+   DEVICE BOX
+========================= */
+.device-box{
+    margin-top:20px;
+    padding:15px;
+    background:#090909;
+    border:1px solid #292929;
+    border-radius:15px;
+}
+.device-label{
+    color:#777;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:8px;
+}
+.device-id{
+    color:#25f4ee;
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+    font-size:13px;
+    line-height:1.5;
+    word-break:break-all;
+}
+/* =========================
+   BUTTON
+========================= */
+.btn{
+    width:100%;
+    border:0;
+    border-radius:14px;
+    padding:14px 16px;
+    margin-top:12px;
+    font-weight:850;
+    cursor:pointer;
+    transition:
+        transform .15s ease,
+        opacity .15s ease;
+}
+.btn:active{
+    transform:scale(.98);
+}
+.copy{
+    background:#ff2c55;
+    color:#fff;
+}
+.open{
+    background:
+        linear-gradient(
+            90deg,
+            #ff2c55,
+            #ff7a00
+        );
+    color:#fff;
+}
+.retry{
+    background:#202020;
+    color:#fff;
+}
+.btn:disabled{
+    opacity:.5;
+}
+/* =========================
+   FOOTER
+========================= */
+.footer{
+    margin-top:20px;
+    text-align:center;
+    color:#555;
+    font-size:10px;
+    letter-spacing:1px;
+}
+/* =========================
+   ERROR
+========================= */
+.error{
+    margin-top:15px;
+    padding:12px;
+    border-radius:12px;
+    background:rgba(255,44,85,.07);
+    border:1px solid rgba(255,44,85,.20);
+    color:#ff7189;
+    text-align:center;
+    font-size:12px;
+    line-height:1.5;
 }
 </style>
 </head>
 <body>
-<div class="container">
-<div class="card">
-  <div class="logo">T</div>
-  <h1>Mở Phiên TikTok LIVE</h1>
-  <div class="subtitle">
-    Hệ thống đang kiểm tra quyền truy cập thiết bị
-  </div>
-  <div id="status" class="status">
-    <span class="loading">
-      <span class="spinner"></span>
-      Đang kiểm tra thiết bị...
-    </span>
-  </div>
-  <div class="device-box">
-<div class="device-title">
-  MÃ THIẾT BỊ
+<div class="bg">
+    <div class="glow one"></div>
+    <div class="glow two"></div>
 </div>
-<div id="deviceId" class="device-id">
-  Đang tạo mã thiết bị...
-</div>
-<!-- COPY CHỈ NẰM Ở T.NAM -->
-<button id="btnCopy" class="btn-copy">
-  COPY MÃ THIẾT BỊ
-</button>
-  </div>
-  <div id="openArea" class="open-area">
-<a
-  id="openTikTok"
-  class="open-button"
-  href="#"
-  rel="noopener"
->
-  MỞ PHIÊN LIVE
-</a>
-<div class="hint">
-  <strong>iPhone / iOS:</strong>
-  Hệ thống đã xác minh thiết bị.
-  Nếu TikTok không tự mở, hãy bấm
-  <strong>MỞ PHIÊN LIVE</strong>.
-</div>
-  </div>
-  <div class="footer">
-    T.NAM • Device Access System
-  </div>
-</div>
+<div class="page">
+    <div class="card">
+        <div class="logo">
+            T.NAM
+        </div>
+        <div class="subtitle">
+            TIKTOK LIVE ACCESS
+        </div>
+        <!-- =====================
+             LOADING
+        ====================== -->
+        <div id="loading">
+            <div class="loading">
+                <div class="spinner"></div>
+                <div class="desc">
+                    Đang kiểm tra thiết bị...
+                </div>
+            </div>
+        </div>
+        <!-- =====================
+             CHƯA DUYỆT
+        ====================== -->
+        <div
+            id="notApproved"
+            class="hidden"
+        >
+            <div class="status-icon lock">
+                🔒
+            </div>
+            <div class="title">
+                Thiết bị chưa được duyệt
+            </div>
+            <div class="desc">
+                Sao chép mã thiết bị bên dưới
+                và gửi cho người quản lý để
+                được cấp quyền.
+            </div>
+            <div class="device-box">
+                <div class="device-label">
+                    Mã thiết bị
+                </div>
+                <div
+                    id="deviceId"
+                    class="device-id"
+                ></div>
+            </div>
+            <button
+                id="copyButton"
+                class="btn copy"
+                onclick="copyDeviceId()"
+            >
+                COPY MÃ THIẾT BỊ
+            </button>
+            <button
+                class="btn retry"
+                onclick="checkAccess()"
+            >
+                KIỂM TRA LẠI
+            </button>
+        </div>
+        <!-- =====================
+             ĐÃ DUYỆT
+        ====================== -->
+        <div
+            id="approved"
+            class="hidden"
+        >
+            <div class="status-icon ok">
+                ✓
+            </div>
+            <div class="title">
+                Thiết bị đã được duyệt
+            </div>
+            <div class="desc">
+                Bạn có thể tiếp tục mở phiên
+                TikTok LIVE.
+            </div>
+            <button
+                id="openButton"
+                class="btn open"
+                onclick="openTikTok()"
+            >
+                MỞ TIKTOK LIVE
+            </button>
+        </div>
+        <!-- =====================
+             ERROR
+        ====================== -->
+        <div
+            id="error"
+            class="error hidden"
+        ></div>
+        <div class="footer">
+            T.NAM • DEVICE ACCESS
+        </div>
+    </div>
 </div>
 <script>
-/* =========================================================
-   CẤU HÌNH
-   ========================================================= */
 /*
-  Đây là URL Worker API.
-  Ví dụ:
-  https://device-api.tenmiencuaban.workers.dev
-  KHÔNG đặt GitHub Token ở đây.
+==================================================
+CẤU HÌNH
+==================================================
 */
-const API_URL =
-  "https://YOUR-WORKER.workers.dev";
-const DEVICE_STORAGE_KEY =
-  "tnam_device_id";
-/* =========================================================
-   DEVICE ID
-   ========================================================= */
-function createDeviceId(){
-  try{
-    if(
-      window.crypto &&
-      typeof window.crypto.randomUUID === "function"
-    ){
-      return "device_" +
-        window.crypto.randomUUID();
-    }
-  }catch(e){}
-  const randomPart =
-    Math.random()
-      .toString(36)
-      .substring(2,12);
-  const timePart =
-    Date.now().toString(36);
-  return "device_" +
-    randomPart +
-    "-" +
-    timePart;
-}
+/*
+ * Đây là Worker API của hệ thống N.
+ *
+ * Ví dụ nếu Worker thật của bạn là:
+ * https://abc.xyz.workers.dev
+ *
+ * thì đổi thành:
+ *
+ * const N_API = "https://abc.xyz.workers.dev";
+ *
+ * KHÔNG dùng:
+ * https://quetlinktrungnam.github.io/r/worker.js
+ *
+ * nếu worker.js chỉ là file JavaScript tĩnh.
+ */
+const N_API =
+    "https://YOUR-WORKER.workers.dev";
+/*
+==================================================
+LOCAL STORAGE
+==================================================
+*/
+const DEVICE_KEY =
+    "shoplink_device_id";
+/*
+==================================================
+TẠO DEVICE ID
+==================================================
+*/
 function getDeviceId(){
-  let deviceId = null;
-  try{
-    deviceId =
-      localStorage.getItem(
-        DEVICE_STORAGE_KEY
-      );
-  }catch(e){}
-  if(
-    !deviceId ||
-    typeof deviceId !== "string"
-  ){
-    deviceId =
-      createDeviceId();
-    try{
-      localStorage.setItem(
-        DEVICE_STORAGE_KEY,
-        deviceId
-      );
-    }catch(e){}
-  }
-  return deviceId;
-}
-/* =========================================================
-   QUERY
-   ========================================================= */
-function getQueryParameter(name){
-  try{
-    const params =
-      new URLSearchParams(
-        window.location.search
-      );
-    const value =
-      params.get(name);
-    if(!value) return null;
-    return value.trim();
-  }catch(e){
-    return null;
-  }
-}
-function getTikTokUrl(){
-  return getQueryParameter("url");
-}
-/* =========================================================
-   ROOM ID
-   ========================================================= */
-function extractRoomId(url){
-  if(!url) return null;
-  let match =
-    url.match(/room_id=(\d+)/);
-  if(match)
-    return match[1];
-  match =
-    url.match(/\/live\/(\d+)/);
-  if(match)
-    return match[1];
-  return null;
-}
-/* =========================================================
-   UI
-   ========================================================= */
-function showDeviceId(deviceId){
-  const el =
-    document.getElementById(
-      "deviceId"
-    );
-  if(el)
-    el.textContent = deviceId;
-}
-function setStatus(
-  message,
-  type=""
-){
-  const el =
-    document.getElementById(
-      "status"
-    );
-  if(!el) return;
-  el.className =
-    "status " + type;
-  el.textContent =
-    message;
-}
-function showCopyButton(show){
-  const btn =
-    document.getElementById(
-      "btnCopy"
-    );
-  if(btn){
-    btn.style.display =
-      show ? "block" : "none";
-  }
-}
-/* =========================================================
-   KIỂM TRA DEVICE QUA WORKER
-   ========================================================= */
-async function checkDevice(deviceId){
-  const url =
-    API_URL +
-    "/check?device=" +
-    encodeURIComponent(deviceId);
-  const res =
-    await fetch(url,{
-      method:"GET",
-      cache:"no-store"
-    });
-  if(!res.ok){
-    throw new Error(
-      "Không thể kiểm tra quyền."
-    );
-  }
-  const data =
-    await res.json();
-  return data;
-}
-/* =========================================================
-   COPY
-   ========================================================= */
-document
-  .getElementById("btnCopy")
-  .addEventListener(
-    "click",
-    async function(){
-      const deviceId =
-        document
-          .getElementById(
-            "deviceId"
-          )
-          .textContent;
-      try{
-        if(
-          navigator.clipboard &&
-          window.isSecureContext
-        ){
-          await navigator.clipboard
-            .writeText(deviceId);
-        }else{
-          fallbackCopy(deviceId);
-        }
-        setStatus(
-          "✅ Đã copy mã thiết bị.\n" +
-          "Gửi mã này cho người quản lý để được duyệt.",
-          "success"
+    let deviceId =
+        localStorage.getItem(
+            DEVICE_KEY
         );
-      }catch(e){
-        fallbackCopy(deviceId);
-      }
-    }
-  );
-function fallbackCopy(text){
-  const ta =
-    document.createElement(
-      "textarea"
-    );
-  ta.value = text;
-  ta.style.position =
-    "fixed";
-  ta.style.left =
-    "-9999px";
-  document.body.appendChild(ta);
-  ta.select();
-  try{
-    document.execCommand(
-      "copy"
-    );
-    setStatus(
-      "✅ Đã copy mã thiết bị.\n" +
-      "Gửi mã này cho người quản lý để được duyệt.",
-      "success"
-    );
-  }catch(e){
-    setStatus(
-      "Không copy được.\n" +
-      "Hãy copy mã thủ công.",
-      "error"
-    );
-  }
-  ta.remove();
-}
-/* =========================================================
-   MỞ TIKTOK
-   ========================================================= */
-function setupTikTok(roomId){
-  const area =
-    document.getElementById(
-      "openArea"
-    );
-  const button =
-    document.getElementById(
-      "openTikTok"
-    );
-  const deepLink =
-    "snssdk1180://live?room_id=" +
-    encodeURIComponent(roomId);
-  button.href =
-    deepLink;
-  button.onclick =
-    function(){
-      setTimeout(
-        function(){
-          try{
-            window.close();
-          }catch(e){}
-          setTimeout(
-            function(){
-              try{
-                window.location.replace(
-                  "about:blank"
-                );
-              }catch(e){}
-            },
-            400
-          );
-        },
-        1200
-      );
-    };
-  area.style.display =
-    "block";
-}
-/* =========================================================
-   START
-   ========================================================= */
-async function checkAccess(){
-  const deviceId =
-    getDeviceId();
-  showDeviceId(
-    deviceId
-  );
-  const tiktokUrl =
-    getTikTokUrl();
-  /*
-    Không có link TikTok:
-    vẫn cho người dùng thấy mã.
-  */
-  if(!tiktokUrl){
-    setStatus(
-      "❌ Không tìm thấy link TikTok LIVE.",
-      "error"
-    );
-    showCopyButton(true);
-    return;
-  }
-  setStatus(
-    "Đang kiểm tra quyền thiết bị..."
-  );
-  try{
-    const result =
-      await checkDevice(
-        deviceId
-      );
     /*
-      Worker chỉ trả về:
-      approved: true / false
-      Không trả room_id cho thiết bị
-      chưa được duyệt.
-    */
+     * Nếu chưa có mã:
+     * tạo mã mới.
+     */
     if(
-      !result ||
-      result.approved !== true
+        !deviceId ||
+        !deviceId.startsWith("device_")
     ){
-      setStatus(
-        "⛔ Thiết bị chưa được cấp phép.\n" +
-        "Hãy copy mã và gửi cho người quản lý.",
-        "error"
-      );
-      showCopyButton(true);
-      return;
+        deviceId =
+            "device_" +
+            crypto.randomUUID();
+        localStorage.setItem(
+            DEVICE_KEY,
+            deviceId
+        );
     }
-    /*
-      Chỉ thiết bị đã duyệt mới xử lý
-      room_id.
-    */
-    const roomId =
-      extractRoomId(
-        tiktokUrl
-      );
-    if(!roomId){
-      setStatus(
-        "❌ Không lấy được room_id từ link.",
-        "error"
-      );
-      showCopyButton(false);
-      return;
-    }
-    setStatus(
-      "✅ Thiết bị đã được cấp phép.\n" +
-      "Đang mở phiên LIVE...",
-      "success"
-    );
-    showCopyButton(false);
-    setupTikTok(
-      roomId
-    );
-    /*
-      Tự mở.
-      Nếu iOS chặn autoplay/deep-link,
-      nút MỞ PHIÊN LIVE vẫn còn.
-    */
-    setTimeout(
-      function(){
-        const button =
-          document.getElementById(
-            "openTikTok"
-          );
-        try{
-          button.click();
-        }catch(e){}
-      },
-      600
-    );
-  }catch(e){
-    setStatus(
-      "❌ Không thể kết nối hệ thống.\n" +
-      "Vui lòng thử lại.",
-      "error"
-    );
-    showCopyButton(true);
-  }
+    return deviceId;
 }
-/* =========================================================
-   START
-   ========================================================= */
+/*
+==================================================
+LẤY ROOM ID / LINK TIKTOK
+==================================================
+*/
+function getTikTokUrl(){
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+    /*
+     * Ưu tiên ?url=
+     */
+    const urlParam =
+        params.get("url");
+    if(urlParam){
+        try{
+            return decodeURIComponent(
+                urlParam
+            );
+        }catch{
+            return urlParam;
+        }
+    }
+    /*
+     * Nếu không có ?url=
+     * dùng URL hiện tại.
+     */
+    return window.location.href;
+}
+/*
+==================================================
+LẤY ROOM ID
+==================================================
+*/
+function getRoomId(){
+    const url =
+        getTikTokUrl();
+    /*
+     * room_id=123456
+     */
+    const roomMatch =
+        url.match(
+            /[?&]room_id=(\d+)/i
+        );
+    if(roomMatch){
+        return roomMatch[1];
+    }
+    /*
+     * /live/123456
+     */
+    const liveMatch =
+        url.match(
+            /\/live\/(\d+)/i
+        );
+    if(liveMatch){
+        return liveMatch[1];
+    }
+    /*
+     * Một số link có room_id
+     * nằm trong chuỗi encode.
+     */
+    const decoded =
+        decodeSafe(url);
+    const encodedMatch =
+        decoded.match(
+            /room_id=(\d+)/i
+        );
+    if(encodedMatch){
+        return encodedMatch[1];
+    }
+    return "";
+}
+/*
+==================================================
+DECODE AN TOÀN
+==================================================
+*/
+function decodeSafe(value){
+    try{
+        return decodeURIComponent(
+            value
+        );
+    }catch{
+        return value;
+    }
+}
+/*
+==================================================
+KIỂM TRA WORKER
+==================================================
+*/
+async function checkDeviceOnN(
+    deviceId
+){
+    const url =
+        N_API +
+        "/check?device=" +
+        encodeURIComponent(
+            deviceId
+        ) +
+        "&t=" +
+        Date.now();
+    const response =
+        await fetch(
+            url,
+            {
+                method:"GET",
+                cache:"no-store",
+                headers:{
+                    "Accept":
+                        "application/json"
+                }
+            }
+        );
+    if(!response.ok){
+        throw new Error(
+            "Worker trả về HTTP " +
+            response.status
+        );
+    }
+    const data =
+        await response.json();
+    return data.approved === true;
+}
+/*
+==================================================
+HIỂN THỊ
+==================================================
+*/
+function showOnly(id){
+    const ids = [
+        "loading",
+        "notApproved",
+        "approved"
+    ];
+    ids.forEach(
+        item => {
+            const element =
+                document.getElementById(
+                    item
+                );
+            if(!element) return;
+            if(item === id){
+                element.classList.remove(
+                    "hidden"
+                );
+            }else{
+                element.classList.add(
+                    "hidden"
+                );
+            }
+        }
+    );
+}
+/*
+==================================================
+ERROR
+==================================================
+*/
+function showError(message){
+    const error =
+        document.getElementById(
+            "error"
+        );
+    error.textContent =
+        message;
+    error.classList.remove(
+        "hidden"
+    );
+}
+function hideError(){
+    document
+        .getElementById("error")
+        .classList
+        .add("hidden");
+}
+/*
+==================================================
+CHECK ACCESS
+==================================================
+*/
+async function checkAccess(){
+    hideError();
+    showOnly("loading");
+    const deviceId =
+        getDeviceId();
+    document
+        .getElementById("deviceId")
+        .textContent =
+        deviceId;
+    try{
+        /*
+         * Không gửi room_id
+         * khi kiểm tra quyền.
+         *
+         * Worker chỉ nhận device_id.
+         */
+        const approved =
+            await checkDeviceOnN(
+                deviceId
+            );
+        if(approved){
+            showOnly(
+                "approved"
+            );
+        }else{
+            showOnly(
+                "notApproved"
+            );
+        }
+    }catch(error){
+        console.error(
+            error
+        );
+        showOnly(
+            "notApproved"
+        );
+        showError(
+            "Không kết nối được hệ thống xác minh. " +
+            "Kiểm tra lại Worker API."
+        );
+    }
+}
+/*
+==================================================
+COPY DEVICE ID
+==================================================
+*/
+async function copyDeviceId(){
+    const deviceId =
+        getDeviceId();
+    const button =
+        document.getElementById(
+            "copyButton"
+        );
+    try{
+        await navigator.clipboard.writeText(
+            deviceId
+        );
+        button.textContent =
+            "✓ ĐÃ COPY";
+        setTimeout(
+            () => {
+                button.textContent =
+                    "COPY MÃ THIẾT BỊ";
+            },
+            1800
+        );
+    }catch{
+        /*
+         * Fallback cho trình duyệt
+         * không hỗ trợ clipboard API.
+         */
+        const textarea =
+            document.createElement(
+                "textarea"
+            );
+        textarea.value =
+            deviceId;
+        textarea.style.position =
+            "fixed";
+        textarea.style.opacity =
+            "0";
+        document.body.appendChild(
+            textarea
+        );
+        textarea.focus();
+        textarea.select();
+        try{
+            document.execCommand(
+                "copy"
+            );
+            button.textContent =
+                "✓ ĐÃ COPY";
+        }catch{
+            alert(
+                "Không thể tự copy. " +
+                "Hãy nhấn giữ mã thiết bị để sao chép."
+            );
+        }
+        textarea.remove();
+        setTimeout(
+            () => {
+                button.textContent =
+                    "COPY MÃ THIẾT BỊ";
+            },
+            1800
+        );
+    }
+}
+/*
+==================================================
+MỞ TIKTOK
+==================================================
+*/
+function openTikTok(){
+    const roomId =
+        getRoomId();
+    /*
+     * Không có room_id:
+     * không mở link linh tinh.
+     */
+    if(!roomId){
+        showError(
+            "Không tìm thấy room_id của phiên TikTok LIVE."
+        );
+        return;
+    }
+    /*
+     * Deep link TikTok.
+     */
+    const deepLink =
+        "snssdk1180://live?room_id=" +
+        encodeURIComponent(
+            roomId
+        );
+    /*
+     * Thử mở TikTok.
+     */
+    window.location.href =
+        deepLink;
+}
+/*
+==================================================
+KHỞI ĐỘNG
+==================================================
+*/
 document.addEventListener(
-  "DOMContentLoaded",
-  function(){
-    checkAccess();
-  }
+    "DOMContentLoaded",
+    () => {
+        /*
+         * Hiển thị device ID ngay từ đầu
+         * nhưng chưa cho người dùng thấy
+         * trước khi xác minh.
+         */
+        const deviceId =
+            getDeviceId();
+        document
+            .getElementById(
+                "deviceId"
+            )
+            .textContent =
+            deviceId;
+        checkAccess();
+    }
 );
 </script>
 </body>
