@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mở Phiên TikTok LIVE</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #080808;
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .container {
+      width: 100%;
+      max-width: 430px;
+    }
+    .card {
+      background: #111;
+      border: 1px solid #292929;
+      border-radius: 22px;
+      padding: 28px 22px;
+      box-shadow:
+        0 0 35px rgba(255, 44, 85, 0.08),
+        0 0 60px rgba(37, 244, 238, 0.03);
+      text-align: center;
+    }
+    .logo {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #ff2c55, #ff0050 45%, #25f4ee);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 900;
+      color: #fff;
+    }
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 800;
+    }
+    .subtitle {
+      margin-top: 8px;
+      color: #999;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .status {
+      margin-top: 22px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #181818;
+      border: 1px solid #292929;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+    .status.success {
+      border-color: rgba(37, 244, 238, 0.4);
+      color: #25f4ee;
+    }
+    .status.error {
+      border-color: rgba(255, 44, 85, 0.4);
+      color: #ff5475;
+    }
+    .device-box {
+      margin-top: 18px;
+      padding: 15px;
+      background: #0b0b0b;
+      border: 1px solid #252525;
+      border-radius: 14px;
+      text-align: left;
+    }
+    .device-title {
+      color: #888;
+      font-size: 12px;
+      margin-bottom: 7px;
+    }
+    .device-id {
+      word-break: break-all;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      color: #fff;
+      line-height: 1.5;
+    }
+    .open-area {
+      display: none;
+      margin-top: 22px;
+    }
+    .open-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 56px;
+      padding: 15px 20px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #ff0050, #ff2c55);
+      color: #fff;
+      text-decoration: none;
+      font-size: 17px;
+      font-weight: 800;
+      box-shadow: 0 8px 25px rgba(255, 0, 80, 0.25);
+    }
+    .open-button:active {
+      transform: scale(0.97);
+      opacity: 0.85;
+    }
+    .hint {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 12px;
+      background: #171717;
+      color: #999;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .hint strong {
+      color: #ddd;
+    }
+    .url-box {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 12px;
+      background: #0b0b0b;
+      border: 1px solid #222;
+      text-align: left;
+      display: none;
+    }
+    .url-label {
+      color: #777;
+      font-size: 11px;
+      margin-bottom: 6px;
+    }
+    .url-value {
+      color: #aaa;
+      font-size: 11px;
+      word-break: break-all;
+      line-height: 1.5;
+    }
+    .footer {
+      margin-top: 22px;
+      color: #555;
+      font-size: 11px;
+    }
+    .loading {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .spinner {
+      width: 15px;
+      height: 15px;
+      border: 2px solid #333;
+      border-top-color: #ff2c55;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <div class="logo">T</div>
+    <h1>Mở Phiên TikTok LIVE</h1>
+    <div class="subtitle">
+      Hệ thống đang kiểm tra quyền truy cập thiết bị
+    </div>
+
+    <div id="status" class="status">
+      <span class="loading">
+        <span class="spinner"></span>
+        Đang kiểm tra thiết bị...
+      </span>
+    </div>
+
+    <div class="device-box">
+      <div class="device-title">MÃ THIẾT BỊ</div>
+      <div id="deviceId" class="device-id">Đang tạo mã thiết bị...</div>
+    </div>
+
+    <!-- Chỉ hiện khi thiết bị đã được duyệt -->
+    <div id="urlBox" class="url-box">
+      <div class="url-label">PHIÊN LIVE</div>
+      <div id="urlValue" class="url-value"></div>
+    </div>
+
+    <div id="openArea" class="open-area">
+      <a id="openTikTok" class="open-button" href="#" rel="noopener">
+        MỞ PHIÊN LIVE
+      </a>
+      <div class="hint">
+        <strong>iPhone / iOS:</strong>
+        Hệ thống đã xác minh thiết bị.
+        Nếu TikTok không tự mở, hãy bấm
+        <strong>MỞ PHIÊN LIVE</strong>.
+      </div>
+    </div>
+
+    <div class="footer">
+      T.NAM • Device Access System
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   DANH SÁCH THIẾT BỊ ĐƯỢC PHÉP
+   ========================================================= */
+const APPROVED_DEVICES = [
+  /* ===== MÃ ===== */
+  "device_1a4e0e58-ecac-48d3-ab0f-8010cca59444",
+  "device_38bc3db0-4694-420b-b936-5530ad78fb6c",
+  "device_ed560ac0-4782-4d8d-87e7-940b0b9f5cd3",
+  "device_b449a06c-2790-4aea-af8e-f99f5d3b4f49",
+  "device_2f535d2e-2367-4742-afa0-d5ca49fe8bf8",
+  "device_6c419f8c-2920-4124-88d2-0ed3694e4884",
+  "device_4548081f-c77e-4f94-8850-4a1a49f2d762",
+  "device_34c51626-1556-40cb-9d4d-ee993f9592b7",
+  "device_90107526-dde3-4916-b519-8d0fad96137f",
+  "device_10",
+  "device_11",
+  "device_12",
+  "device_13",
+  "device_14",
+  "device_15",
+  "device_16",
+  "device_17",
+  "device_18",
+  "device_19",
+  "device_20",
+  "device_21",
+  "device_22",
+  "device_23",
+  "device_24",
+  "device_25",
+  "device_26",
+  "device_27",
+  "device_28",
+  "device_29",
+  "device_30",
+  "device_31",
+  "device_32",
+  "device_33",
+  "device_34",
+  "device_35",
+  "device_36",
+  "device_37",
+  "device_38",
+  "device_39",
+  "device_40",
+  "device_41",
+  "device_42",
+  "device_43",
+  "device_44",
+  "device_45",
+  "device_46",
+  "device_47",
+  "device_48",
+  "device_49",
+  "device_50",
+  "device_51",
+  "device_52",
+  "device_53",
+  "device_54",
+  "device_55",
+  "device_56",
+  "device_57",
+  "device_58",
+  "device_59",
+  "device_60",
+  "device_61",
+  "device_62",
+  "device_63",
+  "device_64",
+  "device_65",
+  "device_66",
+  "device_67",
+  "device_68",
+  "device_69",
+  "device_70",
+  "device_71",
+  "device_72",
+  "device_73",
+  "device_74",
+  "device_75",
+  "device_76",
+  "device_77",
+  "device_78",
+  "device_79",
+  "device_80",
+  "device_81",
+  "device_82",
+  "device_83",
+  "device_84",
+  "device_85",
+  "device_86",
+  "device_87",
+  "device_88",
+  "device_89",
+  "device_90",
+  "device_91",
+  "device_92",
+  "device_93",
+  "device_94",
+  "device_95",
+  "device_96",
+  "device_97",
+  "device_98",
+  "device_99",
+  "device_100"
+];
+
+const DEVICE_STORAGE_KEY = "shoplink_device_id";
+
+function createDeviceId() {
+  try {
+    if (window.crypto && typeof window.crypto.randomUUID === "function") {
+      return "device_" + window.crypto.randomUUID();
+    }
+  } catch (e) {}
+  const randomPart = Math.random().toString(36).substring(2, 12);
+  const timePart = Date.now().toString(36);
+  return "device_" + randomPart + "-" + timePart;
+}
+
+function getDeviceId() {
+  let deviceId = null;
+  try {
+    deviceId = localStorage.getItem(DEVICE_STORAGE_KEY);
+  } catch (e) {}
+  if (!deviceId || typeof deviceId !== "string" || !deviceId.startsWith("device_")) {
+    deviceId = createDeviceId();
+    try {
+      localStorage.setItem(DEVICE_STORAGE_KEY, deviceId);
+    } catch (e) {}
+  }
+  return deviceId;
+}
+
+function getQueryParameter(name) {
+  try {
+    const query = window.location.search.replace(/^\?/, "");
+    if (!query) return null;
+    const parts = query.split("&");
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      if (!part) continue;
+      const equalIndex = part.indexOf("=");
+      if (equalIndex === -1) continue;
+      const key = part.substring(0, equalIndex);
+      let value = part.substring(equalIndex + 1);
+      if (key === name) {
+        try { value = decodeURIComponent(value); } catch (e) {}
+        try {
+          if (value.includes("%3A") || value.includes("%2F") || value.includes("%3F")) {
+            value = decodeURIComponent(value);
+          }
+        } catch (e) {}
+        return value;
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
+function getTikTokUrl() {
+  const url = getQueryParameter("url");
+  return url ? url.trim() : null;
+}
+
+function isValidTikTokUrl(url) {
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    const hostname = parsed.hostname.toLowerCase();
+    const validHost = hostname === "tiktok.com" || hostname.endsWith(".tiktok.com");
+    return parsed.protocol === "https:" && validHost;
+  } catch (e) {
+    return false;
+  }
+}
+
+function extractRoomId(url) {
+  if (!url) return null;
+  let match = url.match(/room_id=(\d+)/);
+  if (match) return match[1];
+  match = url.match(/\/live\/(\d+)/);
+  if (match) return match[1];
+  return null;
+}
+
+function openTikTokDeepLink(roomId) {
+  window.location.href = "snssdk1180://live?room_id=" + roomId;
+  setTimeout(() => {
+    try { window.close(); } catch (e) {}
+    setTimeout(() => {
+      try { window.location.replace("about:blank"); } catch (e) {}
+    }, 400);
+  }, 1200);
+}
+
+function showDeviceId(deviceId) {
+  const el = document.getElementById("deviceId");
+  if (el) el.textContent = deviceId;
+}
+
+function setStatus(message, type = "") {
+  const status = document.getElementById("status");
+  if (!status) return;
+  status.className = "status " + type;
+  status.textContent = message;
+}
+
+function showUrl(url) {
+  const box = document.getElementById("urlBox");
+  const value = document.getElementById("urlValue");
+  if (!box || !value) return;
+  value.textContent = url;
+  box.style.display = "block";
+}
+
+function showOpenButton(roomId) {
+  const area = document.getElementById("openArea");
+  const button = document.getElementById("openTikTok");
+  if (!area || !button) return;
+
+  button.href = "snssdk1180://live?room_id=" + roomId;
+
+  button.onclick = function () {
+    setTimeout(() => {
+      try { window.close(); } catch (err) {}
+      setTimeout(() => {
+        try { window.location.replace("about:blank"); } catch (err) {}
+      }, 400);
+    }, 1200);
+  };
+
+  area.style.display = "block";
+}
+
+function autoClickTikTok() {
+  const button = document.getElementById("openTikTok");
+  if (!button) return;
+  setTimeout(function () {
+    try {
+      button.click();
+    } catch (e) {
+      console.log("Auto click error:", e);
+    }
+  }, 500);
+}
+
+function checkAccess() {
+  const deviceId = getDeviceId();
+  showDeviceId(deviceId);
+
+  const tiktokUrl = getTikTokUrl();
+  if (!tiktokUrl) {
+    setStatus("❌ Không tìm thấy link TikTok LIVE.", "error");
+    return;
+  }
+
+  if (!isValidTikTokUrl(tiktokUrl)) {
+    setStatus("❌ Link TikTok không hợp lệ.", "error");
+    return;
+  }
+
+  const approved = APPROVED_DEVICES.includes(deviceId);
+  if (!approved) {
+    setStatus("⛔ Thiết bị chưa được cấp phép.\nHãy gửi mã thiết bị cho Admin.", "error");
+    return; // Không hiện link LIVE
+  }
+
+  // Đã duyệt mới hiện
+  showUrl(tiktokUrl);
+
+  const roomId = extractRoomId(tiktokUrl);
+  if (!roomId) {
+    setStatus("❌ Không lấy được room_id từ link.", "error");
+    return;
+  }
+
+  setStatus("✅ Thiết bị đã được cấp phép. Đang mở phiên LIVE...", "success");
+  showOpenButton(roomId);
+  autoClickTikTok();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  checkAccess();
+});
+</script>
+</body>
+</html>
