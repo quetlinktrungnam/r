@@ -1,0 +1,49 @@
+{
+  "devices": [
+    {
+      "id": "device_1a4e0e58-ecac-48d3-ab0f-8010cca59444",
+      "note": "Admin",
+      "added_at": "2026-09-18 15:00"
+    },
+    {
+      "id": "device_38bc3db0-4694-420b-b936-5530ad78fb6c",
+      "note": "Admin 2",
+      "added_at": "2026-09-18 15:00"
+    },
+    {
+      "id": "device_ed560ac0-4782-4d8d-87e7-940b0b9f5cd3",
+      "note": "",
+      "added_at": "2026-09-18 15:00"
+    },
+    {
+      "id": "device_b449a06c-2790-4aea-af8e-f99f5d3b4f49",
+      "note": "",
+      "added_at": "2026-09-18 15:00"
+    },
+    {
+      "id": "device_2f535d2e-2367-4742-afa0-d5ca49fe8bf8",
+      "note": "",
+      "added_at": "2026-09-18 15:00"
+    },
+    {
+      "id": "device_6c419f8c-2920-4124-88d2-0ed3694e4884",
+      "note": "",
+      "added_at": "2026-09-18 15:00"
+    },
+    {
+      "id": "device_4548081f-c77e-4f94-8850-4a1a49f2d762",
+      "note": "",
+      "added_at": "2026-09-18 15:00"
+    },
+    {
+      "id": "device_34c51626-1556-40cb-9d4d-ee993f9592b7",
+      "note": "",
+      "added_at": "2026-09-18 15:00"
+    },
+    {
+      "id": "device_90107526-dde3-4916-b519-8d0fad96137f",
+      "note": "",
+      "added_at": "2026-09-18 15:00"
+    }
+  ]
+}
