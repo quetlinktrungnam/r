@@ -1,39 +1,57 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport"
       content="width=device-width,
                initial-scale=1.0,
                maximum-scale=1.0,
                user-scalable=no">
+
 <title>T.NAM</title>
+
 <style>
+
 *{
     box-sizing:border-box;
     -webkit-tap-highlight-color:transparent;
 }
-html,body{
+
+html,
+body{
     margin:0;
     padding:0;
     width:100%;
     min-height:100%;
     background:#050505;
     color:#fff;
-    font-family:-apple-system,BlinkMacSystemFont,
-                "Segoe UI",Arial,sans-serif;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
 }
+
 body{
     min-height:100vh;
+
     display:flex;
     justify-content:center;
     align-items:center;
+
     padding:20px;
 }
+
 .container{
     width:100%;
     max-width:430px;
 }
+
 .card{
     background:
         linear-gradient(
@@ -41,21 +59,31 @@ body{
             rgba(255,255,255,.07),
             rgba(255,255,255,.025)
         );
+
     border:1px solid rgba(255,255,255,.10);
+
     border-radius:24px;
+
     padding:28px 22px;
+
     box-shadow:
         0 20px 70px rgba(0,0,0,.65),
         inset 0 1px rgba(255,255,255,.05);
+
     backdrop-filter:blur(20px);
     -webkit-backdrop-filter:blur(20px);
 }
+
 .logo{
     text-align:center;
+
     font-size:34px;
     font-weight:900;
+
     letter-spacing:4px;
+
     margin-bottom:7px;
+
     background:
         linear-gradient(
             90deg,
@@ -63,69 +91,123 @@ body{
             #fff,
             #ff2c55
         );
+
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
 }
+
 .sub{
     text-align:center;
+
     color:#888;
+
     font-size:13px;
+
     margin-bottom:28px;
 }
+
 .status{
     padding:15px;
+
     border-radius:15px;
+
     background:rgba(255,255,255,.045);
+
     border:1px solid rgba(255,255,255,.07);
+
     text-align:center;
+
     margin-bottom:18px;
+
     font-size:14px;
 }
+
 .status.loading{
     color:#aaa;
 }
+
 .status.success{
     color:#25f4ee;
-    border-color:rgba(37,244,238,.25);
+
+    border-color:
+        rgba(37,244,238,.25);
 }
+
 .status.error{
     color:#ff667f;
-    border-color:rgba(255,44,85,.25);
+
+    border-color:
+        rgba(255,44,85,.25);
 }
+
+.status.warning{
+    color:#ffb347;
+
+    border-color:
+        rgba(255,179,71,.25);
+}
+
 .device-title{
     font-size:12px;
+
     color:#888;
+
     margin-bottom:8px;
 }
+
 .device-box{
     display:flex;
+
     align-items:center;
+
     gap:8px;
+
     background:#090909;
-    border:1px solid rgba(255,255,255,.08);
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+
     border-radius:14px;
+
     padding:5px;
 }
+
 .device-code{
     flex:1;
+
     min-width:0;
+
     padding:10px;
+
     font-family:monospace;
+
     font-size:11px;
+
     color:#ccc;
+
     word-break:break-all;
+
     line-height:1.4;
 }
+
 .copy-btn,
 .open-btn{
     border:0;
+
     cursor:pointer;
+
     color:#fff;
+
     font-weight:800;
+
     border-radius:11px;
+
     padding:11px 14px;
+
     white-space:nowrap;
 }
+
 .copy-btn{
     background:
         linear-gradient(
@@ -134,11 +216,16 @@ body{
             #ff0050
         );
 }
+
 .open-btn{
     width:100%;
+
     margin-top:15px;
+
     padding:15px;
+
     font-size:15px;
+
     background:
         linear-gradient(
             135deg,
@@ -146,184 +233,438 @@ body{
             #1677ff
         );
 }
+
 .copy-btn:active,
 .open-btn:active{
     transform:scale(.97);
 }
+
 .note{
     margin-top:15px;
+
     color:#777;
+
     text-align:center;
+
     font-size:12px;
+
     line-height:1.5;
 }
+
+.expiry{
+    margin-top:10px;
+
+    text-align:center;
+
+    font-size:12px;
+
+    color:#aaa;
+}
+
+.expiry strong{
+    color:#fff;
+}
+
 .hidden{
     display:none !important;
 }
+
 .spinner{
     width:20px;
     height:20px;
+
     margin:0 auto 10px;
-    border:2px solid rgba(255,255,255,.15);
+
+    border:
+        2px solid
+        rgba(255,255,255,.15);
+
     border-top-color:#25f4ee;
+
     border-radius:50%;
-    animation:spin .7s linear infinite;
+
+    animation:
+        spin .7s linear infinite;
 }
+
 @keyframes spin{
+
     to{
         transform:rotate(360deg);
     }
+
 }
+
 </style>
+
 </head>
+
+
 <body>
+
 <div class="container">
+
     <div class="card">
+
         <div class="logo">
             T.NAM
         </div>
+
         <div class="sub">
             XÁC MINH THIẾT BỊ
         </div>
+
+
         <!-- =========================
              ĐANG KIỂM TRA
         ========================== -->
+
         <div id="loadingBox"
              class="status loading">
+
             <div class="spinner"></div>
+
             Đang kiểm tra thiết bị...
+
         </div>
+
+
         <!-- =========================
              CHƯA ĐƯỢC CẤP PHÉP
         ========================== -->
+
         <div id="deniedBox"
              class="hidden">
+
             <div class="status error">
+
                 Thiết bị chưa được cấp phép
+
             </div>
+
+
             <div class="device-title">
+
                 Mã thiết bị của bạn
+
             </div>
+
+
             <div class="device-box">
+
                 <div id="deviceCode"
                      class="device-code">
                 </div>
+
+
                 <button id="copyBtn"
                         class="copy-btn">
+
                     COPY
+
                 </button>
+
             </div>
+
+
             <div class="note">
+
                 Hãy gửi mã thiết bị này cho
                 quản trị viên để được cấp phép.
+
             </div>
+
         </div>
+
+
         <!-- =========================
-             ĐƯỢC CẤP PHÉP
+             ĐÃ CẤP PHÉP
         ========================== -->
+
         <div id="approvedBox"
              class="hidden">
+
             <div class="status success">
+
                 ✓ Thiết bị đã được cấp phép
+
             </div>
-            <button id="openBtn"
-                    class="open-btn">
-                MỞ TIKTOK LIVE
-            </button>
+
+
+            <!-- CỘT B -->
+
             <div id="approvedNote"
                  class="note">
             </div>
+
+
+            <!-- CỘT C -->
+
+            <div id="expiryBox"
+                 class="expiry">
+            </div>
+
+
+            <button id="openBtn"
+                    class="open-btn">
+
+                MỞ TIKTOK LIVE
+
+            </button>
+
         </div>
+
+
+        <!-- =========================
+             HẾT HẠN
+        ========================== -->
+
+        <div id="expiredBox"
+             class="hidden">
+
+            <div class="status warning">
+
+                ⚠ Thiết bị đã hết hạn
+
+            </div>
+
+
+            <div id="expiredNote"
+                 class="note">
+            </div>
+
+
+            <div id="expiredDate"
+                 class="expiry">
+            </div>
+
+
+            <div class="note">
+
+                Thiết bị của bạn đã hết thời gian sử dụng.<br>
+
+                Vui lòng liên hệ admin để gia hạn.
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             LỖI
+        ========================== -->
+
+        <div id="errorBox"
+             class="hidden">
+
+            <div class="status error">
+
+                Không thể kiểm tra thiết bị
+
+            </div>
+
+
+            <div class="note">
+
+                Vui lòng kiểm tra kết nối mạng
+                hoặc quyền truy cập Google Sheet.
+
+            </div>
+
+        </div>
+
     </div>
+
 </div>
+
+
 <script>
+
+
 /* =========================================================
    CẤU HÌNH GOOGLE SHEET
 ========================================================= */
+
 const SHEET_ID =
 "1-e7G6GYM9eJSKOF1AOdATM4H2X-7erAaqj0VJUCD6T8";
+
+
 const SHEET_NAME =
 "Sheet1";
+
+
 /* =========================================================
    TẠO DEVICE ID
+   GIỮ NGUYÊN CODE CŨ
+
+   KHÔNG ĐỔI MÃ ĐÃ TẠO
 ========================================================= */
+
 function generateDeviceId(){
+
     const uuid =
         crypto.randomUUID();
+
+
     const bytes =
-        new TextEncoder().encode(uuid);
+        new TextEncoder()
+            .encode(uuid);
+
+
     let binary = "";
+
+
     bytes.forEach(byte => {
+
         binary +=
             String.fromCharCode(byte);
+
     });
+
+
     return btoa(binary);
+
 }
+
+
 /* =========================================================
    LẤY DEVICE ID
 ========================================================= */
+
 function getDeviceId(){
+
     let id =
         localStorage.getItem(
             "tnam_device_id"
         );
+
+
+    /*
+       Nếu đã có mã:
+
+       GIỮ NGUYÊN MÃ CŨ
+
+       Không tạo lại.
+    */
+
     if(!id){
+
         id =
             generateDeviceId();
+
+
         localStorage.setItem(
             "tnam_device_id",
             id
         );
+
     }
+
+
     return id;
+
 }
+
+
 /* =========================================================
    LẤY LINK TIKTOK
 ========================================================= */
+
 function getTikTokUrl(){
+
     const params =
         new URLSearchParams(
             window.location.search
         );
+
+
     return (
         params.get("url") ||
         params.get("u") ||
         ""
     );
+
 }
+
+
 /* =========================================================
    LẤY ROOM ID
 ========================================================= */
+
 function getRoomId(url){
+
     if(!url){
+
         return "";
+
     }
-    /* room_id=123456 */
+
+
+    /*
+       room_id=123456
+    */
+
     let match =
         url.match(
             /room_id=(\d+)/i
         );
+
+
     if(match){
+
         return match[1];
+
     }
-    /* /live/123456 */
+
+
+    /*
+       /live/123456
+    */
+
     match =
         url.match(
             /\/live\/(\d+)/i
         );
+
+
     if(match){
+
         return match[1];
+
     }
+
+
     return "";
+
 }
+
+
 /* =========================================================
    ĐỌC GOOGLE SHEET
+
+   A = MÃ THIẾT BỊ
+   B = GHI CHÚ
+   C = HẠN SỬ DỤNG
 ========================================================= */
+
 async function readGoogleSheet(){
+
+    /*
+       QUAN TRỌNG:
+
+       Trước đây:
+       select A,B
+
+       Bây giờ:
+       select A,B,C
+    */
+
     const query =
         encodeURIComponent(
-            "select A,B"
+            "select A,B,C"
         );
+
+
     const url =
         "https://docs.google.com/spreadsheets/d/" +
         SHEET_ID +
@@ -335,283 +676,839 @@ async function readGoogleSheet(){
         "&tq=" +
         query +
         "&headers=1";
+
+
     const response =
         await fetch(
+
             url +
             "&t=" +
             Date.now(),
+
             {
                 method:"GET",
                 cache:"no-store"
             }
+
         );
+
+
     if(!response.ok){
+
         throw new Error(
             "Không đọc được Google Sheet"
         );
+
     }
+
+
     const text =
         await response.text();
+
+
     const match =
         text.match(
             /google\.visualization\.Query\.setResponse\(([\s\S]+)\)/
         );
+
+
     if(!match){
+
         throw new Error(
             "Google Sheet không trả dữ liệu hợp lệ"
         );
+
     }
+
+
     const data =
         JSON.parse(
             match[1]
         );
+
+
     const rows =
         data?.table?.rows || [];
+
+
     const devices = [];
+
+
     rows.forEach(row => {
+
         const cells =
             row.c || [];
+
+
+        /*
+           CỘT A
+           MÃ THIẾT BỊ
+        */
+
         const device =
             cells[0]?.v != null
                 ? String(
                     cells[0].v
                   ).trim()
                 : "";
+
+
+        /*
+           CỘT B
+           GHI CHÚ
+        */
+
         const note =
             cells[1]?.v != null
                 ? String(
                     cells[1].v
                   ).trim()
                 : "";
+
+
+        /*
+           CỘT C
+           HẠN SỬ DỤNG
+        */
+
+        const expiry =
+            cells[2]?.v != null
+                ? String(
+                    cells[2].v
+                  ).trim()
+                : "";
+
+
         if(device){
+
             devices.push({
+
                 device:device,
-                note:note
+
+                note:note,
+
+                expiry:expiry
+
             });
+
         }
+
     });
+
+
     return devices;
+
 }
+
+
+/* =========================================================
+   PARSE HẠN
+
+   Ví dụ:
+
+   7:00 19/09/2026
+
+   = 07:00 ngày 19/09/2026
+========================================================= */
+
+function parseExpiry(value){
+
+    if(!value){
+
+        return null;
+
+    }
+
+
+    const text =
+        String(value)
+            .trim();
+
+
+    if(!text){
+
+        return null;
+
+    }
+
+
+    const match =
+        text.match(
+            /^(\d{1,2}):(\d{2})\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+        );
+
+
+    if(!match){
+
+        return null;
+
+    }
+
+
+    const hour =
+        Number(match[1]);
+
+
+    const minute =
+        Number(match[2]);
+
+
+    const day =
+        Number(match[3]);
+
+
+    const month =
+        Number(match[4]);
+
+
+    const year =
+        Number(match[5]);
+
+
+    if(
+        hour < 0 ||
+        hour > 23 ||
+        minute < 0 ||
+        minute > 59 ||
+        month < 1 ||
+        month > 12 ||
+        day < 1 ||
+        day > 31
+    ){
+
+        return null;
+
+    }
+
+
+    const date =
+        new Date(
+            year,
+            month - 1,
+            day,
+            hour,
+            minute,
+            0,
+            0
+        );
+
+
+    /*
+       Kiểm tra ngày hợp lệ
+    */
+
+    if(
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day ||
+        date.getHours() !== hour ||
+        date.getMinutes() !== minute
+    ){
+
+        return null;
+
+    }
+
+
+    return date;
+
+}
+
+
+/* =========================================================
+   FORMAT NGÀY
+========================================================= */
+
+function formatDate(date){
+
+    if(!date){
+
+        return "";
+
+    }
+
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(2,"0");
+
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(2,"0");
+
+
+    const year =
+        date.getFullYear();
+
+
+    const hour =
+        String(
+            date.getHours()
+        ).padStart(2,"0");
+
+
+    const minute =
+        String(
+            date.getMinutes()
+        ).padStart(2,"0");
+
+
+    return (
+        hour +
+        ":" +
+        minute +
+        " " +
+        day +
+        "/" +
+        month +
+        "/" +
+        year
+    );
+
+}
+
+
+/* =========================================================
+   ẨN TẤT CẢ
+========================================================= */
+
+function hideAll(){
+
+    document
+        .getElementById("loadingBox")
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById("deniedBox")
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById("approvedBox")
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById("expiredBox")
+        .classList
+        .add("hidden");
+
+
+    document
+        .getElementById("errorBox")
+        .classList
+        .add("hidden");
+
+}
+
+
+/* =========================================================
+   CHƯA ĐƯỢC DUYỆT
+========================================================= */
+
+function showDenied(){
+
+    hideAll();
+
+
+    document
+        .getElementById("deniedBox")
+        .classList
+        .remove("hidden");
+
+}
+
+
+/* =========================================================
+   ĐÃ DUYỆT - CÒN HẠN
+========================================================= */
+
+function showApproved(
+    note,
+    expiry
+){
+
+    hideAll();
+
+
+    document
+        .getElementById("approvedBox")
+        .classList
+        .remove("hidden");
+
+
+    const noteBox =
+        document.getElementById(
+            "approvedNote"
+        );
+
+
+    const expiryBox =
+        document.getElementById(
+            "expiryBox"
+        );
+
+
+    /*
+       HIỂN THỊ CỘT B
+    */
+
+    if(note){
+
+        noteBox.textContent =
+            "Ghi chú: " +
+            note;
+
+    }else{
+
+        noteBox.textContent =
+            "";
+
+    }
+
+
+    /*
+       HIỂN THỊ CỘT C
+    */
+
+    if(expiry){
+
+        expiryBox.innerHTML =
+            "Hạn sử dụng: <strong>" +
+            formatDate(expiry) +
+            "</strong>";
+
+    }else{
+
+        expiryBox.innerHTML =
+            "Hạn sử dụng: <strong>VÔ HẠN</strong>";
+
+    }
+
+
+    /*
+       TỰ ĐỘNG MỞ TIKTOK
+    */
+
+    setTimeout(
+        openTikTok,
+        500
+    );
+
+}
+
+
+/* =========================================================
+   HẾT HẠN
+========================================================= */
+
+function showExpired(
+    note,
+    expiry
+){
+
+    hideAll();
+
+
+    document
+        .getElementById("expiredBox")
+        .classList
+        .remove("hidden");
+
+
+    const noteBox =
+        document.getElementById(
+            "expiredNote"
+        );
+
+
+    if(note){
+
+        noteBox.textContent =
+            "Ghi chú: " +
+            note;
+
+    }else{
+
+        noteBox.textContent =
+            "";
+
+    }
+
+
+    document
+        .getElementById(
+            "expiredDate"
+        )
+        .innerHTML =
+            "Đã hết hạn lúc: <strong>" +
+            formatDate(expiry) +
+            "</strong>";
+
+}
+
+
+/* =========================================================
+   LỖI
+========================================================= */
+
+function showError(){
+
+    hideAll();
+
+
+    document
+        .getElementById("errorBox")
+        .classList
+        .remove("hidden");
+
+}
+
+
 /* =========================================================
    KIỂM TRA THIẾT BỊ
 ========================================================= */
+
 async function checkDevice(){
+
+    /*
+       LẤY MÃ CŨ
+
+       Không tạo lại nếu localStorage
+       đã có mã.
+    */
+
     const deviceId =
         getDeviceId();
+
+
+    /*
+       HIỂN THỊ MÃ
+    */
+
     document
         .getElementById(
             "deviceCode"
         )
         .textContent =
-        deviceId;
+            deviceId;
+
+
     try{
+
+        /*
+           ĐỌC GOOGLE SHEET
+        */
+
         const devices =
             await readGoogleSheet();
+
+
+        /*
+           TÌM MÃ Ở CỘT A
+
+           Không thêm "device_".
+        */
+
         const found =
             devices.find(
                 item =>
-                    item.device ===
-                    deviceId
+                    item.device.trim() ===
+                    deviceId.trim()
             );
-        if(found){
-            showApproved(
-                found.note
-            );
-        }else{
+
+
+        /*
+           KHÔNG CÓ MÃ
+           => CHƯA DUYỆT
+        */
+
+        if(!found){
+
             showDenied();
+
+            return;
+
         }
+
+
+        /*
+           CỘT C TRỐNG
+           => VÔ HẠN
+        */
+
+        if(!found.expiry){
+
+            showApproved(
+                found.note,
+                null
+            );
+
+            return;
+
+        }
+
+
+        /*
+           ĐỌC HẠN CỘT C
+        */
+
+        const expiry =
+            parseExpiry(
+                found.expiry
+            );
+
+
+        /*
+           CỘT C SAI ĐỊNH DẠNG
+        */
+
+        if(!expiry){
+
+            console.error(
+                "Sai định dạng hạn:",
+                found.expiry
+            );
+
+
+            showError();
+
+            return;
+
+        }
+
+
+        /*
+           SO SÁNH THỜI GIAN
+
+           Đúng chính xác thời điểm
+           hết hạn => hết hạn.
+        */
+
+        const now =
+            new Date();
+
+
+        if(
+            now.getTime() >=
+            expiry.getTime()
+        ){
+
+            showExpired(
+                found.note,
+                expiry
+            );
+
+            return;
+
+        }
+
+
+        /*
+           CÒN HẠN
+        */
+
+        showApproved(
+            found.note,
+            expiry
+        );
+
     }catch(error){
-        console.error(error);
+
+        console.error(
+            error
+        );
+
+
         showError();
+
     }
+
 }
+
+
 /* =========================================================
-   HIỂN THỊ CHƯA DUYỆT
+   COPY MÃ THIẾT BỊ
 ========================================================= */
-function showDenied(){
-    document
-        .getElementById(
-            "loadingBox"
-        )
-        .classList
-        .add("hidden");
-    document
-        .getElementById(
-            "deniedBox"
-        )
-        .classList
-        .remove("hidden");
-    document
-        .getElementById(
-            "approvedBox"
-        )
-        .classList
-        .add("hidden");
-}
-/* =========================================================
-   HIỂN THỊ ĐÃ DUYỆT
-========================================================= */
-function showApproved(note){
-    document
-        .getElementById(
-            "loadingBox"
-        )
-        .classList
-        .add("hidden");
-    document
-        .getElementById(
-            "deniedBox"
-        )
-        .classList
-        .add("hidden");
-    document
-        .getElementById(
-            "approvedBox"
-        )
-        .classList
-        .remove("hidden");
-    const noteBox =
-        document.getElementById(
-            "approvedNote"
-        );
-    if(note){
-        noteBox.textContent =
-            "Ghi chú: " + note;
-    }else{
-        noteBox.textContent = "";
-    }
-    /*
-       Tự động mở TikTok
-    */
-    setTimeout(
-        openTikTok,
-        500
-    );
-}
-/* =========================================================
-   HIỂN THỊ LỖI
-========================================================= */
-function showError(){
-    const box =
-        document.getElementById(
-            "loadingBox"
-        );
-    box.className =
-        "status error";
-    box.innerHTML =
-        "Không thể đọc Google Sheet.<br>" +
-        "<small>" +
-        "Kiểm tra quyền chia sẻ của Google Sheet." +
-        "</small>";
-}
-/* =========================================================
-   COPY DEVICE ID
-========================================================= */
+
 async function copyDevice(){
+
     const id =
         getDeviceId();
+
+
     try{
-        await navigator.clipboard
+
+        await navigator
+            .clipboard
             .writeText(id);
+
+
         const btn =
             document.getElementById(
                 "copyBtn"
             );
+
+
         const old =
             btn.textContent;
+
+
         btn.textContent =
             "ĐÃ COPY";
+
+
         setTimeout(
+
             () => {
+
                 btn.textContent =
                     old;
+
             },
+
             1500
+
         );
+
     }catch{
+
         const input =
             document.createElement(
                 "textarea"
             );
+
+
         input.value =
             id;
+
+
         input.style.position =
             "fixed";
+
+
         input.style.opacity =
             "0";
+
+
         document.body.appendChild(
             input
         );
+
+
         input.select();
+
+
         document.execCommand(
             "copy"
         );
+
+
         input.remove();
+
     }
+
 }
+
+
 /* =========================================================
-   TỰ ĐÓNG TRANG SAU KHI MỞ TIKTOK
+   ĐÓNG TRANG SAU KHI MỞ TIKTOK
 ========================================================= */
+
 function closePageAfterOpen(){
+
     setTimeout(() => {
-        /*
-           Thử đóng tab/cửa sổ
-        */
+
         try{
+
             window.close();
+
         }catch(e){}
-        /*
-           Nếu iOS/Safari không cho đóng,
-           chuyển trang trung gian thành
-           about:blank.
-        */
+
+
         setTimeout(() => {
+
             try{
+
                 window.location.replace(
                     "about:blank"
                 );
+
             }catch(e){}
-        }, 400);
-    }, 1200);
+
+        },400);
+
+    },1200);
+
 }
+
+
 /* =========================================================
    MỞ TIKTOK
 ========================================================= */
+
 function openTikTok(){
+
     const originalUrl =
         getTikTokUrl();
+
+
     const roomId =
         getRoomId(
             originalUrl
         );
+
+
     /*
        Không có room ID
     */
+
     if(!roomId){
+
         return;
+
     }
+
+
     /*
        Deep link TikTok iOS
     */
+
     const deepLink =
         "snssdk1180://live?room_id=" +
         encodeURIComponent(
             roomId
         );
+
+
     /*
-       Chuyển sang TikTok
+       Mở TikTok
     */
+
     window.location.href =
         deepLink;
+
+
     /*
-       Sau khi mở TikTok:
-       thử đóng trang trung gian
+       Đóng trang trung gian
     */
+
     closePageAfterOpen();
+
 }
+
+
 /* =========================================================
    NÚT COPY
 ========================================================= */
+
 document
     .getElementById(
         "copyBtn"
@@ -620,9 +1517,12 @@ document
         "click",
         copyDevice
     );
+
+
 /* =========================================================
    NÚT MỞ TIKTOK
 ========================================================= */
+
 document
     .getElementById(
         "openBtn"
@@ -631,10 +1531,16 @@ document
         "click",
         openTikTok
     );
+
+
 /* =========================================================
    CHẠY KIỂM TRA
 ========================================================= */
+
 checkDevice();
+
 </script>
+
 </body>
+
 </html>
