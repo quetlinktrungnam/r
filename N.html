@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+
+<meta
+name=“viewport”
+content=“width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no”
+
+<title>N</title>
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+html,body{
+  margin:0;
+  padding:0;
+  min-height:100%;
+  background:#070707;
+  color:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,
+    "Segoe UI",Roboto,Arial,sans-serif;
+}
+body{
+  padding:16px;
+}
+.container{
+  width:100%;
+  max-width:760px;
+  margin:auto;
+}
+/* =========================
+   CARD
+   ========================= */
+.card{
+  background:#111;
+  border:1px solid #292929;
+  border-radius:20px;
+  padding:20px;
+  box-shadow:
+    0 15px 50px rgba(0,0,0,.45);
+}
+/* =========================
+   LOGO
+   ========================= */
+.logo{
+  width:56px;
+  height:56px;
+  border-radius:17px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    linear-gradient(
+      135deg,
+      #ff0050,
+      #ff2c55,
+      #25f4ee
+    );
+  font-size:26px;
+  font-weight:900;
+  margin-bottom:15px;
+}
+/* =========================
+   TEXT
+   ========================= */
+h1{
+  margin:0;
+  font-size:23px;
+  font-weight:800;
+}
+.subtitle{
+  margin-top:5px;
+  color:#888;
+  font-size:13px;
+}
+/* =========================
+   INPUT
+   ========================= */
+input,
+textarea{
+  width:100%;
+  background:#090909;
+  color:#fff;
+  border:1px solid #292929;
+  border-radius:12px;
+  padding:13px;
+  outline:none;
+  font-size:14px;
+}
+input:focus,
+textarea:focus{
+  border-color:#ff2c55;
+}
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
+/* =========================
+   BUTTON
+   ========================= */
+button{
+  border:0;
+  border-radius:11px;
+  padding:12px 14px;
+  color:#fff;
+  font-size:13px;
+  font-weight:800;
+  cursor:pointer;
+}
+button:active{
+  transform:scale(.98);
+  opacity:.85;
+}
+.btn-main{
+  width:100%;
+  margin-top:12px;
+  background:
+    linear-gradient(
+      135deg,
+      #ff0050,
+      #ff2c55
+    );
+}
+.btn-add{
+  background:#059669;
+}
+.btn-edit{
+  background:#374151;
+}
+.btn-delete{
+  background:#b91c1c;
+}
+.btn-cancel{
+  background:#333;
+}
+/* =========================
+   LOGIN
+   ========================= */
+.login{
+  max-width:390px;
+  margin:80px auto;
+}
+.login-input{
+  margin-top:22px;
+}
+/* =========================
+   STATUS
+   ========================= */
+.status{
+  margin-top:15px;
+  padding:12px;
+  border-radius:11px;
+  background:#181818;
+  border:1px solid #292929;
+  color:#999;
+  font-size:13px;
+  white-space:pre-line;
+}
+.status.success{
+  color:#25f4ee;
+  border-color:rgba(37,244,238,.35);
+}
+.status.error{
+  color:#ff5475;
+  border-color:rgba(255,44,85,.35);
+}
+/* =========================
+   STATS
+   ========================= */
+.stats{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+}
+.stat{
+  flex:1;
+  background:#0b0b0b;
+  border:1px solid #252525;
+  border-radius:13px;
+  padding:13px;
+}
+.stat b{
+  display:block;
+  font-size:21px;
+}
+.stat span{
+  display:block;
+  margin-top:3px;
+  color:#777;
+  font-size:10px;
+}
+/* =========================
+   TOOLBAR
+   ========================= */
+.toolbar{
+  display:flex;
+  gap:9px;
+  margin-top:15px;
+}
+.toolbar input{
+  flex:1;
+}
+.toolbar button{
+  min-width:80px;
+}
+/* =========================
+   DEVICE
+   ========================= */
+.device{
+  margin-top:12px;
+  background:#0b0b0b;
+  border:1px solid #272727;
+  border-radius:15px;
+  padding:15px;
+}
+.device-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.device-id{
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+  font-size:12px;
+  line-height:1.55;
+  word-break:break-all;
+  color:#fff;
+}
+.badge{
+  flex-shrink:0;
+  padding:5px 8px;
+  border-radius:8px;
+  background:
+    rgba(37,244,238,.1);
+  color:#25f4ee;
+  font-size:9px;
+  font-weight:800;
+}
+.note{
+  margin-top:10px;
+  color:#aaa;
+  font-size:13px;
+  line-height:1.45;
+}
+.created{
+  margin-top:7px;
+  color:#555;
+  font-size:10px;
+}
+.actions{
+  display:flex;
+  gap:7px;
+  margin-top:13px;
+}
+.actions button{
+  flex:1;
+}
+/* =========================
+   EMPTY
+   ========================= */
+.empty{
+  padding:40px 10px;
+  text-align:center;
+  color:#666;
+  font-size:13px;
+}
+/* =========================
+   MODAL
+   ========================= */
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  background:
+    rgba(0,0,0,.82);
+  z-index:999;
+}
+.modal-box{
+  width:100%;
+  max-width:430px;
+  background:#111;
+  border:1px solid #292929;
+  border-radius:18px;
+  padding:20px;
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.6);
+}
+.modal-title{
+  margin:0;
+  font-size:19px;
+  font-weight:800;
+}
+.modal-id{
+  margin-top:15px;
+}
+.modal-note{
+  margin-top:10px;
+}
+.modal-actions{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+.modal-actions button{
+  flex:1;
+}
+/* =========================
+   HIDDEN
+   ========================= */
+.hidden{
+  display:none !important;
+}
+/* =========================
+   MOBILE
+   ========================= */
+@media(max-width:520px){
+  body{
+    padding:10px;
+  }
+  .card{
+    padding:16px;
+    border-radius:17px;
+  }
+  .toolbar{
+    flex-direction:column;
+  }
+  .toolbar button{
+    width:100%;
+  }
+  .device-top{
+    flex-direction:column;
+  }
+  .badge{
+    width:max-content;
+  }
+  .actions{
+    flex-direction:column;
+  }
+}
+</style>
+</head>
+<body>
+<!-- =====================================================
+     MÀN HÌNH NHẬP MÃ
+     ===================================================== -->
+<div
+  id="loginScreen"
+  class="container login"
+>
+  <div class="card">
+<div class="logo">
+  N
+</div>
+<h1>
+  N
+</h1>
+<div class="subtitle">
+  Nhập mã để tiếp tục
+</div>
+<div class="login-input">
+  <input
+    id="loginPassword"
+    type="password"
+    placeholder="Nhập mã"
+    autocomplete="off"
+    autocapitalize="off"
+    spellcheck="false"
+  >
+</div>
+<button
+  class="btn-main"
+  id="loginButton"
+>
+  TIẾP TỤC
+</button>
+<div
+  id="loginStatus"
+  class="status hidden"
+></div>
+  </div>
+</div>
+<!-- =====================================================
+     NỘI DUNG N
+     ===================================================== -->
+<div
+  id="mainApp"
+  class="container hidden"
+>
+  <div class="card">
+<div class="logo">
+  N
+</div>
+<h1>
+  Thiết bị
+</h1>
+<div class="subtitle">
+  Quản lý mã thiết bị được cấp phép
+</div>
+<!-- =====================
+     THỐNG KÊ
+     ===================== -->
+<div class="stats">
+  <div class="stat">
+    <b id="totalCount">
+      0
+    </b>
+    <span>
+      TỔNG THIẾT BỊ
+    </span>
+  </div>
+  <div class="stat">
+    <b id="approvedCount">
+      0
+    </b>
+    <span>
+      ĐÃ DUYỆT
+    </span>
+  </div>
+</div>
+<!-- =====================
+     TÌM KIẾM + THÊM
+     ===================== -->
+<div class="toolbar">
+  <input
+    id="searchInput"
+    type="text"
+    placeholder="Tìm mã hoặc ghi chú..."
+    autocomplete="off"
+  >
+  <button
+    class="btn-add"
+    id="addButton"
+  >
+    + THÊM
+  </button>
+</div>
+<!-- =====================
+     STATUS
+     ===================== -->
+<div
+  id="mainStatus"
+  class="status hidden"
+></div>
+<!-- =====================
+     LIST
+     ===================== -->
+<div id="deviceList">
+  <div class="empty">
+    Đang tải...
+  </div>
+</div>
+  </div>
+</div>
+<!-- =====================================================
+     MODAL
+     ===================================================== -->
+<div
+  id="modal"
+  class="modal"
+>
+  <div class="modal-box">
+<h2
+  id="modalTitle"
+  class="modal-title"
+>
+  Thêm thiết bị
+</h2>
+<input
+  id="modalDevice"
+  class="modal-id"
+  type="text"
+  placeholder="Mã thiết bị"
+  autocomplete="off"
+  autocapitalize="off"
+  spellcheck="false"
+>
+<textarea
+  id="modalNote"
+  class="modal-note"
+  placeholder="Ghi chú..."
+></textarea>
+<div class="modal-actions">
+  <button
+    class="btn-cancel"
+    id="cancelButton"
+  >
+    HỦY
+  </button>
+  <button
+    class="btn-add"
+    id="saveButton"
+  >
+    LƯU
+  </button>
+</div>
+  </div>
+</div>
+<script>
+/* =========================================================
+   CẤU HÌNH
+   ========================================================= */
+/*
+  Mã truy cập trang N
+*/
+const ACCESS_CODE =
+  "nam1408";
+/*
+  Dữ liệu thiết bị được lưu ở đây.
+  Đổi URL này thành Worker/API của bạn.
+  Ví dụ:
+  https://device-api.tenmiencuaban.workers.dev
+*/
+const API_URL =
+  "https://YOUR-WORKER.workers.dev";
+/*
+  Phiên đăng nhập chỉ tồn tại
+  trong tab hiện tại.
+*/
+const SESSION_KEY =
+  "N_DEVICE_ACCESS";
+/* =========================================================
+   BIẾN
+   ========================================================= */
+let devices = [];
+let editIndex = -1;
+/* =========================================================
+   ELEMENT
+   ========================================================= */
+const loginScreen =
+  document.getElementById(
+    "loginScreen"
+  );
+const mainApp =
+  document.getElementById(
+    "mainApp"
+  );
+const loginPassword =
+  document.getElementById(
+    "loginPassword"
+  );
+const loginButton =
+  document.getElementById(
+    "loginButton"
+  );
+const loginStatus =
+  document.getElementById(
+    "loginStatus"
+  );
+const searchInput =
+  document.getElementById(
+    "searchInput"
+  );
+const deviceList =
+  document.getElementById(
+    "deviceList"
+  );
+const modal =
+  document.getElementById(
+    "modal"
+  );
+const modalTitle =
+  document.getElementById(
+    "modalTitle"
+  );
+const modalDevice =
+  document.getElementById(
+    "modalDevice"
+  );
+const modalNote =
+  document.getElementById(
+    "modalNote"
+  );
+const saveButton =
+  document.getElementById(
+    "saveButton"
+  );
+const cancelButton =
+  document.getElementById(
+    "cancelButton"
+  );
+const addButton =
+  document.getElementById(
+    "addButton"
+  );
+/* =========================================================
+   STATUS
+   ========================================================= */
+function setLoginStatus(
+  text,
+  type=""
+){
+  loginStatus.className =
+    "status " + type;
+  loginStatus.textContent =
+    text;
+}
+function setMainStatus(
+  text,
+  type=""
+){
+  const el =
+    document.getElementById(
+      "mainStatus"
+    );
+  el.className =
+    "status " + type;
+  el.textContent =
+    text;
+}
+/* =========================================================
+   ĐĂNG NHẬP
+   ========================================================= */
+function login(){
+  const value =
+    loginPassword.value.trim();
+  if(!value){
+    setLoginStatus(
+      "Vui lòng nhập mã.",
+      "error"
+    );
+    return;
+  }
+  if(value !== ACCESS_CODE){
+    setLoginStatus(
+      "❌ Mã không đúng.",
+      "error"
+    );
+    loginPassword.value = "";
+    loginPassword.focus();
+    return;
+  }
+  sessionStorage.setItem(
+    SESSION_KEY,
+    "1"
+  );
+  loginScreen.classList.add(
+    "hidden"
+  );
+  mainApp.classList.remove(
+    "hidden"
+  );
+  loadDevices();
+}
+/* =========================================================
+   ENTER
+   ========================================================= */
+loginPassword.addEventListener(
+  "keydown",
+  function(event){
+    if(event.key === "Enter"){
+      login();
+    }
+  }
+);
+loginButton.addEventListener(
+  "click",
+  login
+);
+/* =========================================================
+   API
+   ========================================================= */
+async function api(
+  path,
+  options={}
+){
+  const response =
+    await fetch(
+      API_URL + path,
+      {
+        cache:"no-store",
+        ...options,
+        headers:{
+          "Content-Type":
+            "application/json",
+          ...(options.headers || {})
+        }
+      }
+    );
+  let data = null;
+  try{
+    data =
+      await response.json();
+  }catch(e){
+    data = {};
+  }
+  if(!response.ok){
+    throw new Error(
+      data.message ||
+      "Không thể kết nối hệ thống."
+    );
+  }
+  return data;
+}
+/* =========================================================
+   LOAD DEVICE
+   ========================================================= */
+async function loadDevices(){
+  deviceList.innerHTML =
+    '<div class="empty">Đang tải...</div>';
+  try{
+    /*
+      API này lấy danh sách thiết bị
+      mà N đã lưu.
+    */
+    const data =
+      await api(
+        "/devices"
+      );
+    devices =
+      Array.isArray(
+        data.devices
+      )
+      ?
+      data.devices
+      :
+      [];
+    render();
+  }catch(error){
+    deviceList.innerHTML =
+      `
+      <div class="empty">
+        Không tải được danh sách.
+      </div>
+      `;
+    setMainStatus(
+      "❌ " +
+      error.message,
+      "error"
+    );
+  }
+}
+/* =========================================================
+   RENDER
+   ========================================================= */
+function render(){
+  const keyword =
+    searchInput.value
+      .trim()
+      .toLowerCase();
+  const filtered =
+    devices.filter(
+      item => {
+        const id =
+          String(
+            item.id || ""
+          ).toLowerCase();
+        const note =
+          String(
+            item.note || ""
+          ).toLowerCase();
+        return (
+          id.includes(keyword) ||
+          note.includes(keyword)
+        );
+      }
+    );
+  document.getElementById(
+    "totalCount"
+  ).textContent =
+    devices.length;
+  document.getElementById(
+    "approvedCount"
+  ).textContent =
+    devices.length;
+  if(!filtered.length){
+    deviceList.innerHTML =
+      `
+      <div class="empty">
+        Không có thiết bị.
+      </div>
+      `;
+    return;
+  }
+  deviceList.innerHTML =
+    filtered.map(
+      item => {
+        const index =
+          devices.indexOf(
+            item
+          );
+        const id =
+          escapeHtml(
+            item.id
+          );
+        const note =
+          escapeHtml(
+            item.note ||
+            "Chưa có ghi chú"
+          );
+        const created =
+          item.created_at
+          ?
+          escapeHtml(
+            item.created_at
+          )
+          :
+          "";
+        return `
+          <div class="device">
+            <div class="device-top">
+              <div class="device-id">
+                ${id}
+              </div>
+              <div class="badge">
+                ĐÃ DUYỆT
+              </div>
+            </div>
+            <div class="note">
+              📝 ${note}
+            </div>
+            ${
+              created
+              ?
+              `
+              <div class="created">
+                ${created}
+              </div>
+              `
+              :
+              ""
+            }
+            <div class="actions">
+              <button
+                class="btn-edit"
+                onclick="editDevice(${index})"
+              >
+                SỬA GHI CHÚ
+              </button>
+              <button
+                class="btn-delete"
+                onclick="removeDevice(${index})"
+              >
+                XÓA
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    ).join("");
+}
+/* =========================================================
+   ESCAPE HTML
+   ========================================================= */
+function escapeHtml(value){
+  return String(
+    value ?? ""
+  )
+  .replaceAll(
+    "&",
+    "&amp;"
+  )
+  .replaceAll(
+    "<",
+    "&lt;"
+  )
+  .replaceAll(
+    ">",
+    "&gt;"
+  )
+  .replaceAll(
+    '"',
+    "&quot;"
+  )
+  .replaceAll(
+    "'",
+    "&#039;"
+  );
+}
+/* =========================================================
+   THÊM
+   ========================================================= */
+function openAdd(){
+  editIndex = -1;
+  modalTitle.textContent =
+    "Thêm thiết bị";
+  modalDevice.value =
+    "";
+  modalNote.value =
+    "";
+  modalDevice.disabled =
+    false;
+  modal.style.display =
+    "flex";
+  setTimeout(
+    function(){
+      modalDevice.focus();
+    },
+    50
+  );
+}
+addButton.addEventListener(
+  "click",
+  openAdd
+);
+/* =========================================================
+   SỬA
+   ========================================================= */
+function editDevice(index){
+  const item =
+    devices[index];
+  if(!item) return;
+  editIndex =
+    index;
+  modalTitle.textContent =
+    "Sửa ghi chú";
+  modalDevice.value =
+    item.id || "";
+  modalNote.value =
+    item.note || "";
+  /*
+    Không cho sửa ID.
+  */
+  modalDevice.disabled =
+    true;
+  modal.style.display =
+    "flex";
+  setTimeout(
+    function(){
+      modalNote.focus();
+    },
+    50
+  );
+}
+/* =========================================================
+   ĐÓNG MODAL
+   ========================================================= */
+function closeModal(){
+  modal.style.display =
+    "none";
+}
+cancelButton.addEventListener(
+  "click",
+  closeModal
+);
+/* =========================================================
+   LƯU
+   ========================================================= */
+async function saveDevice(){
+  const id =
+    modalDevice.value.trim();
+  const note =
+    modalNote.value.trim();
+  if(!id){
+    alert(
+      "Vui lòng nhập mã thiết bị."
+    );
+    return;
+  }
+  try{
+    saveButton.disabled =
+      true;
+    saveButton.textContent =
+      "ĐANG LƯU...";
+    /*
+      THÊM
+    */
+    if(editIndex === -1){
+      await api(
+        "/devices",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            id,
+            note
+          })
+        }
+      );
+      setMainStatus(
+        "✅ Đã duyệt thiết bị.",
+        "success"
+      );
+    }
+    /*
+      SỬA
+    */
+    else{
+      await api(
+        "/devices/" +
+        encodeURIComponent(
+          id
+        ),
+        {
+          method:"PUT",
+          body:JSON.stringify({
+            note
+          })
+        }
+      );
+      setMainStatus(
+        "✅ Đã cập nhật ghi chú.",
+        "success"
+      );
+    }
+    closeModal();
+    await loadDevices();
+  }catch(error){
+    setMainStatus(
+      "❌ " +
+      error.message,
+      "error"
+    );
+  }finally{
+    saveButton.disabled =
+      false;
+    saveButton.textContent =
+      "LƯU";
+  }
+}
+saveButton.addEventListener(
+  "click",
+  saveDevice
+);
+/* =========================================================
+   XÓA
+   ========================================================= */
+async function removeDevice(index){
+  const item =
+    devices[index];
+  if(!item) return;
+  const confirmed =
+    confirm(
+      "Bạn có chắc muốn xóa mã này?\n\n" +
+      item.id
+    );
+  if(!confirmed)
+    return;
+  try{
+    setMainStatus(
+      "Đang xóa..."
+    );
+    await api(
+      "/devices/" +
+      encodeURIComponent(
+        item.id
+      ),
+      {
+        method:"DELETE"
+      }
+    );
+    setMainStatus(
+      "✅ Đã xóa thiết bị.",
+      "success"
+    );
+    await loadDevices();
+  }catch(error){
+    setMainStatus(
+      "❌ " +
+      error.message,
+      "error"
+    );
+  }
+}
+/* =========================================================
+   TÌM KIẾM
+   ========================================================= */
+searchInput.addEventListener(
+  "input",
+  render
+);
+/* =========================================================
+   CLICK RA NGOÀI MODAL
+   ========================================================= */
+modal.addEventListener(
+  "click",
+  function(event){
+    if(
+      event.target === modal
+    ){
+      closeModal();
+    }
+  }
+);
+/* =========================================================
+   SESSION
+   ========================================================= */
+(function(){
+  const logged =
+    sessionStorage.getItem(
+      SESSION_KEY
+    );
+  if(logged === "1"){
+    loginScreen.classList.add(
+      "hidden"
+    );
+    mainApp.classList.remove(
+      "hidden"
+    );
+    loadDevices();
+  }
+})();
+</script>
+</body>
+</html>
