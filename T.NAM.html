@@ -11,7 +11,7 @@
                maximum-scale=1.0,
                user-scalable=no">
 
-<title>T.NAM</title>
+<title>Quét Link Trung Nam</title>
 
 <style>
 
@@ -370,7 +370,7 @@ body{
             <div class="note">
 
                 Hãy gửi mã thiết bị này cho
-                quản trị viên để được cấp phép.
+                admin @dvmxhnam để được cấp phép.
 
             </div>
 
@@ -378,7 +378,7 @@ body{
 
 
         <!-- =========================
-             ĐÃ CẤP PHÉP
+             
         ========================== -->
 
         <div id="approvedBox"
@@ -408,7 +408,7 @@ body{
             <button id="openBtn"
                     class="open-btn">
 
-                MỞ TIKTOK LIVE
+                MỞ TIKTOK 
 
             </button>
 
@@ -443,7 +443,7 @@ body{
 
                 Thiết bị của bạn đã hết thời gian sử dụng.<br>
 
-                Vui lòng liên hệ admin để gia hạn.
+                Vui lòng liên hệ admin @dvmxhnam để gia hạn.
 
             </div>
 
@@ -467,7 +467,7 @@ body{
             <div class="note">
 
                 Vui lòng kiểm tra kết nối mạng
-                hoặc quyền truy cập Google Sheet.
+                hoặc quyền truy cập .
 
             </div>
 
@@ -482,7 +482,7 @@ body{
 
 
 /* =========================================================
-   CẤU HÌNH GOOGLE SHEET
+  
 ========================================================= */
 
 const SHEET_ID =
@@ -494,10 +494,7 @@ const SHEET_NAME =
 
 
 /* =========================================================
-   TẠO DEVICE ID
-   GIỮ NGUYÊN CODE CŨ
-
-   KHÔNG ĐỔI MÃ ĐÃ TẠO
+  
 ========================================================= */
 
 function generateDeviceId(){
@@ -528,7 +525,7 @@ function generateDeviceId(){
 
 
 /* =========================================================
-   LẤY DEVICE ID
+   
 ========================================================= */
 
 function getDeviceId(){
@@ -540,11 +537,7 @@ function getDeviceId(){
 
 
     /*
-       Nếu đã có mã:
-
-       GIỮ NGUYÊN MÃ CŨ
-
-       Không tạo lại.
+       
     */
 
     if(!id){
@@ -567,7 +560,7 @@ function getDeviceId(){
 
 
 /* =========================================================
-   LẤY LINK TIKTOK
+   
 ========================================================= */
 
 function getTikTokUrl(){
@@ -588,7 +581,7 @@ function getTikTokUrl(){
 
 
 /* =========================================================
-   LẤY ROOM ID
+   
 ========================================================= */
 
 function getRoomId(url){
@@ -601,7 +594,7 @@ function getRoomId(url){
 
 
     /*
-       room_id=123456
+      
     */
 
     let match =
@@ -618,7 +611,7 @@ function getRoomId(url){
 
 
     /*
-       /live/123456
+      
     */
 
     match =
@@ -640,23 +633,13 @@ function getRoomId(url){
 
 
 /* =========================================================
-   ĐỌC GOOGLE SHEET
-
-   A = MÃ THIẾT BỊ
-   B = GHI CHÚ
-   C = HẠN SỬ DỤNG
+   
 ========================================================= */
 
 async function readGoogleSheet(){
 
     /*
-       QUAN TRỌNG:
-
-       Trước đây:
-       select A,B
-
-       Bây giờ:
-       select A,B,C
+       
     */
 
     const query =
@@ -741,8 +724,7 @@ async function readGoogleSheet(){
 
 
         /*
-           CỘT A
-           MÃ THIẾT BỊ
+           
         */
 
         const device =
@@ -754,8 +736,7 @@ async function readGoogleSheet(){
 
 
         /*
-           CỘT B
-           GHI CHÚ
+           
         */
 
         const note =
@@ -767,8 +748,7 @@ async function readGoogleSheet(){
 
 
         /*
-           CỘT C
-           HẠN SỬ DỤNG
+          
         */
 
         const expiry =
@@ -802,13 +782,7 @@ async function readGoogleSheet(){
 
 
 /* =========================================================
-   PARSE HẠN
-
-   Ví dụ:
-
-   7:00 19/09/2026
-
-   = 07:00 ngày 19/09/2026
+   
 ========================================================= */
 
 function parseExpiry(value){
@@ -894,7 +868,7 @@ function parseExpiry(value){
 
 
     /*
-       Kiểm tra ngày hợp lệ
+      
     */
 
     if(
@@ -916,7 +890,7 @@ function parseExpiry(value){
 
 
 /* =========================================================
-   FORMAT NGÀY
+   
 ========================================================= */
 
 function formatDate(date){
@@ -972,7 +946,6 @@ function formatDate(date){
 
 
 /* =========================================================
-   ẨN TẤT CẢ
 ========================================================= */
 
 function hideAll(){
@@ -1010,7 +983,6 @@ function hideAll(){
 
 
 /* =========================================================
-   CHƯA ĐƯỢC DUYỆT
 ========================================================= */
 
 function showDenied(){
@@ -1027,7 +999,6 @@ function showDenied(){
 
 
 /* =========================================================
-   ĐÃ DUYỆT - CÒN HẠN
 ========================================================= */
 
 function showApproved(
@@ -1178,11 +1149,7 @@ function showError(){
 
 async function checkDevice(){
 
-    /*
-       LẤY MÃ CŨ
-
-       Không tạo lại nếu localStorage
-       đã có mã.
+    /*.
     */
 
     const deviceId =
@@ -1190,7 +1157,7 @@ async function checkDevice(){
 
 
     /*
-       HIỂN THỊ MÃ
+       
     */
 
     document
@@ -1204,7 +1171,7 @@ async function checkDevice(){
     try{
 
         /*
-           ĐỌC GOOGLE SHEET
+           
         */
 
         const devices =
@@ -1212,9 +1179,7 @@ async function checkDevice(){
 
 
         /*
-           TÌM MÃ Ở CỘT A
-
-           Không thêm "device_".
+          
         */
 
         const found =
@@ -1226,8 +1191,7 @@ async function checkDevice(){
 
 
         /*
-           KHÔNG CÓ MÃ
-           => CHƯA DUYỆT
+          
         */
 
         if(!found){
@@ -1240,8 +1204,7 @@ async function checkDevice(){
 
 
         /*
-           CỘT C TRỐNG
-           => VÔ HẠN
+           
         */
 
         if(!found.expiry){
@@ -1257,7 +1220,7 @@ async function checkDevice(){
 
 
         /*
-           ĐỌC HẠN CỘT C
+          
         */
 
         const expiry =
@@ -1267,7 +1230,6 @@ async function checkDevice(){
 
 
         /*
-           CỘT C SAI ĐỊNH DẠNG
         */
 
         if(!expiry){
@@ -1286,10 +1248,7 @@ async function checkDevice(){
 
 
         /*
-           SO SÁNH THỜI GIAN
-
-           Đúng chính xác thời điểm
-           hết hạn => hết hạn.
+           
         */
 
         const now =
@@ -1312,7 +1271,7 @@ async function checkDevice(){
 
 
         /*
-           CÒN HẠN
+          
         */
 
         showApproved(
@@ -1335,7 +1294,7 @@ async function checkDevice(){
 
 
 /* =========================================================
-   COPY MÃ THIẾT BỊ
+   
 ========================================================= */
 
 async function copyDevice(){
@@ -1419,7 +1378,7 @@ async function copyDevice(){
 
 
 /* =========================================================
-   ĐÓNG TRANG SAU KHI MỞ TIKTOK
+
 ========================================================= */
 
 function closePageAfterOpen(){
@@ -1451,7 +1410,7 @@ function closePageAfterOpen(){
 
 
 /* =========================================================
-   MỞ TIKTOK
+   
 ========================================================= */
 
 function openTikTok(){
@@ -1467,7 +1426,7 @@ function openTikTok(){
 
 
     /*
-       Không có room ID
+      
     */
 
     if(!roomId){
@@ -1478,7 +1437,7 @@ function openTikTok(){
 
 
     /*
-       Deep link TikTok iOS
+      
     */
 
     const deepLink =
@@ -1506,7 +1465,7 @@ function openTikTok(){
 
 
 /* =========================================================
-   NÚT COPY
+   
 ========================================================= */
 
 document
@@ -1520,7 +1479,7 @@ document
 
 
 /* =========================================================
-   NÚT MỞ TIKTOK
+  
 ========================================================= */
 
 document
@@ -1534,7 +1493,7 @@ document
 
 
 /* =========================================================
-   CHẠY KIỂM TRA
+   
 ========================================================= */
 
 checkDevice();
