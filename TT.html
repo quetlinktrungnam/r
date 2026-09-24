@@ -16,7 +16,7 @@
     .card {
       width: 100%; max-width: 420px;
       background: #111; border: 1px solid #292929;
-      border-radius: 20px; padding: 22px 18px;
+      border-radius: 20px; padding: 28px 20px;
       box-shadow: 0 0 40px rgba(255,44,85,.1);
       text-align: center;
     }
@@ -40,7 +40,6 @@
       font-variant-numeric: tabular-nums; color: #fbbf24;
     }
     .countdown.urgent .time { color: #f87171; }
-    .countdown.done .time { color: #4ade80; font-size: 20px; }
     .countdown.expired .time { color: #f87171; font-size: 20px; }
     .box {
       margin-top: 14px; padding: 12px; background: #181818;
@@ -65,16 +64,30 @@
     .status.wait { border-color: #f59e0b; color: #fbbf24; }
     .status.ok { border-color: #22c55e; color: #4ade80; }
     .status.err { border-color: #ef4444; color: #f87171; }
+    /* Màn thành công */
+    #successView { display: none; padding: 12px 0 4px; }
+    .check {
+      width: 88px; height: 88px; margin: 8px auto 16px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 48px; color: #fff;
+      box-shadow: 0 0 30px rgba(34,197,94,.35);
+    }
+    .ok-title { font-size: 20px; font-weight: 800; color: #4ade80; margin: 0 0 10px; }
+    .ok-msg { color: #ccc; font-size: 14px; line-height: 1.6; margin: 0 0 8px; }
+    .ok-bot {
+      display: inline-block; margin-top: 8px; padding: 10px 14px;
+      background: #181818; border: 1px solid #25f4ee55; border-radius: 10px;
+      color: #25f4ee; font-weight: 700; font-size: 14px; text-decoration: none;
+    }
     button {
       margin-top: 10px; width: 100%; padding: 13px; border: none;
       border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer;
     }
     .btn-copy { background: #3b82f6; color: #fff; }
-    .btn-bot {
-      background: linear-gradient(135deg, #ff2c55, #ff0050);
-      color: #fff; display: none;
-    }
-    .hint { margin-top: 12px; color: #666; font-size: 12px; }
+    .hint { margin-top: 14px; color: #666; font-size: 12px; }
+    #payBlock { display: block; }
   </style>
 </head>
 <body>
@@ -82,19 +95,35 @@
     <div class="logo">TN</div>
     <h1>Thanh toán thuê bot</h1>
     <div class="botname">Bot Thuê – Quét Link Trung Nam</div>
-    <p class="sub">@thuebotquetlinktrungnam1_bot · Quét QR · CK đúng nội dung</p>
+    <p class="sub">@thuebotquetlinktrungnam1_bot</p>
 
-    <div class="countdown" id="cdBox">
-      <div class="label">THỜI HẠN THANH TOÁN</div>
-      <div class="time" id="cdTime">10:00</div>
+    <!-- Khi CHƯA thành công -->
+    <div id="payBlock">
+      <div class="countdown" id="cdBox">
+        <div class="label">THỜI HẠN THANH TOÁN</div>
+        <div class="time" id="cdTime">10:00</div>
+      </div>
+      <div class="box" id="infoBox">Đang tải...</div>
+      <div id="qrWrap"><span style="color:#333;font-size:12px">QR...</span></div>
+      <div class="status wait" id="statusBox">⏳ Quét QR và chuyển khoản...</div>
+      <button class="btn-copy" type="button" id="btnCopy">📋 Copy nội dung CK</button>
     </div>
 
-    <div class="box" id="infoBox">Đang tải...</div>
-    <div id="qrWrap"><span style="color:#333;font-size:12px">QR...</span></div>
-    <div class="status wait" id="statusBox">⏳ Quét QR và chuyển khoản...</div>
-    <button class="btn-copy" type="button" id="btnCopy">📋 Copy nội dung CK</button>
-    <button class="btn-bot" type="button" id="btnBot">✅ Xác nhận đã thanh toán — mở bot</button>
-    <p class="hint">Admin hỗ trợ: @dvmxhnam</p>
+    <!-- Khi ĐÃ thành công: chỉ dấu tích -->
+    <div id="successView">
+      <div class="check">✓</div>
+      <p class="ok-title">Thanh toán thành công</p>
+      <p class="ok-msg">
+        Xin mời bạn vào bot để nhận link nhóm<br>
+        và xác minh thiết bị.
+      </p>
+      <a class="ok-bot" href="https://t.me/thuebotquetlinktrungnam1_bot" target="_blank" rel="noopener">
+        @thuebotquetlinktrungnam1_bot
+      </a>
+      <p class="hint" style="margin-top:18px">Admin hỗ trợ: @dvmxhnam</p>
+    </div>
+
+    <p class="hint" id="adminHint">Admin hỗ trợ: @dvmxhnam</p>
   </div>
 <script>
 (function () {
@@ -113,17 +142,35 @@
   const orderId = params.get("order") || "";
   const ck = (params.get("ck") || "").trim().toLowerCase();
   const amount = parseInt(params.get("amount") || "0", 10) || 0;
-  const token = (params.get("token") || "").trim();
   let until = parseInt(params.get("until") || "0", 10) || 0;
   if (!until || until < 1e9) until = Math.floor(Date.now() / 1000) + DEFAULT_SEC;
 
+  const storageKey = "tn_paid_" + (orderId || ck || "x");
+
+  const payBlock = document.getElementById("payBlock");
+  const successView = document.getElementById("successView");
+  const adminHint = document.getElementById("adminHint");
   const infoBox = document.getElementById("infoBox");
   const statusBox = document.getElementById("statusBox");
   const qrWrap = document.getElementById("qrWrap");
   const btnCopy = document.getElementById("btnCopy");
-  const btnBot = document.getElementById("btnBot");
   const cdBox = document.getElementById("cdBox");
   const cdTime = document.getElementById("cdTime");
+
+  function showSuccessOnly() {
+    payBlock.style.display = "none";
+    successView.style.display = "block";
+    adminHint.style.display = "none";
+    document.title = "✅ Thanh toán thành công";
+  }
+
+  // Vào lại link đã thành công → chỉ hiện dấu tích
+  try {
+    if (localStorage.getItem(storageKey) === "1") {
+      showSuccessOnly();
+      return;
+    }
+  } catch (e) {}
 
   if (!ck || !amount) {
     infoBox.innerHTML = "❌ Link không hợp lệ. Mở lại từ bot thuê.";
@@ -149,7 +196,7 @@
     "&addInfo=" + encodeURIComponent(ck) +
     "&accountName=" + encodeURIComponent(BANK_HOLDER);
   img.onerror = function () {
-    qrWrap.innerHTML = "<span style='color:#666;font-size:12px'>Chuyển khoản thủ công theo STK + nội dung</span>";
+    qrWrap.innerHTML = "<span style='color:#666;font-size:12px'>CK thủ công theo STK + nội dung</span>";
   };
   qrWrap.innerHTML = "";
   qrWrap.appendChild(img);
@@ -195,17 +242,14 @@
 
   let done = false, expired = false;
 
-  function openBotConfirm() {
-    const payload = "ok_" + orderId + "_" + (token || "x");
-    location.href = "https://t.me/" + BOT_USERNAME + "?start=" + encodeURIComponent(payload);
+  function markPaidUI() {
+    done = true;
+    try { localStorage.setItem(storageKey, "1"); } catch (e) {}
+    showSuccessOnly();
   }
 
   function tickCountdown() {
-    if (done) {
-      cdBox.className = "countdown done";
-      cdTime.textContent = "ĐÃ THANH TOÁN";
-      return;
-    }
+    if (done) return;
     const remain = until - Math.floor(Date.now() / 1000);
     if (remain <= 0) {
       expired = true;
@@ -230,21 +274,15 @@
   async function checkSheet() {
     if (done || expired) return;
     try {
-      const res = await fetch(SHEET_CSV + (SHEET_CSV.indexOf("?") >= 0 ? "&" : "?") + "_t=" + Date.now(), { cache: "no-store" });
+      const res = await fetch(
+        SHEET_CSV + (SHEET_CSV.indexOf("?") >= 0 ? "&" : "?") + "_t=" + Date.now(),
+        { cache: "no-store" }
+      );
       if (!res.ok) throw new Error("HTTP " + res.status);
       const lines = (await res.text()).split(/\r?\n/).filter(Boolean).slice(1).slice(-LAST_ROWS);
       for (let i = lines.length - 1; i >= 0; i--) {
-        const parts = parseCsvLine(lines[i]);
-        if (rowMatches(parts)) {
-          done = true;
-          tickCountdown();
-          setStatus("ok",
-            "✅ <b>Đã thấy giao dịch</b><br>" +
-            "Tiền: <b>" + moneyFromColH(parts[COL_H]).toLocaleString("vi-VN") + "đ</b><br>" +
-            "Đang mở bot để xác nhận đơn..."
-          );
-          btnBot.style.display = "block";
-          setTimeout(openBotConfirm, 1200);
+        if (rowMatches(parseCsvLine(lines[i]))) {
+          markPaidUI();
           return;
         }
       }
@@ -254,7 +292,6 @@
     }
   }
 
-  btnBot.onclick = openBotConfirm;
   tickCountdown();
   setInterval(tickCountdown, 1000);
   checkSheet();
