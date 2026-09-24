@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Thanh toán – Quét Link Trung Nam</title>
+  <title>Bot Thuê – Quét Link Trung Nam</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
@@ -21,33 +21,30 @@
       text-align: center;
     }
     .logo {
-      width: 56px; height: 56px; margin: 0 auto 12px;
+      width: 56px; height: 56px; margin: 0 auto 10px;
       border-radius: 16px;
       background: linear-gradient(135deg, #ff2c55, #25f4ee);
       display: flex; align-items: center; justify-content: center;
       font-weight: 900; font-size: 18px;
     }
-    h1 { margin: 0; font-size: 19px; }
-    .sub { color: #888; font-size: 13px; margin-top: 6px; line-height: 1.45; }
+    h1 { margin: 0; font-size: 18px; }
+    .botname { color: #25f4ee; font-size: 13px; margin-top: 4px; font-weight: 600; }
+    .sub { color: #888; font-size: 12px; margin-top: 6px; line-height: 1.45; }
     .countdown {
       margin-top: 14px; padding: 14px 12px;
-      border-radius: 14px;
-      background: #1a1208;
-      border: 1px solid #f59e0b55;
+      border-radius: 14px; background: #1a1208; border: 1px solid #f59e0b55;
     }
     .countdown .label { font-size: 12px; color: #fbbf24; margin-bottom: 4px; }
     .countdown .time {
       font-size: 36px; font-weight: 800; letter-spacing: 2px;
-      font-variant-numeric: tabular-nums;
-      color: #fbbf24;
+      font-variant-numeric: tabular-nums; color: #fbbf24;
     }
     .countdown.urgent .time { color: #f87171; }
-    .countdown.done .time { color: #4ade80; font-size: 22px; }
+    .countdown.done .time { color: #4ade80; font-size: 20px; }
     .countdown.expired .time { color: #f87171; font-size: 20px; }
     .box {
-      margin-top: 14px; padding: 12px;
-      background: #181818; border: 1px solid #292929;
-      border-radius: 14px; text-align: left; font-size: 13px;
+      margin-top: 14px; padding: 12px; background: #181818;
+      border: 1px solid #292929; border-radius: 14px; text-align: left; font-size: 13px;
     }
     .box b { color: #25f4ee; }
     .ck {
@@ -63,30 +60,29 @@
     #qrWrap img { width: 100%; height: 100%; object-fit: contain; }
     .status {
       margin-top: 14px; padding: 12px; border-radius: 12px;
-      border: 1px solid #292929; background: #181818;
-      font-size: 14px; line-height: 1.5;
+      border: 1px solid #292929; background: #181818; font-size: 14px; line-height: 1.5;
     }
     .status.wait { border-color: #f59e0b; color: #fbbf24; }
     .status.ok { border-color: #22c55e; color: #4ade80; }
     .status.err { border-color: #ef4444; color: #f87171; }
     button {
-      margin-top: 10px; width: 100%; padding: 13px;
-      border: none; border-radius: 12px; font-weight: 700;
-      font-size: 14px; cursor: pointer;
+      margin-top: 10px; width: 100%; padding: 13px; border: none;
+      border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer;
     }
     .btn-copy { background: #3b82f6; color: #fff; }
     .btn-bot {
       background: linear-gradient(135deg, #ff2c55, #ff0050);
       color: #fff; display: none;
     }
-    .hint { margin-top: 12px; color: #555; font-size: 11px; line-height: 1.4; }
+    .hint { margin-top: 12px; color: #666; font-size: 12px; }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="logo">TN</div>
     <h1>Thanh toán thuê bot</h1>
-    <p class="sub">Quét Link Trung Nam · Tự kiểm tra Google Sheet</p>
+    <div class="botname">Bot Thuê – Quét Link Trung Nam</div>
+    <p class="sub">@thuebotquetlinktrungnam1_bot · Quét QR · CK đúng nội dung</p>
 
     <div class="countdown" id="cdBox">
       <div class="label">THỜI HẠN THANH TOÁN</div>
@@ -95,10 +91,10 @@
 
     <div class="box" id="infoBox">Đang tải...</div>
     <div id="qrWrap"><span style="color:#333;font-size:12px">QR...</span></div>
-    <div class="status wait" id="statusBox">⏳ Chờ thanh toán / đang quét sheet...</div>
+    <div class="status wait" id="statusBox">⏳ Quét QR và chuyển khoản...</div>
     <button class="btn-copy" type="button" id="btnCopy">📋 Copy nội dung CK</button>
-    <button class="btn-bot" type="button" id="btnBot">✅ Đã thanh toán — mở bot</button>
-    <p class="hint">Hạn CK: 10 phút. Chỉ đọc giao dịch mới (cuối sheet).<br>Admin: @dvmxhnam</p>
+    <button class="btn-bot" type="button" id="btnBot">✅ Xác nhận đã thanh toán — mở bot</button>
+    <p class="hint">Admin hỗ trợ: @dvmxhnam</p>
   </div>
 <script>
 (function () {
@@ -107,19 +103,19 @@
   const BANK_ACC = "033159";
   const BANK_NAME = "MBBank";
   const BANK_HOLDER = "BUI TRUNG NAM";
-  const BOT_USERNAME = "YOUR_RENTAL_BOT"; // <-- sửa username bot thuê (không có @)
+  const BOT_USERNAME = "thuebotquetlinktrungnam1_bot";
   const POLL_MS = 2000;
-  const LAST_ROWS = 50;
+  const LAST_ROWS = 60;
   const DEFAULT_SEC = 600;
+  const COL_F = 5, COL_G = 6, COL_H = 7;
 
   const params = new URLSearchParams(location.search);
   const orderId = params.get("order") || "";
   const ck = (params.get("ck") || "").trim().toLowerCase();
   const amount = parseInt(params.get("amount") || "0", 10) || 0;
+  const token = (params.get("token") || "").trim();
   let until = parseInt(params.get("until") || "0", 10) || 0;
-  if (!until || until < 1e9) {
-    until = Math.floor(Date.now() / 1000) + DEFAULT_SEC;
-  }
+  if (!until || until < 1e9) until = Math.floor(Date.now() / 1000) + DEFAULT_SEC;
 
   const infoBox = document.getElementById("infoBox");
   const statusBox = document.getElementById("statusBox");
@@ -130,32 +126,30 @@
   const cdTime = document.getElementById("cdTime");
 
   if (!ck || !amount) {
-    infoBox.innerHTML = "❌ Link thiếu ck hoặc amount. Mở từ bot.";
+    infoBox.innerHTML = "❌ Link không hợp lệ. Mở lại từ bot thuê.";
     statusBox.className = "status err";
-    statusBox.textContent = "Link không hợp lệ";
+    statusBox.textContent = "Thiếu thông tin đơn";
     qrWrap.style.display = "none";
     return;
   }
 
   infoBox.innerHTML =
-    (orderId ? "<div>Đơn: <b>#" + orderId + "</b></div>" : "") +
+    (orderId ? "<div>Mã đơn: <b>#" + orderId + "</b></div>" : "") +
     "<div>Số tiền: <b>" + amount.toLocaleString("vi-VN") + "đ</b></div>" +
     "<div>STK: <b>" + BANK_ACC + "</b> · " + BANK_NAME + "</div>" +
-    "<div style='margin-top:6px'>Nội dung CK:</div>" +
-    "<span class='ck' id='ckText'>" + ck + "</span>";
+    "<div style='margin-top:6px'>Nội dung chuyển khoản:</div>" +
+    "<span class='ck'>" + ck + "</span>";
 
-  const qrUrl =
+  const img = document.createElement("img");
+  img.alt = "QR";
+  img.src =
     "https://img.vietqr.io/image/" +
-    encodeURIComponent(BANK_NAME) + "-" +
-    encodeURIComponent(BANK_ACC) +
+    encodeURIComponent(BANK_NAME) + "-" + encodeURIComponent(BANK_ACC) +
     "-compact2.png?amount=" + amount +
     "&addInfo=" + encodeURIComponent(ck) +
     "&accountName=" + encodeURIComponent(BANK_HOLDER);
-  const img = document.createElement("img");
-  img.alt = "QR thanh toán";
-  img.src = qrUrl;
   img.onerror = function () {
-    qrWrap.innerHTML = "<span style='color:#666;font-size:12px;padding:8px'>CK thủ công theo nội dung trên</span>";
+    qrWrap.innerHTML = "<span style='color:#666;font-size:12px'>Chuyển khoản thủ công theo STK + nội dung</span>";
   };
   qrWrap.innerHTML = "";
   qrWrap.appendChild(img);
@@ -172,18 +166,39 @@
     }
   };
 
-  function setStatus(kind, html) {
-    statusBox.className = "status " + kind;
-    statusBox.innerHTML = html;
-  }
+  function setStatus(k, h) { statusBox.className = "status " + k; statusBox.innerHTML = h; }
   function pad(n) { return n < 10 ? "0" + n : "" + n; }
-  function fmtRemain(sec) {
-    sec = Math.max(0, sec | 0);
-    return pad(Math.floor(sec / 60)) + ":" + pad(sec % 60);
+  function fmtRemain(s) { s = Math.max(0, s | 0); return pad(Math.floor(s / 60)) + ":" + pad(s % 60); }
+
+  function parseCsvLine(line) {
+    const out = []; let cur = ""; let inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; continue; }
+      if (c === "," && !inQ) { out.push(cur); cur = ""; continue; }
+      cur += c;
+    }
+    out.push(cur);
+    return out;
+  }
+  function ckFromColF(content) {
+    const s = String(content || "").trim().toLowerCase();
+    const first = (s.split(/\s+/)[0] || "");
+    if (/^quetlinktrungnam\d{7}$/.test(first)) return first;
+    const m = s.replace(/\s+/g, "").match(/quetlinktrungnam\d{7}/);
+    return m ? m[0] : "";
+  }
+  function moneyFromColH(raw) {
+    const d = String(raw || "").replace(/[^\d]/g, "");
+    return d ? parseInt(d, 10) : 0;
   }
 
-  let done = false;
-  let expired = false;
+  let done = false, expired = false;
+
+  function openBotConfirm() {
+    const payload = "ok_" + orderId + "_" + (token || "x");
+    location.href = "https://t.me/" + BOT_USERNAME + "?start=" + encodeURIComponent(payload);
+  }
 
   function tickCountdown() {
     if (done) {
@@ -196,45 +211,20 @@
       expired = true;
       cdBox.className = "countdown expired";
       cdTime.textContent = "HẾT HẠN";
-      setStatus("err", "⏰ <b>Hết 10 phút</b><br>Đơn đã hết hạn thanh toán. Quay bot thuê lại.");
+      setStatus("err", "⏰ Hết 10 phút. Tạo đơn mới trên bot.");
       return;
     }
     cdTime.textContent = fmtRemain(remain);
     cdBox.className = remain <= 60 ? "countdown urgent" : "countdown";
   }
 
-  function extractCodes(text) {
-    return (String(text || "").toLowerCase().replace(/\s+/g, "").match(/quetlinktrungnam\d{7}/g) || []);
-  }
-  function parseAmountNearIn(line) {
-    const m = line.match(/\bin\b[,;\s]*([\d.,]+)/i);
-    if (m) {
-      const d = m[1].replace(/[^\d]/g, "");
-      if (d) return parseInt(d, 10);
-    }
-    const parts = line.split(",");
-    for (let i = 0; i < parts.length - 1; i++) {
-      if (parts[i].trim().toLowerCase() === "in") {
-        const chunks = [];
-        let j = i + 1;
-        while (j < parts.length && /^\d+$/.test(parts[j].trim())) {
-          chunks.push(parts[j].trim());
-          j++;
-          if (chunks[0] && chunks[0].length > 3) break;
-          if (chunks.length > 1 && chunks[chunks.length - 1].length !== 3) { chunks.pop(); break; }
-        }
-        if (chunks.length) return parseInt(chunks.join(""), 10);
-      }
-    }
-    return 0;
-  }
-  function matchRow(line) {
-    const codes = extractCodes(line);
-    if (codes.indexOf(ck.replace(/\s+/g, "")) < 0) return false;
-    if (/\bout\b|\bchi\b/i.test(line) && !/\bin\b/i.test(line)) return false;
-    const found = parseAmountNearIn(line);
-    if (amount > 0 && found > 0 && found < amount) return false;
-    return true;
+  function rowMatches(parts) {
+    if (parts.length <= COL_H) return false;
+    const code = ckFromColF(parts[COL_F]);
+    if (!code || code !== ck.replace(/\s+/g, "")) return false;
+    const typ = String(parts[COL_G] || "").trim().toLowerCase();
+    if (typ === "out" || typ === "chi") return false;
+    return moneyFromColH(parts[COL_H]) >= amount;
   }
 
   async function checkSheet() {
@@ -242,34 +232,29 @@
     try {
       const res = await fetch(SHEET_CSV + (SHEET_CSV.indexOf("?") >= 0 ? "&" : "?") + "_t=" + Date.now(), { cache: "no-store" });
       if (!res.ok) throw new Error("HTTP " + res.status);
-      const text = await res.text();
-      const lines = text.split(/\r?\n/).filter(Boolean).slice(1);
-      const slice = lines.slice(-LAST_ROWS);
-      for (let i = slice.length - 1; i >= 0; i--) {
-        if (matchRow(slice[i])) {
+      const lines = (await res.text()).split(/\r?\n/).filter(Boolean).slice(1).slice(-LAST_ROWS);
+      for (let i = lines.length - 1; i >= 0; i--) {
+        const parts = parseCsvLine(lines[i]);
+        if (rowMatches(parts)) {
           done = true;
           tickCountdown();
-          setStatus("ok", "✅ <b>Thanh toán thành công</b><br>Đã thấy giao dịch trên sheet.<br>Bấm nút mở bot để nhận link nhóm.");
+          setStatus("ok",
+            "✅ <b>Đã thấy giao dịch</b><br>" +
+            "Tiền: <b>" + moneyFromColH(parts[COL_H]).toLocaleString("vi-VN") + "đ</b><br>" +
+            "Đang mở bot để xác nhận đơn..."
+          );
           btnBot.style.display = "block";
-          document.title = "✅ Đã thanh toán #" + orderId;
+          setTimeout(openBotConfirm, 1200);
           return;
         }
       }
-      setStatus("wait", "⏳ Chưa thấy giao dịch...<br>Quét " + LAST_ROWS + " dòng mới · còn " + fmtRemain(until - Math.floor(Date.now() / 1000)));
+      setStatus("wait", "⏳ Chưa thấy giao dịch · còn " + fmtRemain(until - Math.floor(Date.now() / 1000)));
     } catch (e) {
-      setStatus("err", "⚠️ Lỗi sheet: " + (e.message || e));
+      setStatus("err", "⚠️ " + (e.message || e));
     }
   }
 
-  btnBot.onclick = function () {
-    const payload = orderId ? ("paid_" + orderId) : "start";
-    if (BOT_USERNAME && BOT_USERNAME !== "YOUR_RENTAL_BOT") {
-      location.href = "https://t.me/" + BOT_USERNAME + "?start=" + encodeURIComponent(payload);
-    } else {
-      alert("Quay lại bot thuê trong Telegram.");
-    }
-  };
-
+  btnBot.onclick = openBotConfirm;
   tickCountdown();
   setInterval(tickCountdown, 1000);
   checkSheet();
