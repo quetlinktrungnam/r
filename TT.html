@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Thanh toán – Quét Link Trung Nam</title>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0; min-height: 100vh;
+      font-family: system-ui, -apple-system, Arial, sans-serif;
+      background: #080808; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .card {
+      width: 100%; max-width: 420px;
+      background: #111; border: 1px solid #292929;
+      border-radius: 20px; padding: 22px 18px;
+      box-shadow: 0 0 40px rgba(255,44,85,.1);
+      text-align: center;
+    }
+    .logo {
+      width: 56px; height: 56px; margin: 0 auto 12px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #ff2c55, #25f4ee);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 18px;
+    }
+    h1 { margin: 0; font-size: 19px; }
+    .sub { color: #888; font-size: 13px; margin-top: 6px; line-height: 1.45; }
+    .countdown {
+      margin-top: 14px; padding: 14px 12px;
+      border-radius: 14px;
+      background: #1a1208;
+      border: 1px solid #f59e0b55;
+    }
+    .countdown .label { font-size: 12px; color: #fbbf24; margin-bottom: 4px; }
+    .countdown .time {
+      font-size: 36px; font-weight: 800; letter-spacing: 2px;
+      font-variant-numeric: tabular-nums;
+      color: #fbbf24;
+    }
+    .countdown.urgent .time { color: #f87171; }
+    .countdown.done .time { color: #4ade80; font-size: 22px; }
+    .countdown.expired .time { color: #f87171; font-size: 20px; }
+    .box {
+      margin-top: 14px; padding: 12px;
+      background: #181818; border: 1px solid #292929;
+      border-radius: 14px; text-align: left; font-size: 13px;
+    }
+    .box b { color: #25f4ee; }
+    .ck {
+      font-family: ui-monospace, monospace; font-size: 13px;
+      background: #0a0a0a; padding: 8px 10px; border-radius: 8px;
+      margin-top: 6px; display: block; user-select: all; word-break: break-all;
+    }
+    #qrWrap {
+      margin: 16px auto 0; width: 220px; height: 220px;
+      background: #fff; border-radius: 12px; padding: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #qrWrap img { width: 100%; height: 100%; object-fit: contain; }
+    .status {
+      margin-top: 14px; padding: 12px; border-radius: 12px;
+      border: 1px solid #292929; background: #181818;
+      font-size: 14px; line-height: 1.5;
+    }
+    .status.wait { border-color: #f59e0b; color: #fbbf24; }
+    .status.ok { border-color: #22c55e; color: #4ade80; }
+    .status.err { border-color: #ef4444; color: #f87171; }
+    button {
+      margin-top: 10px; width: 100%; padding: 13px;
+      border: none; border-radius: 12px; font-weight: 700;
+      font-size: 14px; cursor: pointer;
+    }
+    .btn-copy { background: #3b82f6; color: #fff; }
+    .btn-bot {
+      background: linear-gradient(135deg, #ff2c55, #ff0050);
+      color: #fff; display: none;
+    }
+    .hint { margin-top: 12px; color: #555; font-size: 11px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">TN</div>
+    <h1>Thanh toán thuê bot</h1>
+    <p class="sub">Quét Link Trung Nam · Tự kiểm tra Google Sheet</p>
+
+    <div class="countdown" id="cdBox">
+      <div class="label">THỜI HẠN THANH TOÁN</div>
+      <div class="time" id="cdTime">10:00</div>
+    </div>
+
+    <div class="box" id="infoBox">Đang tải...</div>
+    <div id="qrWrap"><span style="color:#333;font-size:12px">QR...</span></div>
+    <div class="status wait" id="statusBox">⏳ Chờ thanh toán / đang quét sheet...</div>
+    <button class="btn-copy" type="button" id="btnCopy">📋 Copy nội dung CK</button>
+    <button class="btn-bot" type="button" id="btnBot">✅ Đã thanh toán — mở bot</button>
+    <p class="hint">Hạn CK: 10 phút. Chỉ đọc giao dịch mới (cuối sheet).<br>Admin: @dvmxhnam</p>
+  </div>
+<script>
+(function () {
+  const SHEET_CSV =
+    "https://docs.google.com/spreadsheets/d/1EXAZOdc36TmXwsZCmnyqbgwFoE6bOvFH96E2s7m559c/export?format=csv";
+  const BANK_ACC = "033159";
+  const BANK_NAME = "MBBank";
+  const BANK_HOLDER = "BUI TRUNG NAM";
+  const BOT_USERNAME = "YOUR_RENTAL_BOT"; // <-- sửa username bot thuê (không có @)
+  const POLL_MS = 2000;
+  const LAST_ROWS = 50;
+  const DEFAULT_SEC = 600;
+
+  const params = new URLSearchParams(location.search);
+  const orderId = params.get("order") || "";
+  const ck = (params.get("ck") || "").trim().toLowerCase();
+  const amount = parseInt(params.get("amount") || "0", 10) || 0;
+  let until = parseInt(params.get("until") || "0", 10) || 0;
+  if (!until || until < 1e9) {
+    until = Math.floor(Date.now() / 1000) + DEFAULT_SEC;
+  }
+
+  const infoBox = document.getElementById("infoBox");
+  const statusBox = document.getElementById("statusBox");
+  const qrWrap = document.getElementById("qrWrap");
+  const btnCopy = document.getElementById("btnCopy");
+  const btnBot = document.getElementById("btnBot");
+  const cdBox = document.getElementById("cdBox");
+  const cdTime = document.getElementById("cdTime");
+
+  if (!ck || !amount) {
+    infoBox.innerHTML = "❌ Link thiếu ck hoặc amount. Mở từ bot.";
+    statusBox.className = "status err";
+    statusBox.textContent = "Link không hợp lệ";
+    qrWrap.style.display = "none";
+    return;
+  }
+
+  infoBox.innerHTML =
+    (orderId ? "<div>Đơn: <b>#" + orderId + "</b></div>" : "") +
+    "<div>Số tiền: <b>" + amount.toLocaleString("vi-VN") + "đ</b></div>" +
+    "<div>STK: <b>" + BANK_ACC + "</b> · " + BANK_NAME + "</div>" +
+    "<div style='margin-top:6px'>Nội dung CK:</div>" +
+    "<span class='ck' id='ckText'>" + ck + "</span>";
+
+  const qrUrl =
+    "https://img.vietqr.io/image/" +
+    encodeURIComponent(BANK_NAME) + "-" +
+    encodeURIComponent(BANK_ACC) +
+    "-compact2.png?amount=" + amount +
+    "&addInfo=" + encodeURIComponent(ck) +
+    "&accountName=" + encodeURIComponent(BANK_HOLDER);
+  const img = document.createElement("img");
+  img.alt = "QR thanh toán";
+  img.src = qrUrl;
+  img.onerror = function () {
+    qrWrap.innerHTML = "<span style='color:#666;font-size:12px;padding:8px'>CK thủ công theo nội dung trên</span>";
+  };
+  qrWrap.innerHTML = "";
+  qrWrap.appendChild(img);
+
+  btnCopy.onclick = function () {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(ck).then(function () { btnCopy.textContent = "✅ Đã copy"; });
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = ck; document.body.appendChild(ta);
+      ta.select(); document.execCommand("copy");
+      document.body.removeChild(ta);
+      btnCopy.textContent = "✅ Đã copy";
+    }
+  };
+
+  function setStatus(kind, html) {
+    statusBox.className = "status " + kind;
+    statusBox.innerHTML = html;
+  }
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+  function fmtRemain(sec) {
+    sec = Math.max(0, sec | 0);
+    return pad(Math.floor(sec / 60)) + ":" + pad(sec % 60);
+  }
+
+  let done = false;
+  let expired = false;
+
+  function tickCountdown() {
+    if (done) {
+      cdBox.className = "countdown done";
+      cdTime.textContent = "ĐÃ THANH TOÁN";
+      return;
+    }
+    const remain = until - Math.floor(Date.now() / 1000);
+    if (remain <= 0) {
+      expired = true;
+      cdBox.className = "countdown expired";
+      cdTime.textContent = "HẾT HẠN";
+      setStatus("err", "⏰ <b>Hết 10 phút</b><br>Đơn đã hết hạn thanh toán. Quay bot thuê lại.");
+      return;
+    }
+    cdTime.textContent = fmtRemain(remain);
+    cdBox.className = remain <= 60 ? "countdown urgent" : "countdown";
+  }
+
+  function extractCodes(text) {
+    return (String(text || "").toLowerCase().replace(/\s+/g, "").match(/quetlinktrungnam\d{7}/g) || []);
+  }
+  function parseAmountNearIn(line) {
+    const m = line.match(/\bin\b[,;\s]*([\d.,]+)/i);
+    if (m) {
+      const d = m[1].replace(/[^\d]/g, "");
+      if (d) return parseInt(d, 10);
+    }
+    const parts = line.split(",");
+    for (let i = 0; i < parts.length - 1; i++) {
+      if (parts[i].trim().toLowerCase() === "in") {
+        const chunks = [];
+        let j = i + 1;
+        while (j < parts.length && /^\d+$/.test(parts[j].trim())) {
+          chunks.push(parts[j].trim());
+          j++;
+          if (chunks[0] && chunks[0].length > 3) break;
+          if (chunks.length > 1 && chunks[chunks.length - 1].length !== 3) { chunks.pop(); break; }
+        }
+        if (chunks.length) return parseInt(chunks.join(""), 10);
+      }
+    }
+    return 0;
+  }
+  function matchRow(line) {
+    const codes = extractCodes(line);
+    if (codes.indexOf(ck.replace(/\s+/g, "")) < 0) return false;
+    if (/\bout\b|\bchi\b/i.test(line) && !/\bin\b/i.test(line)) return false;
+    const found = parseAmountNearIn(line);
+    if (amount > 0 && found > 0 && found < amount) return false;
+    return true;
+  }
+
+  async function checkSheet() {
+    if (done || expired) return;
+    try {
+      const res = await fetch(SHEET_CSV + (SHEET_CSV.indexOf("?") >= 0 ? "&" : "?") + "_t=" + Date.now(), { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const text = await res.text();
+      const lines = text.split(/\r?\n/).filter(Boolean).slice(1);
+      const slice = lines.slice(-LAST_ROWS);
+      for (let i = slice.length - 1; i >= 0; i--) {
+        if (matchRow(slice[i])) {
+          done = true;
+          tickCountdown();
+          setStatus("ok", "✅ <b>Thanh toán thành công</b><br>Đã thấy giao dịch trên sheet.<br>Bấm nút mở bot để nhận link nhóm.");
+          btnBot.style.display = "block";
+          document.title = "✅ Đã thanh toán #" + orderId;
+          return;
+        }
+      }
+      setStatus("wait", "⏳ Chưa thấy giao dịch...<br>Quét " + LAST_ROWS + " dòng mới · còn " + fmtRemain(until - Math.floor(Date.now() / 1000)));
+    } catch (e) {
+      setStatus("err", "⚠️ Lỗi sheet: " + (e.message || e));
+    }
+  }
+
+  btnBot.onclick = function () {
+    const payload = orderId ? ("paid_" + orderId) : "start";
+    if (BOT_USERNAME && BOT_USERNAME !== "YOUR_RENTAL_BOT") {
+      location.href = "https://t.me/" + BOT_USERNAME + "?start=" + encodeURIComponent(payload);
+    } else {
+      alert("Quay lại bot thuê trong Telegram.");
+    }
+  };
+
+  tickCountdown();
+  setInterval(tickCountdown, 1000);
+  checkSheet();
+  setInterval(checkSheet, POLL_MS);
+})();
+</script>
+</body>
+</html>
