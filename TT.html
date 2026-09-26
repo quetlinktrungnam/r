@@ -315,6 +315,10 @@
       và xác minh thiết bị.
     </p>
 
+    <p class="ok-msg" id="autoCloseMsg" style="color:#fbbf24;margin-top:12px">
+      Trang sẽ tự đóng sau <b id="closeSec">5</b> giây...
+    </p>
+
     <a
       class="ok-bot"
       href="https://t.me/thuebotquetlinktrungnam1_bot"
@@ -468,6 +472,25 @@
 
     document.title =
       "✅ Thanh toán thành công";
+
+    /* Đếm ngược 5 giây rồi tự đóng tab */
+    let sec = 5;
+    const secEl = document.getElementById("closeSec");
+    const timer = setInterval(function () {
+      sec--;
+      if (secEl) secEl.textContent = sec;
+      if (sec <= 0) {
+        clearInterval(timer);
+        try {
+          window.close();
+        } catch (e) {}
+        /* Nếu không đóng được (tab do user mở) thì đổi thông báo */
+        const msg = document.getElementById("autoCloseMsg");
+        if (msg) {
+          msg.textContent = "Bạn có thể đóng trang này.";
+        }
+      }
+    }, 1000);
 
   }
 
