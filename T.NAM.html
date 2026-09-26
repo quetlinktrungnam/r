@@ -171,8 +171,6 @@ body{
     border-radius:14px;
 
     padding:5px;
-
-    margin-bottom:12px;
 }
 
 .device-code{
@@ -253,27 +251,6 @@ body{
     line-height:1.5;
 }
 
-.note a{
-    color:#25f4ee;
-    text-decoration:none;
-    word-break:break-all;
-}
-
-.note a:hover{
-    text-decoration:underline;
-}
-
-.admin-line{
-    margin-top:8px;
-    text-align:center;
-    font-size:12px;
-    color:#aaa;
-}
-
-.admin-line strong{
-    color:#fff;
-}
-
 .expiry{
     margin-top:10px;
 
@@ -339,7 +316,7 @@ body{
 
 
         <!-- =========================
-             LOADING
+             
         ========================== -->
 
         <div id="loadingBox"
@@ -353,7 +330,7 @@ body{
 
 
         <!-- =========================
-             CHƯA CẤP PHÉP
+            
         ========================== -->
 
         <div id="deniedBox"
@@ -375,12 +352,12 @@ body{
 
             <div class="device-box">
 
-                <div id="deviceCodeDenied"
+                <div id="deviceCode"
                      class="device-code">
                 </div>
 
 
-                <button id="copyBtnDenied"
+                <button id="copyBtn"
                         class="copy-btn">
 
                     COPY
@@ -392,22 +369,16 @@ body{
 
             <div class="note">
 
-                Vui lòng copy mã thiết bị và gửi về bot:<br>
-                <a href="https://t.me/thuebotquetlinktrungnam1_bot" target="_blank" rel="noopener">
-                    https://t.me/thuebotquetlinktrungnam1_bot
-                </a><br>
-                để được duyệt mã.
-            </div>
+                Vui lòng copy mã gửi về cho bot: <a href="https://t.me/thuebotquetlinktrungnam1_bot" style="color:#25f4ee;text-decoration:none;">https://t.me/thuebotquetlinktrungnam1_bot</a> để được duyệt mã.<br>
+                Admin: @dvmxhnam
 
-            <div class="admin-line">
-                Admin: <strong>@dvmxhnam</strong>
             </div>
 
         </div>
 
 
         <!-- =========================
-             ĐÃ CẤP PHÉP
+             
         ========================== -->
 
         <div id="approvedBox"
@@ -455,20 +426,6 @@ body{
 
             <div id="expiryBox"
                  class="expiry">
-            </div>
-
-
-            <div class="note">
-
-                Vui lòng copy mã thiết bị và gửi về bot:<br>
-                <a href="https://t.me/thuebotquetlinktrungnam1_bot" target="_blank" rel="noopener">
-                    https://t.me/thuebotquetlinktrungnam1_bot
-                </a><br>
-                nếu cần hỗ trợ hoặc gia hạn.
-            </div>
-
-            <div class="admin-line">
-                Admin: <strong>@dvmxhnam</strong>
             </div>
 
 
@@ -532,16 +489,11 @@ body{
 
             <div class="note">
 
+                Vui lòng copy mã gửi về cho bot: <a href="https://t.me/thuebotquetlinktrungnam1_bot" style="color:#25f4ee;text-decoration:none;">https://t.me/thuebotquetlinktrungnam1_bot</a> để được duyệt mã.<br>
+                Admin: @dvmxhnam<br><br>
                 Thiết bị của bạn đã hết thời gian sử dụng.<br>
-                Vui lòng copy mã thiết bị và gửi về bot:<br>
-                <a href="https://t.me/thuebotquetlinktrungnam1_bot" target="_blank" rel="noopener">
-                    https://t.me/thuebotquetlinktrungnam1_bot
-                </a><br>
-                để được duyệt / gia hạn mã.
-            </div>
+                Vui lòng liên hệ admin @dvmxhnam để gia hạn.
 
-            <div class="admin-line">
-                Admin: <strong>@dvmxhnam</strong>
             </div>
 
         </div>
@@ -565,6 +517,7 @@ body{
 
                 Vui lòng kiểm tra kết nối mạng
                 hoặc quyền truy cập .
+
             </div>
 
         </div>
@@ -1253,21 +1206,31 @@ async function checkDevice(){
 
 
     /*
-       Gán mã thiết bị cho tất cả các box
+       
     */
 
-    const codeElements = [
-        "deviceCodeDenied",
-        "deviceCodeApproved",
-        "deviceCodeExpired"
-    ];
+    document
+        .getElementById(
+            "deviceCode"
+        )
+        .textContent =
+            deviceId;
 
-    codeElements.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.textContent = deviceId;
-        }
-    });
+
+    document
+        .getElementById(
+            "deviceCodeApproved"
+        )
+        .textContent =
+            deviceId;
+
+
+    document
+        .getElementById(
+            "deviceCodeExpired"
+        )
+        .textContent =
+            deviceId;
 
 
     try{
@@ -1412,22 +1375,35 @@ async function copyDevice(){
             .writeText(id);
 
 
-        // Cập nhật tất cả các nút COPY
-        const btns = [
-            "copyBtnDenied",
-            "copyBtnApproved",
-            "copyBtnExpired"
-        ];
+        const btns =
+            document.querySelectorAll(
+                ".copy-btn"
+            );
 
-        btns.forEach(btnId => {
-            const btn = document.getElementById(btnId);
-            if (btn) {
-                const old = btn.textContent;
-                btn.textContent = "ĐÃ COPY";
-                setTimeout(() => {
-                    btn.textContent = old;
-                }, 1500);
-            }
+
+        btns.forEach(btn => {
+
+            const old =
+                btn.textContent;
+
+
+            btn.textContent =
+                "ĐÃ COPY";
+
+
+            setTimeout(
+
+                () => {
+
+                    btn.textContent =
+                        old;
+
+                },
+
+                1500
+
+            );
+
         });
 
     }catch{
@@ -1563,12 +1539,13 @@ function openTikTok(){
 
 document
     .getElementById(
-        "copyBtnDenied"
+        "copyBtn"
     )
     .addEventListener(
         "click",
         copyDevice
     );
+
 
 document
     .getElementById(
@@ -1578,6 +1555,7 @@ document
         "click",
         copyDevice
     );
+
 
 document
     .getElementById(
