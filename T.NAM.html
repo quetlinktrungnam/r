@@ -797,15 +797,26 @@ async function readGoogleSheet(){
 
 
         /*
-          
+          Ưu tiên lấy giá trị đã format (.f) nếu có,
+          tránh trường hợp cột C là Date/DateTime
+          trả về dạng Date(year,month,...)
         */
 
-        const expiry =
-            cells[2]?.v != null
-                ? String(
-                    cells[2].v
-                  ).trim()
-                : "";
+        let expiryRaw = "";
+
+        if(cells[2]){
+
+            if(cells[2].f != null && String(cells[2].f).trim() !== ""){
+
+                expiryRaw = String(cells[2].f).trim();
+
+            }else if(cells[2].v != null){
+
+                expiryRaw = String(cells[2].v).trim();
+
+            }
+
+        }
 
 
         if(device){
@@ -816,7 +827,7 @@ async function readGoogleSheet(){
 
                 note:note,
 
-                expiry:expiry
+                expiry:expiryRaw
 
             });
 
@@ -855,85 +866,202 @@ function parseExpiry(value){
     }
 
 
-    const match =
+    /*
+      Trường hợp Google trả về dạng Date(year, month0, day, hour, minute, second)
+      (tháng 0-based)
+    */
+
+    const dateCtorMatch =
+        text.match(
+            /^Date\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?(?:,\s*(\d+))?(?:,\s*(\d+))?/
+        );
+
+
+    if(dateCtorMatch){
+
+        const year   = Number(dateCtorMatch[1]);
+        const month  = Number(dateCtorMatch[2]); // đã 0-based
+        const day    = Number(dateCtorMatch[3]);
+        const hour   = Number(dateCtorMatch[4] || 0);
+        const minute = Number(dateCtorMatch[5] || 0);
+        const second = Number(dateCtorMatch[6] || 0);
+
+
+        const date =
+            new Date(
+                year,
+                month,
+                day,
+                hour,
+                minute,
+                second,
+                0
+            );
+
+
+        if(
+            date.getFullYear() === year &&
+            date.getMonth() === month &&
+            date.getDate() === day
+        ){
+
+            return date;
+
+        }
+
+        return null;
+
+    }
+
+
+    /*
+      Định dạng chính: HH:MM DD/MM/YYYY
+      (giữ nguyên logic cũ)
+    */
+
+    let match =
         text.match(
             /^(\d{1,2}):(\d{2})\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/
         );
 
 
-    if(!match){
+    if(match){
 
-        return null;
+        const hour   = Number(match[1]);
+        const minute = Number(match[2]);
+        const day    = Number(match[3]);
+        const month  = Number(match[4]);
+        const year   = Number(match[5]);
+
+
+        if(
+            hour < 0 || hour > 23 ||
+            minute < 0 || minute > 59 ||
+            month < 1 || month > 12 ||
+            day < 1 || day > 31
+        ){
+
+            return null;
+
+        }
+
+
+        const date =
+            new Date(
+                year,
+                month - 1,
+                day,
+                hour,
+                minute,
+                0,
+                0
+            );
+
+
+        if(
+            date.getFullYear() !== year ||
+            date.getMonth() !== month - 1 ||
+            date.getDate() !== day ||
+            date.getHours() !== hour ||
+            date.getMinutes() !== minute
+        ){
+
+            return null;
+
+        }
+
+
+        return date;
 
     }
-
-
-    const hour =
-        Number(match[1]);
-
-
-    const minute =
-        Number(match[2]);
-
-
-    const day =
-        Number(match[3]);
-
-
-    const month =
-        Number(match[4]);
-
-
-    const year =
-        Number(match[5]);
-
-
-    if(
-        hour < 0 ||
-        hour > 23 ||
-        minute < 0 ||
-        minute > 59 ||
-        month < 1 ||
-        month > 12 ||
-        day < 1 ||
-        day > 31
-    ){
-
-        return null;
-
-    }
-
-
-    const date =
-        new Date(
-            year,
-            month - 1,
-            day,
-            hour,
-            minute,
-            0,
-            0
-        );
 
 
     /*
-      
+      Thêm hỗ trợ các format phổ biến khác để tránh báo sai
+      (không thay đổi logic so sánh, chỉ parse tốt hơn)
     */
 
-    if(
-        date.getFullYear() !== year ||
-        date.getMonth() !== month - 1 ||
-        date.getDate() !== day ||
-        date.getHours() !== hour ||
-        date.getMinutes() !== minute
-    ){
+    // DD/MM/YYYY HH:MM
+    match =
+        text.match(
+            /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})$/
+        );
+
+    if(match){
+
+        const day    = Number(match[1]);
+        const month  = Number(match[2]);
+        const year   = Number(match[3]);
+        const hour   = Number(match[4]);
+        const minute = Number(match[5]);
+
+        if(
+            hour < 0 || hour > 23 ||
+            minute < 0 || minute > 59 ||
+            month < 1 || month > 12 ||
+            day < 1 || day > 31
+        ){
+            return null;
+        }
+
+        const date = new Date(year, month - 1, day, hour, minute, 0, 0);
+
+        if(
+            date.getFullYear() === year &&
+            date.getMonth() === month - 1 &&
+            date.getDate() === day
+        ){
+            return date;
+        }
 
         return null;
+    }
+
+
+    // DD/MM/YYYY
+    match =
+        text.match(
+            /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+        );
+
+    if(match){
+
+        const day   = Number(match[1]);
+        const month = Number(match[2]);
+        const year  = Number(match[3]);
+
+        if(
+            month < 1 || month > 12 ||
+            day < 1 || day > 31
+        ){
+            return null;
+        }
+
+        const date = new Date(year, month - 1, day, 23, 59, 59, 999);
+
+        if(
+            date.getFullYear() === year &&
+            date.getMonth() === month - 1 &&
+            date.getDate() === day
+        ){
+            return date;
+        }
+
+        return null;
+    }
+
+
+    // Thử parse bằng Date native (fallback cuối)
+    const native = new Date(text);
+
+    if(!isNaN(native.getTime())){
+
+        return native;
 
     }
 
 
-    return date;
+    return null;
 
 }
 
