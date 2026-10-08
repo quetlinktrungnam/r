@@ -130,6 +130,20 @@ body{
     word-break:break-all;
     line-height:1.4;
 }
+/* Hiển thị 4 ký tự đầu to hơn khi approved */
+.device-code-short{
+    flex:1;
+    min-width:0;
+    padding:14px 10px;
+    font-family:monospace;
+    font-size:28px;
+    font-weight:800;
+    color:#25f4ee;
+    text-align:center;
+    letter-spacing:2px;
+    word-break:break-all;
+    line-height:1.2;
+}
 .copy-btn,
 .open-btn{
     border:0;
@@ -211,17 +225,15 @@ body{
         <div class="sub">
             XÁC MINH THIẾT BỊ
         </div>
-        <!-- =========================
-             
-        ========================== -->
+
+        <!-- LOADING -->
         <div id="loadingBox"
              class="status loading">
             <div class="spinner"></div>
             Đang kiểm tra thiết bị...
         </div>
-        <!-- =========================
-            
-        ========================== -->
+
+        <!-- DENIED -->
         <div id="deniedBox"
              class="hidden">
             <div class="status error">
@@ -244,25 +256,20 @@ body{
                 Admin: @dvmxhnam
             </div>
         </div>
-        <!-- =========================
-             
-        ========================== -->
+
+        <!-- APPROVED -->
         <div id="approvedBox"
              class="hidden">
             <div class="status success">
                 ✓ Thiết bị đã được cấp phép
             </div>
             <div class="device-title">
-                Mã thiết bị của bạn
+                Mã thiết bị (4 ký tự đầu)
             </div>
             <div class="device-box">
                 <div id="deviceCodeApproved"
-                     class="device-code">
+                     class="device-code-short">
                 </div>
-                <button id="copyBtnApproved"
-                        class="copy-btn">
-                    COPY
-                </button>
             </div>
             <!-- CỘT B -->
             <div id="approvedNote"
@@ -277,9 +284,8 @@ body{
                 MỞ TIKTOK 
             </button>
         </div>
-        <!-- =========================
-             HẾT HẠN
-        ========================== -->
+
+        <!-- HẾT HẠN -->
         <div id="expiredBox"
              class="hidden">
             <div class="status warning">
@@ -310,9 +316,8 @@ body{
                 Vui lòng liên hệ admin @dvmxhnam để gia hạn.
             </div>
         </div>
-        <!-- =========================
-             LỖI
-        ========================== -->
+
+        <!-- LỖI -->
         <div id="errorBox"
              class="hidden">
             <div class="status error">
@@ -325,16 +330,18 @@ body{
         </div>
     </div>
 </div>
+
 <script>
 /* =========================================================
-  
+   CONFIG
 ========================================================= */
 const SHEET_ID =
 "1-e7G6GYM9eJSKOF1AOdATM4H2X-7erAaqj0VJUCD6T8";
 const SHEET_NAME =
 "Sheet1";
+
 /* =========================================================
-  
+   GENERATE DEVICE ID
 ========================================================= */
 function generateDeviceId(){
     const uuid =
@@ -349,8 +356,9 @@ function generateDeviceId(){
     });
     return btoa(binary);
 }
+
 /* =========================================================
-   
+   GET / SAVE DEVICE ID
 ========================================================= */
 function getDeviceId(){
     let id =
@@ -367,8 +375,9 @@ function getDeviceId(){
     }
     return id;
 }
+
 /* =========================================================
-   
+   GET TIKTOK URL
 ========================================================= */
 function getTikTokUrl(){
     const params =
@@ -381,8 +390,9 @@ function getTikTokUrl(){
         ""
     );
 }
+
 /* =========================================================
-   
+   GET ROOM ID
 ========================================================= */
 function getRoomId(url){
     if(!url){
@@ -404,6 +414,7 @@ function getRoomId(url){
     }
     return "";
 }
+
 /* =========================================================
    LẤY GIỜ VIỆT NAM TỪ WEB (không dùng giờ máy)
 ========================================================= */
@@ -420,19 +431,18 @@ async function getVietnamNow(){
             throw new Error("API time lỗi");
         }
         const data = await response.json();
-        // unix là giây → nhân 1000 thành milliseconds
         if(data && typeof data.unix === "number"){
             return new Date(data.unix * 1000);
         }
         throw new Error("Không có unix timestamp");
     }catch(e){
         console.warn("Không lấy được giờ VN từ web, fallback local:", e);
-        // Fallback cuối cùng nếu API chết
         return new Date();
     }
 }
+
 /* =========================================================
-   
+   ĐỌC GOOGLE SHEET
 ========================================================= */
 async function readGoogleSheet(){
     const query =
@@ -516,6 +526,7 @@ async function readGoogleSheet(){
     });
     return devices;
 }
+
 /* =========================================================
    PARSE HẠN SỬ DỤNG - LUÔN THEO GIỜ VIỆT NAM (+07)
 ========================================================= */
@@ -529,29 +540,22 @@ function parseExpiry(value){
     if(!text){
         return null;
     }
-
-    // Tạo timestamp đúng theo giờ Việt Nam (+07)
-    // month truyền vào là 0-based
     function createVNDate(year, month, day, hour = 0, minute = 0, second = 0){
         return new Date(Date.UTC(year, month, day, hour - 7, minute, second, 0));
     }
-
-    /* Google Sheets trả về dạng Date(year, month0, day, ...) */
     const dateCtorMatch =
         text.match(
             /^Date\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?(?:,\s*(\d+))?(?:,\s*(\d+))?/
         );
     if(dateCtorMatch){
         const year   = Number(dateCtorMatch[1]);
-        const month  = Number(dateCtorMatch[2]); // 0-based
+        const month  = Number(dateCtorMatch[2]);
         const day    = Number(dateCtorMatch[3]);
         const hour   = Number(dateCtorMatch[4] || 0);
         const minute = Number(dateCtorMatch[5] || 0);
         const second = Number(dateCtorMatch[6] || 0);
         return createVNDate(year, month, day, hour, minute, second);
     }
-
-    /* Định dạng chính: HH:MM DD/MM/YYYY  (7:00 04/10/2026 hoặc 07:00 04/10/2026) */
     let match =
         text.match(
             /^(\d{1,2}):(\d{2})\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/
@@ -572,8 +576,6 @@ function parseExpiry(value){
         }
         return createVNDate(year, month - 1, day, hour, minute);
     }
-
-    /* DD/MM/YYYY HH:MM */
     match =
         text.match(
             /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})$/
@@ -594,8 +596,6 @@ function parseExpiry(value){
         }
         return createVNDate(year, month - 1, day, hour, minute);
     }
-
-    /* Chỉ có ngày DD/MM/YYYY → hết hạn 23:59:59 ngày đó */
     match =
         text.match(
             /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
@@ -612,14 +612,13 @@ function parseExpiry(value){
         }
         return createVNDate(year, month - 1, day, 23, 59, 59);
     }
-
-    /* Fallback */
     const native = new Date(text);
     if(!isNaN(native.getTime())){
         return native;
     }
     return null;
 }
+
 /* =========================================================
    HIỂN THỊ GIỜ THEO VIỆT NAM
 ========================================================= */
@@ -646,66 +645,36 @@ function formatDate(date){
         get("year")
     );
 }
+
 /* =========================================================
+   UI HELPERS
 ========================================================= */
 function hideAll(){
-    document
-        .getElementById("loadingBox")
-        .classList
-        .add("hidden");
-    document
-        .getElementById("deniedBox")
-        .classList
-        .add("hidden");
-    document
-        .getElementById("approvedBox")
-        .classList
-        .add("hidden");
-    document
-        .getElementById("expiredBox")
-        .classList
-        .add("hidden");
-    document
-        .getElementById("errorBox")
-        .classList
-        .add("hidden");
+    document.getElementById("loadingBox").classList.add("hidden");
+    document.getElementById("deniedBox").classList.add("hidden");
+    document.getElementById("approvedBox").classList.add("hidden");
+    document.getElementById("expiredBox").classList.add("hidden");
+    document.getElementById("errorBox").classList.add("hidden");
 }
-/* =========================================================
-========================================================= */
+
 function showDenied(){
     hideAll();
-    document
-        .getElementById("deniedBox")
-        .classList
-        .remove("hidden");
+    document.getElementById("deniedBox").classList.remove("hidden");
 }
-/* =========================================================
-========================================================= */
-function showApproved(
-    note,
-    expiry
-){
+
+function showApproved(note, expiry){
     hideAll();
-    document
-        .getElementById("approvedBox")
-        .classList
-        .remove("hidden");
-    const noteBox =
-        document.getElementById(
-            "approvedNote"
-        );
-    const expiryBox =
-        document.getElementById(
-            "expiryBox"
-        );
+    document.getElementById("approvedBox").classList.remove("hidden");
+
+    const noteBox = document.getElementById("approvedNote");
+    const expiryBox = document.getElementById("expiryBox");
+
     if(note){
-        noteBox.textContent =
-            "Ghi chú: " +
-            note;
+        noteBox.textContent = "Ghi chú: " + note;
     }else{
-        noteBox.textContent =
-            "";
+        noteBox.textContent = "";
     }
+
     if(expiry){
         expiryBox.innerHTML =
             "Hạn sử dụng: <strong>" +
@@ -715,94 +684,57 @@ function showApproved(
         expiryBox.innerHTML =
             "Hạn sử dụng: <strong>VÔ HẠN</strong>";
     }
-    setTimeout(
-        openTikTok,
-        500
-    );
+
+    // Tự mở TikTok sau 500ms
+    setTimeout(openTikTok, 500);
 }
-/* =========================================================
-   HẾT HẠN
-========================================================= */
-function showExpired(
-    note,
-    expiry
-){
+
+function showExpired(note, expiry){
     hideAll();
-    document
-        .getElementById("expiredBox")
-        .classList
-        .remove("hidden");
-    const noteBox =
-        document.getElementById(
-            "expiredNote"
-        );
+    document.getElementById("expiredBox").classList.remove("hidden");
+
+    const noteBox = document.getElementById("expiredNote");
     if(note){
-        noteBox.textContent =
-            "Ghi chú: " +
-            note;
+        noteBox.textContent = "Ghi chú: " + note;
     }else{
-        noteBox.textContent =
-            "";
+        noteBox.textContent = "";
     }
-    document
-        .getElementById(
-            "expiredDate"
-        )
-        .innerHTML =
-            "Đã hết hạn lúc: <strong>" +
-            formatDate(expiry) +
-            "</strong>";
+
+    document.getElementById("expiredDate").innerHTML =
+        "Đã hết hạn lúc: <strong>" +
+        formatDate(expiry) +
+        "</strong>";
 }
-/* =========================================================
-   LỖI
-========================================================= */
+
 function showError(){
     hideAll();
-    document
-        .getElementById("errorBox")
-        .classList
-        .remove("hidden");
+    document.getElementById("errorBox").classList.remove("hidden");
 }
+
 /* =========================================================
-   KIỂM TRA THIẾT BỊ
+   KIỂM TRA THIẾT BỊ (CHẠY SONG SONG ĐỂ NHANH HƠN)
 ========================================================= */
 async function checkDevice(){
-    const deviceId =
-        getDeviceId();
+    const deviceId = getDeviceId();
 
-    document
-        .getElementById(
-            "deviceCode"
-        )
-        .textContent =
-            deviceId;
-    document
-        .getElementById(
-            "deviceCodeApproved"
-        )
-        .textContent =
-            deviceId;
-    document
-        .getElementById(
-            "deviceCodeExpired"
-        )
-        .textContent =
-            deviceId;
+    // Hiển thị mã đầy đủ cho denied + expired
+    document.getElementById("deviceCode").textContent = deviceId;
+    document.getElementById("deviceCodeExpired").textContent = deviceId;
+
+    // Chỉ hiện 4 ký tự đầu + ngoặc khi approved
+    const shortCode = "(" + deviceId.substring(0, 4) + ")";
+    document.getElementById("deviceCodeApproved").textContent = shortCode;
 
     try{
-        // 1. Lấy giờ Việt Nam chuẩn từ web
-        const now = await getVietnamNow();
+        // Chạy song song 2 request → nhanh hơn nhiều
+        const [now, devices] = await Promise.all([
+            getVietnamNow(),
+            readGoogleSheet()
+        ]);
 
-        // 2. Đọc danh sách thiết bị
-        const devices =
-            await readGoogleSheet();
-
-        const found =
-            devices.find(
-                item =>
-                    item.device.trim() ===
-                    deviceId.trim()
-            );
+        const found = devices.find(
+            item => item.device.trim() === deviceId.trim()
+        );
 
         if(!found){
             showDenied();
@@ -810,99 +742,58 @@ async function checkDevice(){
         }
 
         if(!found.expiry){
-            showApproved(
-                found.note,
-                null
-            );
+            showApproved(found.note, null);
             return;
         }
 
-        const expiry =
-            parseExpiry(
-                found.expiry
-            );
-
+        const expiry = parseExpiry(found.expiry);
         if(!expiry){
-            console.error(
-                "Sai định dạng hạn:",
-                found.expiry
-            );
+            console.error("Sai định dạng hạn:", found.expiry);
             showError();
             return;
         }
 
-        // So sánh bằng timestamp tuyệt đối (không phụ thuộc giờ máy)
-        if(
-            now.getTime() >
-            expiry.getTime()
-        ){
-            showExpired(
-                found.note,
-                expiry
-            );
+        if(now.getTime() > expiry.getTime()){
+            showExpired(found.note, expiry);
             return;
         }
 
-        showApproved(
-            found.note,
-            expiry
-        );
+        showApproved(found.note, expiry);
     }catch(error){
-        console.error(
-            error
-        );
+        console.error(error);
         showError();
     }
 }
+
 /* =========================================================
-   
+   COPY DEVICE ID
 ========================================================= */
 async function copyDevice(){
-    const id =
-        getDeviceId();
+    const id = getDeviceId();
     try{
-        await navigator
-            .clipboard
-            .writeText(id);
-        const btns =
-            document.querySelectorAll(
-                ".copy-btn"
-            );
+        await navigator.clipboard.writeText(id);
+        const btns = document.querySelectorAll(".copy-btn");
         btns.forEach(btn => {
-            const old =
-                btn.textContent;
-            btn.textContent =
-                "ĐÃ COPY";
-            setTimeout(
-                () => {
-                    btn.textContent =
-                        old;
-                },
-                1500
-            );
+            const old = btn.textContent;
+            btn.textContent = "ĐÃ COPY";
+            setTimeout(() => {
+                btn.textContent = old;
+            }, 1500);
         });
     }catch{
-        const input =
-            document.createElement(
-                "textarea"
-            );
-        input.value =
-            id;
-        input.style.position =
-            "fixed";
-        input.style.opacity =
-            "0";
-        document.body.appendChild(
-            input
-        );
+        const input = document.createElement("textarea");
+        input.value = id;
+        input.style.position = "fixed";
+        input.style.opacity = "0";
+        document.body.appendChild(input);
         input.select();
-        document.execCommand(
-            "copy"
-        );
+        document.execCommand("copy");
         input.remove();
     }
 }
+
 /* =========================================================
+   ĐÓNG TRANG SAU KHI MỞ
 ========================================================= */
 function closePageAfterOpen(){
     setTimeout(() => {
@@ -911,75 +802,42 @@ function closePageAfterOpen(){
         }catch(e){}
         setTimeout(() => {
             try{
-                window.location.replace(
-                    "about:blank"
-                );
+                window.location.replace("about:blank");
             }catch(e){}
-        },400);
-    },1200);
+        }, 400);
+    }, 1200);
 }
+
 /* =========================================================
-   
+   MỞ TIKTOK
 ========================================================= */
 function openTikTok(){
-    const originalUrl =
-        getTikTokUrl();
-    const roomId =
-        getRoomId(
-            originalUrl
-        );
+    const originalUrl = getTikTokUrl();
+    const roomId = getRoomId(originalUrl);
     if(!roomId){
         return;
     }
     const deepLink =
         "snssdk1180://live?room_id=" +
-        encodeURIComponent(
-            roomId
-        );
-    window.location.href =
-        deepLink;
+        encodeURIComponent(roomId);
+    window.location.href = deepLink;
     closePageAfterOpen();
 }
+
 /* =========================================================
-   
+   EVENT LISTENERS
 ========================================================= */
-document
-    .getElementById(
-        "copyBtn"
-    )
-    .addEventListener(
-        "click",
-        copyDevice
-    );
-document
-    .getElementById(
-        "copyBtnApproved"
-    )
-    .addEventListener(
-        "click",
-        copyDevice
-    );
-document
-    .getElementById(
-        "copyBtnExpired"
-    )
-    .addEventListener(
-        "click",
-        copyDevice
-    );
+document.getElementById("copyBtn")
+    .addEventListener("click", copyDevice);
+
+document.getElementById("copyBtnExpired")
+    .addEventListener("click", copyDevice);
+
+document.getElementById("openBtn")
+    .addEventListener("click", openTikTok);
+
 /* =========================================================
-  
-========================================================= */
-document
-    .getElementById(
-        "openBtn"
-    )
-    .addEventListener(
-        "click",
-        openTikTok
-    );
-/* =========================================================
-   
+   START
 ========================================================= */
 checkDevice();
 </script>
