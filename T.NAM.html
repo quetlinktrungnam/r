@@ -13,648 +13,305 @@
     box-sizing:border-box;
     -webkit-tap-highlight-color:transparent;
 }
-html,
-body{
-    margin:0;
-    padding:0;
-    width:100%;
-    min-height:100%;
-    background:#050505;
-    color:#fff;
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Arial,
-        sans-serif;
+html,body{
+    margin:0;padding:0;width:100%;min-height:100%;
+    background:#050505;color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
 }
 body{
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:20px;
+    min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;
 }
-.container{
-    width:100%;
-    max-width:430px;
-}
+.container{width:100%;max-width:430px;}
 .card{
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,.07),
-            rgba(255,255,255,.025)
-        );
+    background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));
     border:1px solid rgba(255,255,255,.10);
-    border-radius:24px;
-    padding:28px 22px;
-    box-shadow:
-        0 20px 70px rgba(0,0,0,.65),
-        inset 0 1px rgba(255,255,255,.05);
-    backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
+    border-radius:24px;padding:28px 22px;
+    box-shadow:0 20px 70px rgba(0,0,0,.65),inset 0 1px rgba(255,255,255,.05);
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
 }
 .logo{
-    text-align:center;
-    font-size:34px;
-    font-weight:900;
-    letter-spacing:4px;
-    margin-bottom:7px;
-    background:
-        linear-gradient(
-            90deg,
-            #25f4ee,
-            #fff,
-            #ff2c55
-        );
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
+    text-align:center;font-size:34px;font-weight:900;letter-spacing:4px;margin-bottom:7px;
+    background:linear-gradient(90deg,#25f4ee,#fff,#ff2c55);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
-.sub{
-    text-align:center;
-    color:#888;
-    font-size:13px;
-    margin-bottom:28px;
-}
+.sub{text-align:center;color:#888;font-size:13px;margin-bottom:28px;}
 .status{
-    padding:15px;
-    border-radius:15px;
-    background:rgba(255,255,255,.045);
-    border:1px solid rgba(255,255,255,.07);
-    text-align:center;
-    margin-bottom:18px;
-    font-size:14px;
+    padding:15px;border-radius:15px;background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.07);text-align:center;margin-bottom:18px;font-size:14px;
 }
-.status.loading{
-    color:#aaa;
-}
-.status.success{
-    color:#25f4ee;
-    border-color:
-        rgba(37,244,238,.25);
-}
-.status.error{
-    color:#ff667f;
-    border-color:
-        rgba(255,44,85,.25);
-}
-.status.warning{
-    color:#ffb347;
-    border-color:
-        rgba(255,179,71,.25);
-}
-.device-title{
-    font-size:12px;
-    color:#888;
-    margin-bottom:8px;
-}
+.status.loading{color:#aaa;}
+.status.success{color:#25f4ee;border-color:rgba(37,244,238,.25);}
+.status.error{color:#ff667f;border-color:rgba(255,44,85,.25);}
+.status.warning{color:#ffb347;border-color:rgba(255,179,71,.25);}
+.device-title{font-size:12px;color:#888;margin-bottom:8px;}
 .device-box{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    background:#090909;
-    border:
-        1px solid
-        rgba(255,255,255,.08);
-    border-radius:14px;
-    padding:5px;
+    display:flex;align-items:center;gap:8px;background:#090909;
+    border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:5px;
 }
 .device-code{
-    flex:1;
-    min-width:0;
-    padding:10px;
-    font-family:monospace;
-    font-size:11px;
-    color:#ccc;
-    word-break:break-all;
-    line-height:1.4;
+    flex:1;min-width:0;padding:10px;font-family:monospace;font-size:11px;
+    color:#ccc;word-break:break-all;line-height:1.4;
 }
-/* Hiển thị 4 ký tự đầu to hơn khi approved */
 .device-code-short{
-    flex:1;
-    min-width:0;
-    padding:14px 10px;
-    font-family:monospace;
-    font-size:28px;
-    font-weight:800;
-    color:#25f4ee;
-    text-align:center;
-    letter-spacing:2px;
-    word-break:break-all;
-    line-height:1.2;
+    flex:1;min-width:0;padding:14px 10px;font-family:monospace;
+    font-size:28px;font-weight:800;color:#25f4ee;text-align:center;
+    letter-spacing:2px;line-height:1.2;
 }
-.copy-btn,
+.copy-btn,.open-btn{
+    border:0;cursor:pointer;color:#fff;font-weight:800;border-radius:11px;
+    padding:11px 14px;white-space:nowrap;
+}
+.copy-btn{background:linear-gradient(135deg,#ff2c55,#ff0050);}
 .open-btn{
-    border:0;
-    cursor:pointer;
-    color:#fff;
-    font-weight:800;
-    border-radius:11px;
-    padding:11px 14px;
-    white-space:nowrap;
+    width:100%;margin-top:15px;padding:15px;font-size:15px;
+    background:linear-gradient(135deg,#25f4ee,#1677ff);
 }
-.copy-btn{
-    background:
-        linear-gradient(
-            135deg,
-            #ff2c55,
-            #ff0050
-        );
-}
-.open-btn{
-    width:100%;
-    margin-top:15px;
-    padding:15px;
-    font-size:15px;
-    background:
-        linear-gradient(
-            135deg,
-            #25f4ee,
-            #1677ff
-        );
-}
-.copy-btn:active,
-.open-btn:active{
-    transform:scale(.97);
-}
-.note{
-    margin-top:15px;
-    color:#777;
-    text-align:center;
-    font-size:12px;
-    line-height:1.5;
-}
-.expiry{
-    margin-top:10px;
-    text-align:center;
-    font-size:12px;
-    color:#aaa;
-}
-.expiry strong{
-    color:#fff;
-}
-.hidden{
-    display:none !important;
-}
+.copy-btn:active,.open-btn:active{transform:scale(.97);}
+.note{margin-top:15px;color:#777;text-align:center;font-size:12px;line-height:1.5;}
+.expiry{margin-top:10px;text-align:center;font-size:12px;color:#aaa;}
+.expiry strong{color:#fff;}
+.hidden{display:none !important;}
 .spinner{
-    width:20px;
-    height:20px;
-    margin:0 auto 10px;
-    border:
-        2px solid
-        rgba(255,255,255,.15);
-    border-top-color:#25f4ee;
-    border-radius:50%;
-    animation:
-        spin .7s linear infinite;
+    width:20px;height:20px;margin:0 auto 10px;
+    border:2px solid rgba(255,255,255,.15);border-top-color:#25f4ee;
+    border-radius:50%;animation:spin .7s linear infinite;
 }
-@keyframes spin{
-    to{
-        transform:rotate(360deg);
-    }
-}
+@keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
 <div class="container">
     <div class="card">
-        <div class="logo">
-            Quét Link Trung Nam
-        </div>
-        <div class="sub">
-            XÁC MINH THIẾT BỊ
-        </div>
+        <div class="logo">Quét Link Trung Nam</div>
+        <div class="sub">XÁC MINH THIẾT BỊ</div>
 
-        <!-- LOADING -->
-        <div id="loadingBox"
-             class="status loading">
+        <div id="loadingBox" class="status loading">
             <div class="spinner"></div>
             Đang kiểm tra thiết bị...
         </div>
 
-        <!-- DENIED -->
-        <div id="deniedBox"
-             class="hidden">
-            <div class="status error">
-                Thiết bị chưa được cấp phép
-            </div>
-            <div class="device-title">
-                Mã thiết bị của bạn
-            </div>
+        <div id="deniedBox" class="hidden">
+            <div class="status error">Thiết bị chưa được cấp phép</div>
+            <div class="device-title">Mã thiết bị của bạn</div>
             <div class="device-box">
-                <div id="deviceCode"
-                     class="device-code">
-                </div>
-                <button id="copyBtn"
-                        class="copy-btn">
-                    COPY
-                </button>
+                <div id="deviceCode" class="device-code"></div>
+                <button id="copyBtn" class="copy-btn">COPY</button>
             </div>
             <div class="note">
-                Vui lòng copy mã gửi về cho bot: <a href="https://t.me/thuebotquetlinktrungnam1_bot" style="color:#25f4ee;text-decoration:none;">https://t.me/thuebotquetlinktrungnam1_bot</a> để được duyệt mã.<br>
+                Vui lòng copy mã gửi về cho bot: 
+                <a href="https://t.me/thuebotquetlinktrungnam1_bot" style="color:#25f4ee;text-decoration:none;">
+                    https://t.me/thuebotquetlinktrungnam1_bot
+                </a> để được duyệt mã.<br>
                 Admin: @dvmxhnam
             </div>
         </div>
 
-        <!-- APPROVED -->
-        <div id="approvedBox"
-             class="hidden">
-            <div class="status success">
-                ✓ Thiết bị đã được cấp phép
-            </div>
-            <div class="device-title">
-                Mã thiết bị (4 ký tự đầu)
-            </div>
+        <div id="approvedBox" class="hidden">
+            <div class="status success">✓ Thiết bị đã được cấp phép</div>
+            <div class="device-title">Mã thiết bị (4 ký tự đầu)</div>
             <div class="device-box">
-                <div id="deviceCodeApproved"
-                     class="device-code-short">
-                </div>
+                <div id="deviceCodeApproved" class="device-code-short"></div>
             </div>
-            <!-- CỘT B -->
-            <div id="approvedNote"
-                 class="note">
-            </div>
-            <!-- CỘT C -->
-            <div id="expiryBox"
-                 class="expiry">
-            </div>
-            <button id="openBtn"
-                    class="open-btn">
-                MỞ TIKTOK 
-            </button>
+            <div id="approvedNote" class="note"></div>
+            <div id="expiryBox" class="expiry"></div>
+            <button id="openBtn" class="open-btn">MỞ TIKTOK</button>
         </div>
 
-        <!-- HẾT HẠN -->
-        <div id="expiredBox"
-             class="hidden">
-            <div class="status warning">
-                ⚠ Thiết bị đã hết hạn
-            </div>
-            <div class="device-title">
-                Mã thiết bị của bạn
-            </div>
+        <div id="expiredBox" class="hidden">
+            <div class="status warning">⚠ Thiết bị đã hết hạn</div>
+            <div class="device-title">Mã thiết bị của bạn</div>
             <div class="device-box">
-                <div id="deviceCodeExpired"
-                     class="device-code">
-                </div>
-                <button id="copyBtnExpired"
-                        class="copy-btn">
-                    COPY
-                </button>
+                <div id="deviceCodeExpired" class="device-code"></div>
+                <button id="copyBtnExpired" class="copy-btn">COPY</button>
             </div>
-            <div id="expiredNote"
-                 class="note">
-            </div>
-            <div id="expiredDate"
-                 class="expiry">
-            </div>
+            <div id="expiredNote" class="note"></div>
+            <div id="expiredDate" class="expiry"></div>
             <div class="note">
-                Vui lòng copy mã gửi về cho bot: <a href="https://t.me/thuebotquetlinktrungnam1_bot" style="color:#25f4ee;text-decoration:none;">https://t.me/thuebotquetlinktrungnam1_bot</a> để được duyệt mã.<br>
+                Vui lòng copy mã gửi về cho bot: 
+                <a href="https://t.me/thuebotquetlinktrungnam1_bot" style="color:#25f4ee;text-decoration:none;">
+                    https://t.me/thuebotquetlinktrungnam1_bot
+                </a> để được duyệt mã.<br>
                 Admin: @dvmxhnam<br><br>
                 Thiết bị của bạn đã hết thời gian sử dụng.<br>
                 Vui lòng liên hệ admin @dvmxhnam để gia hạn.
             </div>
         </div>
 
-        <!-- LỖI -->
-        <div id="errorBox"
-             class="hidden">
-            <div class="status error">
-                Không thể kiểm tra thiết bị
-            </div>
-            <div class="note">
-                Vui lòng kiểm tra kết nối mạng
-                hoặc quyền truy cập .
-            </div>
+        <div id="errorBox" class="hidden">
+            <div class="status error">Không thể kiểm tra thiết bị</div>
+            <div class="note">Vui lòng kiểm tra kết nối mạng hoặc quyền truy cập.</div>
         </div>
     </div>
 </div>
 
 <script>
-/* =========================================================
-   CONFIG
-========================================================= */
-const SHEET_ID =
-"1-e7G6GYM9eJSKOF1AOdATM4H2X-7erAaqj0VJUCD6T8";
-const SHEET_NAME =
-"Sheet1";
+const SHEET_ID = "1-e7G6GYM9eJSKOF1AOdATM4H2X-7erAaqj0VJUCD6T8";
+const SHEET_NAME = "Sheet1";
+const CACHE_KEY = "tnam_devices_cache";
+const CACHE_TTL = 8 * 1000; // chỉ 8 giây – an toàn hơn
 
-/* =========================================================
-   GENERATE DEVICE ID
-========================================================= */
 function generateDeviceId(){
-    const uuid =
-        crypto.randomUUID();
-    const bytes =
-        new TextEncoder()
-            .encode(uuid);
+    const uuid = crypto.randomUUID();
+    const bytes = new TextEncoder().encode(uuid);
     let binary = "";
-    bytes.forEach(byte => {
-        binary +=
-            String.fromCharCode(byte);
-    });
+    bytes.forEach(b => binary += String.fromCharCode(b));
     return btoa(binary);
 }
 
-/* =========================================================
-   GET / SAVE DEVICE ID
-========================================================= */
 function getDeviceId(){
-    let id =
-        localStorage.getItem(
-            "tnam_device_id"
-        );
+    let id = localStorage.getItem("tnam_device_id");
     if(!id){
-        id =
-            generateDeviceId();
-        localStorage.setItem(
-            "tnam_device_id",
-            id
-        );
+        id = generateDeviceId();
+        localStorage.setItem("tnam_device_id", id);
     }
     return id;
 }
 
-/* =========================================================
-   GET TIKTOK URL
-========================================================= */
 function getTikTokUrl(){
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
-    return (
-        params.get("url") ||
-        params.get("u") ||
-        ""
-    );
+    const params = new URLSearchParams(window.location.search);
+    return params.get("url") || params.get("u") || "";
 }
 
-/* =========================================================
-   GET ROOM ID
-========================================================= */
 function getRoomId(url){
-    if(!url){
-        return "";
-    }
-    let match =
-        url.match(
-            /room_id=(\d+)/i
-        );
-    if(match){
-        return match[1];
-    }
-    match =
-        url.match(
-            /\/live\/(\d+)/i
-        );
-    if(match){
-        return match[1];
-    }
-    return "";
+    if(!url) return "";
+    let m = url.match(/room_id=(\d+)/i);
+    if(m) return m[1];
+    m = url.match(/\/live\/(\d+)/i);
+    return m ? m[1] : "";
 }
 
-/* =========================================================
-   LẤY GIỜ VIỆT NAM TỪ WEB (không dùng giờ máy)
-========================================================= */
 async function getVietnamNow(){
     try{
-        const response = await fetch(
+        const res = await fetch(
             "https://utctime.app/api/now/Asia/Ho_Chi_Minh?t=" + Date.now(),
-            {
-                method: "GET",
-                cache: "no-store"
-            }
+            { method:"GET", cache:"no-store" }
         );
-        if(!response.ok){
-            throw new Error("API time lỗi");
-        }
-        const data = await response.json();
+        if(!res.ok) throw new Error();
+        const data = await res.json();
         if(data && typeof data.unix === "number"){
             return new Date(data.unix * 1000);
         }
-        throw new Error("Không có unix timestamp");
-    }catch(e){
-        console.warn("Không lấy được giờ VN từ web, fallback local:", e);
-        return new Date();
+        throw new Error();
+    }catch{
+        return new Date(); // fallback
     }
 }
 
-/* =========================================================
-   ĐỌC GOOGLE SHEET
-========================================================= */
+function getCachedDevices(){
+    try{
+        const raw = localStorage.getItem(CACHE_KEY);
+        if(!raw) return null;
+        const data = JSON.parse(raw);
+        if(Date.now() - data.ts > CACHE_TTL) return null;
+        return data.devices;
+    }catch{ return null; }
+}
+
+function setCachedDevices(devices){
+    try{
+        localStorage.setItem(CACHE_KEY, JSON.stringify({
+            ts: Date.now(),
+            devices
+        }));
+    }catch{}
+}
+
+function parseCSVLine(line){
+    const result = [];
+    let current = "", inQuotes = false;
+    for(let i = 0; i < line.length; i++){
+        const c = line[i];
+        if(c === '"'){
+            if(inQuotes && line[i+1] === '"'){ current += '"'; i++; }
+            else inQuotes = !inQuotes;
+        }else if(c === ',' && !inQuotes){
+            result.push(current); current = "";
+        }else current += c;
+    }
+    result.push(current);
+    return result;
+}
+
 async function readGoogleSheet(){
-    const query =
-        encodeURIComponent(
-            "select A,B,C"
-        );
-    const url =
-        "https://docs.google.com/spreadsheets/d/" +
-        SHEET_ID +
-        "/gviz/tq?" +
-        "sheet=" +
-        encodeURIComponent(
-            SHEET_NAME
-        ) +
-        "&tq=" +
-        query +
-        "&headers=1";
-    const response =
-        await fetch(
-            url +
-            "&t=" +
-            Date.now(),
-            {
-                method:"GET",
-                cache:"no-store"
-            }
-        );
-    if(!response.ok){
-        throw new Error(
-            "Không đọc được Google Sheet"
-        );
-    }
-    const text =
-        await response.text();
-    const match =
-        text.match(
-            /google\.visualization\.Query\.setResponse\(([\s\S]+)\)/
-        );
-    if(!match){
-        throw new Error(
-            "Google Sheet không trả dữ liệu hợp lệ"
-        );
-    }
-    const data =
-        JSON.parse(
-            match[1]
-        );
-    const rows =
-        data?.table?.rows || [];
+    const cached = getCachedDevices();
+    if(cached) return cached;
+
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}&t=${Date.now()}`;
+    const res = await fetch(url, { method:"GET", cache:"no-store" });
+    if(!res.ok) throw new Error("Không đọc được Sheet");
+
+    const text = await res.text();
+    const lines = text.trim().split(/\r?\n/);
     const devices = [];
-    rows.forEach(row => {
-        const cells =
-            row.c || [];
-        const device =
-            cells[0]?.v != null
-                ? String(
-                    cells[0].v
-                  ).trim()
-                : "";
-        const note =
-            cells[1]?.v != null
-                ? String(
-                    cells[1].v
-                  ).trim()
-                : "";
-        let expiryRaw = "";
-        if(cells[2]){
-            if(cells[2].f != null && String(cells[2].f).trim() !== ""){
-                expiryRaw = String(cells[2].f).trim();
-            }else if(cells[2].v != null){
-                expiryRaw = String(cells[2].v).trim();
-            }
-        }
-        if(device){
-            devices.push({
-                device:device,
-                note:note,
-                expiry:expiryRaw
-            });
-        }
-    });
+
+    for(let i = 1; i < lines.length; i++){
+        const cols = parseCSVLine(lines[i]);
+        const device = (cols[0] || "").trim();
+        if(!device) continue;
+        devices.push({
+            device,
+            note: (cols[1] || "").trim(),
+            expiry: (cols[2] || "").trim()
+        });
+    }
+
+    setCachedDevices(devices);
     return devices;
 }
 
-/* =========================================================
-   PARSE HẠN SỬ DỤNG - LUÔN THEO GIỜ VIỆT NAM (+07)
-========================================================= */
 function parseExpiry(value){
-    if(!value){
-        return null;
+    if(!value) return null;
+    const text = String(value).trim();
+    if(!text) return null;
+
+    function createVNDate(y, m, d, h=0, mi=0, s=0){
+        return new Date(Date.UTC(y, m, d, h - 7, mi, s, 0));
     }
-    const text =
-        String(value)
-            .trim();
-    if(!text){
-        return null;
+
+    let m = text.match(/^Date\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?(?:,\s*(\d+))?(?:,\s*(\d+))?/);
+    if(m) return createVNDate(+m[1], +m[2], +m[3], +(m[4]||0), +(m[5]||0), +(m[6]||0));
+
+    m = text.match(/^(\d{1,2}):(\d{2})\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if(m){
+        const [_, h, mi, d, mo, y] = m.map(Number);
+        if(h>23||mi>59||mo<1||mo>12||d<1||d>31) return null;
+        return createVNDate(y, mo-1, d, h, mi);
     }
-    function createVNDate(year, month, day, hour = 0, minute = 0, second = 0){
-        return new Date(Date.UTC(year, month, day, hour - 7, minute, second, 0));
+
+    m = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})$/);
+    if(m){
+        const [_, d, mo, y, h, mi] = m.map(Number);
+        if(h>23||mi>59||mo<1||mo>12||d<1||d>31) return null;
+        return createVNDate(y, mo-1, d, h, mi);
     }
-    const dateCtorMatch =
-        text.match(
-            /^Date\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?(?:,\s*(\d+))?(?:,\s*(\d+))?/
-        );
-    if(dateCtorMatch){
-        const year   = Number(dateCtorMatch[1]);
-        const month  = Number(dateCtorMatch[2]);
-        const day    = Number(dateCtorMatch[3]);
-        const hour   = Number(dateCtorMatch[4] || 0);
-        const minute = Number(dateCtorMatch[5] || 0);
-        const second = Number(dateCtorMatch[6] || 0);
-        return createVNDate(year, month, day, hour, minute, second);
+
+    m = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if(m){
+        const [_, d, mo, y] = m.map(Number);
+        if(mo<1||mo>12||d<1||d>31) return null;
+        return createVNDate(y, mo-1, d, 23, 59, 59);
     }
-    let match =
-        text.match(
-            /^(\d{1,2}):(\d{2})\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/
-        );
-    if(match){
-        const hour   = Number(match[1]);
-        const minute = Number(match[2]);
-        const day    = Number(match[3]);
-        const month  = Number(match[4]);
-        const year   = Number(match[5]);
-        if(
-            hour < 0 || hour > 23 ||
-            minute < 0 || minute > 59 ||
-            month < 1 || month > 12 ||
-            day < 1 || day > 31
-        ){
-            return null;
-        }
-        return createVNDate(year, month - 1, day, hour, minute);
-    }
-    match =
-        text.match(
-            /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})$/
-        );
-    if(match){
-        const day    = Number(match[1]);
-        const month  = Number(match[2]);
-        const year   = Number(match[3]);
-        const hour   = Number(match[4]);
-        const minute = Number(match[5]);
-        if(
-            hour < 0 || hour > 23 ||
-            minute < 0 || minute > 59 ||
-            month < 1 || month > 12 ||
-            day < 1 || day > 31
-        ){
-            return null;
-        }
-        return createVNDate(year, month - 1, day, hour, minute);
-    }
-    match =
-        text.match(
-            /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
-        );
-    if(match){
-        const day   = Number(match[1]);
-        const month = Number(match[2]);
-        const year  = Number(match[3]);
-        if(
-            month < 1 || month > 12 ||
-            day < 1 || day > 31
-        ){
-            return null;
-        }
-        return createVNDate(year, month - 1, day, 23, 59, 59);
-    }
+
     const native = new Date(text);
-    if(!isNaN(native.getTime())){
-        return native;
-    }
-    return null;
+    return isNaN(native.getTime()) ? null : native;
 }
 
-/* =========================================================
-   HIỂN THỊ GIỜ THEO VIỆT NAM
-========================================================= */
 function formatDate(date){
-    if(!date){
-        return "";
-    }
-    const options = {
+    if(!date) return "";
+    const opts = {
         timeZone: "Asia/Ho_Chi_Minh",
-        hour: "2-digit",
-        minute: "2-digit",
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
+        hour: "2-digit", minute: "2-digit",
+        day: "2-digit", month: "2-digit", year: "numeric",
         hour12: false
     };
-    const parts = new Intl.DateTimeFormat("vi-VN", options).formatToParts(date);
-    const get = (type) => parts.find(p => p.type === type)?.value || "";
-    return (
-        get("hour") + ":" +
-        get("minute") + " " +
-        get("day") + "/" +
-        get("month") + "/" +
-        get("year")
-    );
+    const parts = new Intl.DateTimeFormat("vi-VN", opts).formatToParts(date);
+    const get = t => parts.find(p => p.type === t)?.value || "";
+    return `${get("hour")}:${get("minute")} ${get("day")}/${get("month")}/${get("year")}`;
 }
 
-/* =========================================================
-   UI HELPERS
-========================================================= */
 function hideAll(){
-    document.getElementById("loadingBox").classList.add("hidden");
-    document.getElementById("deniedBox").classList.add("hidden");
-    document.getElementById("approvedBox").classList.add("hidden");
-    document.getElementById("expiredBox").classList.add("hidden");
-    document.getElementById("errorBox").classList.add("hidden");
+    ["loadingBox","deniedBox","approvedBox","expiredBox","errorBox"]
+        .forEach(id => document.getElementById(id).classList.add("hidden"));
 }
 
 function showDenied(){
@@ -665,45 +322,19 @@ function showDenied(){
 function showApproved(note, expiry){
     hideAll();
     document.getElementById("approvedBox").classList.remove("hidden");
-
-    const noteBox = document.getElementById("approvedNote");
-    const expiryBox = document.getElementById("expiryBox");
-
-    if(note){
-        noteBox.textContent = "Ghi chú: " + note;
-    }else{
-        noteBox.textContent = "";
-    }
-
-    if(expiry){
-        expiryBox.innerHTML =
-            "Hạn sử dụng: <strong>" +
-            formatDate(expiry) +
-            "</strong>";
-    }else{
-        expiryBox.innerHTML =
-            "Hạn sử dụng: <strong>VÔ HẠN</strong>";
-    }
-
-    // Tự mở TikTok sau 500ms
-    setTimeout(openTikTok, 500);
+    document.getElementById("approvedNote").textContent = note ? "Ghi chú: " + note : "";
+    document.getElementById("expiryBox").innerHTML = expiry
+        ? `Hạn sử dụng: <strong>${formatDate(expiry)}</strong>`
+        : `Hạn sử dụng: <strong>VÔ HẠN</strong>`;
+    setTimeout(openTikTok, 400);
 }
 
 function showExpired(note, expiry){
     hideAll();
     document.getElementById("expiredBox").classList.remove("hidden");
-
-    const noteBox = document.getElementById("expiredNote");
-    if(note){
-        noteBox.textContent = "Ghi chú: " + note;
-    }else{
-        noteBox.textContent = "";
-    }
-
+    document.getElementById("expiredNote").textContent = note ? "Ghi chú: " + note : "";
     document.getElementById("expiredDate").innerHTML =
-        "Đã hết hạn lúc: <strong>" +
-        formatDate(expiry) +
-        "</strong>";
+        `Đã hết hạn lúc: <strong>${formatDate(expiry)}</strong>`;
 }
 
 function showError(){
@@ -711,42 +342,32 @@ function showError(){
     document.getElementById("errorBox").classList.remove("hidden");
 }
 
-/* =========================================================
-   KIỂM TRA THIẾT BỊ (CHẠY SONG SONG ĐỂ NHANH HƠN)
-========================================================= */
 async function checkDevice(){
     const deviceId = getDeviceId();
 
-    // Hiển thị mã đầy đủ cho denied + expired
     document.getElementById("deviceCode").textContent = deviceId;
     document.getElementById("deviceCodeExpired").textContent = deviceId;
-
-    // Chỉ hiện 4 ký tự đầu + ngoặc khi approved
-    const shortCode = "(" + deviceId.substring(0, 4) + ")";
-    document.getElementById("deviceCodeApproved").textContent = shortCode;
+    document.getElementById("deviceCodeApproved").textContent = "(" + deviceId.substring(0,4) + ")";
 
     try{
-        // Chạy song song 2 request → nhanh hơn nhiều
-        const [now, devices] = await Promise.all([
-            getVietnamNow(),
-            readGoogleSheet()
-        ]);
-
-        const found = devices.find(
-            item => item.device.trim() === deviceId.trim()
-        );
+        const devices = await readGoogleSheet();
+        const found = devices.find(item => item.device.trim() === deviceId.trim());
 
         if(!found){
             showDenied();
             return;
         }
 
+        // Không có hạn → approved ngay, không gọi time API
         if(!found.expiry){
             showApproved(found.note, null);
             return;
         }
 
+        // Có hạn → mới lấy giờ VN
+        const now = await getVietnamNow();
         const expiry = parseExpiry(found.expiry);
+
         if(!expiry){
             console.error("Sai định dạng hạn:", found.expiry);
             showError();
@@ -755,90 +376,56 @@ async function checkDevice(){
 
         if(now.getTime() > expiry.getTime()){
             showExpired(found.note, expiry);
-            return;
+        }else{
+            showApproved(found.note, expiry);
         }
 
-        showApproved(found.note, expiry);
-    }catch(error){
-        console.error(error);
+    }catch(err){
+        console.error(err);
         showError();
     }
 }
 
-/* =========================================================
-   COPY DEVICE ID
-========================================================= */
 async function copyDevice(){
     const id = getDeviceId();
     try{
         await navigator.clipboard.writeText(id);
-        const btns = document.querySelectorAll(".copy-btn");
-        btns.forEach(btn => {
+        document.querySelectorAll(".copy-btn").forEach(btn => {
             const old = btn.textContent;
             btn.textContent = "ĐÃ COPY";
-            setTimeout(() => {
-                btn.textContent = old;
-            }, 1500);
+            setTimeout(() => btn.textContent = old, 1500);
         });
     }catch{
-        const input = document.createElement("textarea");
-        input.value = id;
-        input.style.position = "fixed";
-        input.style.opacity = "0";
-        document.body.appendChild(input);
-        input.select();
+        const ta = document.createElement("textarea");
+        ta.value = id;
+        ta.style.cssText = "position:fixed;opacity:0";
+        document.body.appendChild(ta);
+        ta.select();
         document.execCommand("copy");
-        input.remove();
+        ta.remove();
     }
 }
 
-/* =========================================================
-   ĐÓNG TRANG SAU KHI MỞ
-========================================================= */
 function closePageAfterOpen(){
     setTimeout(() => {
-        try{
-            window.close();
-        }catch(e){}
+        try{ window.close(); }catch(e){}
         setTimeout(() => {
-            try{
-                window.location.replace("about:blank");
-            }catch(e){}
+            try{ window.location.replace("about:blank"); }catch(e){}
         }, 400);
-    }, 1200);
+    }, 1000);
 }
 
-/* =========================================================
-   MỞ TIKTOK
-========================================================= */
 function openTikTok(){
-    const originalUrl = getTikTokUrl();
-    const roomId = getRoomId(originalUrl);
-    if(!roomId){
-        return;
-    }
-    const deepLink =
-        "snssdk1180://live?room_id=" +
-        encodeURIComponent(roomId);
-    window.location.href = deepLink;
+    const roomId = getRoomId(getTikTokUrl());
+    if(!roomId) return;
+    window.location.href = "snssdk1180://live?room_id=" + encodeURIComponent(roomId);
     closePageAfterOpen();
 }
 
-/* =========================================================
-   EVENT LISTENERS
-========================================================= */
-document.getElementById("copyBtn")
-    .addEventListener("click", copyDevice);
+document.getElementById("copyBtn").addEventListener("click", copyDevice);
+document.getElementById("copyBtnExpired").addEventListener("click", copyDevice);
+document.getElementById("openBtn").addEventListener("click", openTikTok);
 
-document.getElementById("copyBtnExpired")
-    .addEventListener("click", copyDevice);
-
-document.getElementById("openBtn")
-    .addEventListener("click", openTikTok);
-
-/* =========================================================
-   START
-========================================================= */
 checkDevice();
 </script>
 </body>
