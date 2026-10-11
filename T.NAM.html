@@ -182,21 +182,19 @@ function getRoomId(url){
 
 // ====== TIME (chỉ gọi khi cần) ======
 async function getVietnamNow(){
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 4500);
     try{
         const res = await fetch(
             "https://utctime.app/api/now/Asia/Ho_Chi_Minh?t=" + Date.now(),
-            { method:"GET", cache:"no-store", credentials:"omit", signal:controller.signal }
+            { method:"GET", cache:"no-store" }
         );
-        if(!res.ok) throw new Error("Không lấy được giờ chuẩn");
+        if(!res.ok) throw new Error();
         const data = await res.json();
-        if(data && typeof data.unix === "number" && Number.isFinite(data.unix)){
+        if(data && typeof data.unix === "number"){
             return new Date(data.unix * 1000);
         }
-        throw new Error("Dữ liệu giờ chuẩn không hợp lệ");
-    }finally{
-        clearTimeout(timeout);
+        throw new Error();
+    }catch{
+        return new Date();
     }
 }
 
@@ -217,56 +215,27 @@ function parseCSVLine(line){
     return result;
 }
 
-// ====== FETCH SHEET: TRA CỨU ĐÚNG 1 THIẾT BỊ ======
-// Dùng Google Visualization Query để Google chỉ trả về dòng khớp mã,
-// thay vì tải toàn bộ Sheet về trình duyệt.
-function csvToRows(text){
-    const lines = String(text || "").trim().split(/\r?\n/).filter(Boolean);
-    if(!lines.length) return [];
-    return lines.map(parseCSVLine);
-}
+// ====== FETCH SHEET (không cache, luôn mới) ======
+async function readGoogleSheet(){
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}&t=${Date.now()}`;
+    const res = await fetch(url, { method:"GET", cache:"no-store" });
+    if(!res.ok) throw new Error("Không đọc được Sheet");
 
-async function readGoogleSheetDevice(deviceId){
-    // Mã thiết bị do UUID/base64 tạo ra, không chứa dấu nháy đơn.
-    // Vẫn escape để tránh làm hỏng cú pháp truy vấn nếu định dạng ID đổi sau này.
-    const safeId = String(deviceId).replace(/'/g, "\\'");
-    const query = `select A, B, C where A = '${safeId}' limit 1`;
-    const params = new URLSearchParams({
-        tqx: "out:csv",
-        sheet: SHEET_NAME,
-        tq: query,
-        t: String(Date.now())
-    });
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?${params.toString()}`;
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 7000);
-    try{
-        const res = await fetch(url, {
-            method: "GET",
-            cache: "no-store",
-            credentials: "omit",
-            signal: controller.signal
-        });
-        if(!res.ok) throw new Error(`Google Sheets HTTP ${res.status}`);
-        const body = await res.text();
-        // Google có thể trả trang lỗi HTML thay vì CSV nếu Sheet/query không hợp lệ.
-        if(/^\s*<(?:!doctype|html)/i.test(body) || /google visualization api query error/i.test(body)){
-            throw new Error("Google Sheets không chấp nhận truy vấn. Kiểm tra quyền truy cập và tên cột.");
-        }
-        const rows = csvToRows(body);
-        // GViz CSV luôn có dòng tiêu đề. Nếu chỉ còn tiêu đề thì mã không tồn tại.
-        if(rows.length <= 1) return null;
-        const cols = rows[1];
+    const text = await res.text();
+    const lines = text.trim().split(/\r?\n/);
+    const devices = [];
+
+    for(let i = 1; i < lines.length; i++){
+        const cols = parseCSVLine(lines[i]);
         const device = (cols[0] || "").trim();
-        if(!device || device !== String(deviceId).trim()) return null;
-        return {
+        if(!device) continue;
+        devices.push({
             device,
             note: (cols[1] || "").trim(),
             expiry: (cols[2] || "").trim()
-        };
-    }finally{
-        clearTimeout(timeout);
+        });
     }
+    return devices;
 }
 
 // ====== PARSE EXPIRY ======
@@ -275,43 +244,36 @@ function parseExpiry(value){
     const text = String(value).trim();
     if(!text) return null;
 
-    function createVNDate(y, m0, d, h=0, mi=0, s=0){
-        // Convert Vietnam local time (UTC+7) to an absolute timestamp.
-        const date = new Date(Date.UTC(y, m0, d, h - 7, mi, s, 0));
-        // Reject impossible calendar values instead of silently normalizing them.
-        const check = new Date(Date.UTC(y, m0, d, 12, 0, 0));
-        if(check.getUTCFullYear() !== y || check.getUTCMonth() !== m0 || check.getUTCDate() !== d) return null;
-        if(h < 0 || h > 23 || mi < 0 || mi > 59 || s < 0 || s > 59) return null;
-        return date;
+    function createVNDate(y, m, d, h=0, mi=0, s=0){
+        return new Date(Date.UTC(y, m, d, h - 7, mi, s, 0));
     }
 
-    // Google Sheets GViz date format: Date(year, monthZeroBased, day, hour, minute, second)
-    let m = text.match(/^Date\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?(?:,\s*(\d+))?(?:,\s*(\d+))?\)/);
+    let m = text.match(/^Date\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?(?:,\s*(\d+))?(?:,\s*(\d+))?/);
     if(m) return createVNDate(+m[1], +m[2], +m[3], +(m[4]||0), +(m[5]||0), +(m[6]||0));
 
-    // HH:mm DD/MM/YYYY
     m = text.match(/^(\d{1,2}):(\d{2})\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
     if(m){
-        const [, h, mi, d, mo, y] = m;
-        return createVNDate(+y, +mo-1, +d, +h, +mi);
+        const [_, h, mi, d, mo, y] = m.map(Number);
+        if(h>23||mi>59||mo<1||mo>12||d<1||d>31) return null;
+        return createVNDate(y, mo-1, d, h, mi);
     }
 
-    // DD/MM/YYYY HH:mm
     m = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})$/);
     if(m){
-        const [, d, mo, y, h, mi] = m;
-        return createVNDate(+y, +mo-1, +d, +h, +mi);
+        const [_, d, mo, y, h, mi] = m.map(Number);
+        if(h>23||mi>59||mo<1||mo>12||d<1||d>31) return null;
+        return createVNDate(y, mo-1, d, h, mi);
     }
 
-    // DD/MM/YYYY: valid through 23:59:59 Vietnam time
     m = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
     if(m){
-        const [, d, mo, y] = m;
-        return createVNDate(+y, +mo-1, +d, 23, 59, 59);
+        const [_, d, mo, y] = m.map(Number);
+        if(mo<1||mo>12||d<1||d>31) return null;
+        return createVNDate(y, mo-1, d, 23, 59, 59);
     }
 
-    // Do not guess ambiguous formats such as 10/11/2026 via Date(string).
-    return null;
+    const native = new Date(text);
+    return isNaN(native.getTime()) ? null : native;
 }
 
 function formatDate(date){
@@ -366,49 +328,50 @@ function showError(){
 async function checkDevice(){
     const deviceId = getDeviceId();
 
-    // Hiển thị mã thiết bị ngay, không chờ mạng.
+    // Hiển thị mã ngay (không chờ)
     document.getElementById("deviceCode").textContent = deviceId;
     document.getElementById("deviceCodeExpired").textContent = deviceId;
     document.getElementById("deviceCodeApproved").textContent = "(" + deviceId.substring(0,4) + ")";
 
     try{
-        // Chạy truy vấn Sheet và lấy giờ chuẩn song song để giảm thời gian chờ.
-        // Bọc lỗi giờ thành kết quả để thiết bị vô hạn/không tồn tại không tạo unhandled rejection.
-        const timePromise = getVietnamNow()
-            .then(now => ({ now }))
-            .catch(error => ({ error }));
-        const found = await readGoogleSheetDevice(deviceId);
+        // Bắt đầu tải Sheet và lấy giờ VN cùng lúc.
+        // Giữ nguyên quy tắc cũ: chỉ dùng giờ VN nếu thiết bị có hạn.
+        // Nhờ vậy, thiết bị có hạn không phải chờ thêm một lượt mạng sau khi Sheet tải xong.
+        const vietnamNowPromise = getVietnamNow();
+        const devices = await readGoogleSheet();
+        const found = devices.find(item => item.device.trim() === deviceId.trim());
+
         if(!found){
             showDenied();
             return;
         }
 
-        // Ô C trống = vô hạn; chỉ áp dụng nếu truy vấn Sheet thành công.
+        // Không có hạn → duyệt ngay như logic cũ.
         if(!found.expiry){
             showApproved(found.note, null);
             return;
         }
 
-        // Thiết bị có hạn bắt buộc phải có giờ chuẩn; nếu API giờ lỗi thì không cấp quyền.
-        const timeResult = await timePromise;
-        if(timeResult.error) throw timeResult.error;
-        const now = timeResult.now;
-        const expiry = parseExpiry(found.expiry);
+        // Có hạn → dùng giờ VN đã được lấy song song với Sheet.
+        const [now, expiry] = await Promise.all([
+            vietnamNowPromise,
+            Promise.resolve(parseExpiry(found.expiry))
+        ]);
+
         if(!expiry){
             console.error("Sai định dạng hạn:", found.expiry);
             showError();
             return;
         }
 
-        // Tại đúng thời điểm hết hạn cũng xem là hết hạn.
-        if(now.getTime() >= expiry.getTime()){
+        if(now.getTime() > expiry.getTime()){
             showExpired(found.note, expiry);
         }else{
             showApproved(found.note, expiry);
         }
+
     }catch(err){
-        console.error("Lỗi kiểm tra thiết bị:", err);
-        // Fail closed: mất mạng/Sheet lỗi thì không cấp quyền.
+        console.error(err);
         showError();
     }
 }
@@ -457,7 +420,7 @@ document.getElementById("copyBtn").addEventListener("click", copyDevice);
 document.getElementById("copyBtnExpired").addEventListener("click", copyDevice);
 document.getElementById("openBtn").addEventListener("click", openTikTok);
 
-// Chạy kiểm tra ngay khi trang mở.
+// Chạy check NGAY LẬP TỨC
 checkDevice();
 </script>
 </body>
