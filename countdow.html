@@ -1,117 +1,266 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Đếm ngược • Trung Nam</title>
+<title>Quét Link Trung Nam • Đếm ngược</title>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;width:100%;min-height:100%;background:#050505;color:#fff;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
-body{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
-.container{width:100%;max-width:420px}
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+}
+html,body{
+    margin:0;padding:0;width:100%;min-height:100%;
+    background:#050505;color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+}
+body{
+    min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;
+}
+.container{width:100%;max-width:430px;}
 .card{
-  background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));
-  border:1px solid rgba(255,255,255,.10);border-radius:24px;padding:28px 22px;
-  box-shadow:0 20px 70px rgba(0,0,0,.65),inset 0 1px rgba(255,255,255,.05);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);text-align:center
+    background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:24px;padding:28px 22px;
+    box-shadow:0 20px 70px rgba(0,0,0,.65),inset 0 1px rgba(255,255,255,.05);
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    text-align:center;
 }
 .logo{
-  font-size:28px;font-weight:900;letter-spacing:3px;margin-bottom:6px;
-  background:linear-gradient(90deg,#25f4ee,#fff,#ff2c55);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent
+    font-size:26px;font-weight:900;letter-spacing:1px;margin-bottom:4px;
+    background:linear-gradient(90deg,#25f4ee,#fff,#ff2c55);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
-.sub{color:#888;font-size:13px;margin-bottom:22px}
+.sub{color:#888;font-size:13px;margin-bottom:18px;}
+
+.type-box{
+    display:inline-block;
+    margin-bottom:6px;
+    padding:8px 18px;
+    border-radius:999px;
+    background:rgba(37,244,238,.12);
+    border:1px solid rgba(37,244,238,.28);
+    font-size:15px;font-weight:800;color:#25f4ee;
+}
+.box-value{
+    font-size:26px;font-weight:900;color:#fff;margin:6px 0 2px;
+    letter-spacing:1px;
+}
+.ratio-line{font-size:13px;color:#aaa;margin-bottom:12px;}
+
+/* ===== Đếm ngược: chỉ giây + mili giây ===== */
 .timer{
-  font-size:52px;font-weight:800;letter-spacing:2px;margin:18px 0 8px;
-  font-variant-numeric:tabular-nums;color:#25f4ee
+    font-size:64px;font-weight:800;
+    letter-spacing:1px;
+    font-variant-numeric:tabular-nums;
+    margin:14px 0 4px;
+    color:#25f4ee;
+    transition:color .2s;
+    line-height:1.1;
 }
-.timer.danger{color:#ff2c55}
-.timer.warn{color:#ffb347}
-.info{font-size:14px;color:#aaa;line-height:1.6;margin-top:12px}
-.ratio{
-  display:inline-block;margin-top:14px;padding:8px 18px;border-radius:999px;
-  background:rgba(37,244,238,.12);border:1px solid rgba(37,244,238,.25);
-  font-size:18px;font-weight:700;color:#25f4ee
+.timer .ms{
+    font-size:32px;
+    opacity:.75;
+    font-weight:700;
 }
-.open-btn{
-  width:100%;margin-top:22px;padding:15px;font-size:15px;font-weight:800;border:0;
-  border-radius:14px;color:#fff;cursor:pointer;
-  background:linear-gradient(135deg,#25f4ee,#1677ff)
+.timer.warn{color:#ffb347;}
+.timer.danger{color:#ff2c55;}
+.timer.expired{color:#666;font-size:42px;}
+
+.info{font-size:14px;color:#aaa;line-height:1.45;margin-top:6px;}
+
+/* Giờ phút giây + ngày hết hạn (chữ nhỏ) */
+.end-time{
+    margin-top:14px;
+    font-size:12px;
+    color:#777;
+    line-height:1.5;
 }
-.open-btn:active{transform:scale(.97)}
-.note{margin-top:16px;color:#666;font-size:12px}
+.end-time strong{color:#ccc;font-weight:600;}
+
+.adj{
+    display:flex;justify-content:center;gap:12px;margin-top:18px;
+}
+.adj button{
+    width:42px;height:42px;border:0;border-radius:12px;
+    background:rgba(255,255,255,.08);color:#fff;
+    font-size:22px;font-weight:700;cursor:pointer;
+}
+.adj button:active{transform:scale(.92);background:rgba(255,255,255,.15);}
+.adj-label{font-size:11px;color:#555;margin-top:8px;}
+
+.note{margin-top:14px;color:#444;font-size:11px;line-height:1.5;}
 </style>
 </head>
 <body>
 <div class="container">
   <div class="card">
-    <div class="logo">TRUNG NAM</div>
+    <div class="logo">Quét Link Trung Nam</div>
     <div class="sub">ĐẾM NGƯỢC RƯƠNG / TÚI</div>
 
-    <div id="ratioBox" class="ratio">—</div>
-    <div id="timer" class="timer">--:--:--</div>
+    <div id="typeBox" class="type-box" style="display:none;"></div>
+    <div id="boxValue" class="box-value" style="display:none;"></div>
+    <div id="ratioLine" class="ratio-line" style="display:none;"></div>
+
+    <div id="timer" class="timer">--.---</div>
     <div id="info" class="info">Đang tải...</div>
 
-    <button id="openBtn" class="open-btn" style="display:none">MỞ TIKTOK LIVE</button>
-    <div class="note">Thời gian theo giờ Việt Nam (API)</div>
+    <!-- Giờ phút giây + ngày hết hạn (chữ nhỏ) -->
+    <div id="endTime" class="end-time"></div>
+
+    <div class="adj">
+      <button id="btnMinus" type="button">−</button>
+      <button id="btnPlus" type="button">+</button>
+    </div>
+    <div class="adj-label">Chỉnh ±1 giây (nếu lệch giờ)</div>
+
+    <div class="note">Thời gian theo giờ Việt Nam</div>
   </div>
 </div>
 
 <script>
-const params = new URLSearchParams(location.search);
-const expire = parseInt(params.get("expire") || "0", 10);   // unix timestamp (seconds)
-const room   = params.get("room") || "";
-const ratio  = params.get("ratio") || "";
-const name   = params.get("name") || "";
+/* ===== Chặn copy / chọn / chuột phải ===== */
+document.addEventListener("contextmenu", e => e.preventDefault());
+document.addEventListener("selectstart", e => e.preventDefault());
+document.addEventListener("copy", e => e.preventDefault());
+document.addEventListener("cut", e => e.preventDefault());
+document.addEventListener("dragstart", e => e.preventDefault());
+
+const params = new URLSearchParams(window.location.search);
+
+const endStr  = (params.get("end") || "").trim();   // "19:17:02"
+const type    = (params.get("type") || "").trim();  // "RƯƠNG LỚN"
+const box     = (params.get("box") || "").trim();   // "30/10"
+const ratio   = (params.get("ratio") || "").trim(); // "3.0 xu"
+const name    = (params.get("name") || "").trim();
 
 const timerEl = document.getElementById("timer");
 const infoEl  = document.getElementById("info");
-const ratioEl = document.getElementById("ratioBox");
-const openBtn = document.getElementById("openBtn");
+const endEl   = document.getElementById("endTime");
+const typeEl  = document.getElementById("typeBox");
+const boxEl   = document.getElementById("boxValue");
+const ratioEl = document.getElementById("ratioLine");
 
-if (ratio) ratioEl.textContent = ratio;
-if (name)  infoEl.textContent = name;
+if (type) {
+  typeEl.style.display = "inline-block";
+  typeEl.textContent = type;
+}
+if (box) {
+  boxEl.style.display = "block";
+  boxEl.textContent = box;
+}
+if (ratio) {
+  ratioEl.style.display = "block";
+  ratioEl.textContent = "Ratio: " + ratio;
+}
 
-function pad(n){ return String(n).padStart(2,"0"); }
+function pad(n, len = 2) {
+  return String(n).padStart(len, "0");
+}
 
-function tick(){
-  if (!expire) {
-    timerEl.textContent = "N/A";
-    infoEl.textContent = "Không có thời gian hết hạn";
+/** Lấy thành phần giờ theo Asia/Ho_Chi_Minh */
+function getVNParts(date = new Date()) {
+  const fmt = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", second: "2-digit",
+    hour12: false
+  });
+  const parts = {};
+  for (const p of fmt.formatToParts(date)) {
+    if (p.type !== "literal") parts[p.type] = p.value;
+  }
+  return {
+    year:  +parts.year,
+    month: +parts.month,
+    day:   +parts.day,
+    hour:  +parts.hour,
+    minute:+parts.minute,
+    second:+parts.second
+  };
+}
+
+/** VN time → UTC Date (offset +7) */
+function vnDateToUTC(y, m, d, h, mi, s) {
+  return new Date(Date.UTC(y, m - 1, d, h - 7, mi, s, 0));
+}
+
+function parseEndTime(endStr) {
+  if (!endStr) return null;
+  const m = endStr.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
+  if (!m) return null;
+  const h = +m[1], mi = +m[2], s = +m[3];
+  if (h > 23 || mi > 59 || s > 59) return null;
+
+  const now = getVNParts();
+  let expire = vnDateToUTC(now.year, now.month, now.day, h, mi, s);
+
+  // Đã qua > 2 phút → ngày mai
+  if (expire.getTime() < Date.now() - 120000) {
+    const tomorrow = new Date(Date.now() + 86400000);
+    const t = getVNParts(tomorrow);
+    expire = vnDateToUTC(t.year, t.month, t.day, h, mi, s);
+  }
+  return expire;
+}
+
+let expireDate = parseEndTime(endStr);
+let offsetSec = 0;
+
+if (expireDate) {
+  const p = getVNParts(expireDate);
+  // Chữ nhỏ: giờ phút giây + ngày
+  endEl.innerHTML =
+    `Hết hạn: <strong>${pad(p.hour)}:${pad(p.minute)}:${pad(p.second)}</strong>` +
+    ` &nbsp;•&nbsp; <strong>${pad(p.day)}/${pad(p.month)}/${p.year}</strong>`;
+} else {
+  endEl.textContent = "Không nhận được thời gian hết hạn";
+  infoEl.textContent = "Thiếu tham số end=HH:MM:SS";
+}
+
+function tick() {
+  if (!expireDate) {
+    timerEl.textContent = "--.---";
+    timerEl.className = "timer expired";
     return;
   }
-  const now = Math.floor(Date.now() / 1000);
-  let left = expire - now;
 
-  if (left <= 0) {
-    timerEl.textContent = "00:00:00";
-    timerEl.className = "timer danger";
+  const target = expireDate.getTime() + offsetSec * 1000;
+  const leftMs = target - Date.now();
+
+  if (leftMs <= 0) {
+    timerEl.innerHTML = "0<span class='ms'>.000</span>";
+    timerEl.className = "timer expired";
     infoEl.textContent = "Đã hết hạn";
     return;
   }
 
-  const h = Math.floor(left / 3600);
-  const m = Math.floor((left % 3600) / 60);
-  const s = left % 60;
-  timerEl.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+  // Chỉ hiện giây + mili giây (3 chữ số)
+  const totalSec = leftMs / 1000;
+  const sec = Math.floor(totalSec);
+  const ms  = Math.floor((totalSec - sec) * 1000);
 
-  if (left <= 60)      timerEl.className = "timer danger";
-  else if (left <= 300) timerEl.className = "timer warn";
-  else                 timerEl.className = "timer";
+  timerEl.innerHTML = `${sec}<span class="ms">.${pad(ms, 3)}</span>`;
 
-  infoEl.textContent = `Còn lại ${h}h ${m}m ${s}s`;
+  if (totalSec <= 60)      timerEl.className = "timer danger";
+  else if (totalSec <= 300) timerEl.className = "timer warn";
+  else                      timerEl.className = "timer";
+
+  const label = type && box ? `${type} • ${box}` : (name || "Rương/Túi");
+  infoEl.textContent = label;
 }
 
+// Cập nhật rất nhanh để mili giây mượt
 tick();
-setInterval(tick, 250);
+setInterval(tick, 33);   // ~30fps
 
-if (room) {
-  openBtn.style.display = "block";
-  openBtn.onclick = () => {
-    location.href = "snssdk1180://live?room_id=" + encodeURIComponent(room);
-  };
-}
+document.getElementById("btnMinus").onclick = () => { offsetSec -= 1; tick(); };
+document.getElementById("btnPlus").onclick  = () => { offsetSec += 1; tick(); };
 </script>
 </body>
 </html>
