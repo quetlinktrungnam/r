@@ -252,13 +252,10 @@ function parseEndTime(endStr) {
   if (!m) return null;
   const h = +m[1], mi = +m[2], s = +m[3];
   if (h > 23 || mi > 59 || s > 59) return null;
-  const now = getVNParts();
-  let expire = vnDateToUTC(now.year, now.month, now.day, h, mi, s);
-  if (expire.getTime() < Date.now() - 120000) {
-    const t = getVNParts(new Date(Date.now() + 86400000));
-    expire = vnDateToUTC(t.year, t.month, t.day, h, mi, s);
-  }
-  return expire;
+
+  // LUÔN lấy ngày HÔM NAY theo giờ VN — không nhảy ngày mai
+  const nowParts = getVNParts();
+  return vnDateToUTC(nowParts.year, nowParts.month, nowParts.day, h, mi, s);
 }
 
 var STORAGE_KEY = "tnam_countdown_colors";
