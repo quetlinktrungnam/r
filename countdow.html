@@ -39,62 +39,107 @@ body{
 .sub{color:#888;font-size:13px;margin-bottom:18px;}
 
 .type-box{
-    display:inline-block;
-    margin-bottom:6px;
-    padding:8px 18px;
-    border-radius:999px;
-    background:rgba(37,244,238,.12);
-    border:1px solid rgba(37,244,238,.28);
+    display:inline-block;margin-bottom:6px;padding:8px 18px;border-radius:999px;
+    background:rgba(37,244,238,.12);border:1px solid rgba(37,244,238,.28);
     font-size:15px;font-weight:800;color:#25f4ee;
 }
-.box-value{
-    font-size:26px;font-weight:900;color:#fff;margin:6px 0 2px;
-    letter-spacing:1px;
-}
+.box-value{font-size:26px;font-weight:900;color:#fff;margin:6px 0 2px;letter-spacing:1px;}
 .ratio-line{font-size:13px;color:#aaa;margin-bottom:12px;}
 
-/* ===== Đếm ngược: chỉ giây + mili giây ===== */
 .timer{
-    font-size:64px;font-weight:800;
-    letter-spacing:1px;
-    font-variant-numeric:tabular-nums;
-    margin:14px 0 4px;
-    color:#25f4ee;
-    transition:color .2s;
-    line-height:1.1;
+    font-size:72px;font-weight:700;letter-spacing:-0.02em;
+    font-variant-numeric:tabular-nums;margin:18px 0 6px;
+    color:#25f4ee;transition:color .2s ease;line-height:1;
 }
-.timer .ms{
-    font-size:32px;
-    opacity:.75;
-    font-weight:700;
+.timer .dot{letter-spacing:0.08em;}
+.timer.done{
+    color:#ff2c55;font-size:90px;
+    animation:popX .35s ease-out;
 }
-.timer.warn{color:#ffb347;}
-.timer.danger{color:#ff2c55;}
-.timer.expired{color:#666;font-size:42px;}
+@keyframes popX{
+    0%{transform:scale(.3);opacity:0}
+    70%{transform:scale(1.15)}
+    100%{transform:scale(1);opacity:1}
+}
+@keyframes blink{
+    0%,100%{opacity:1}
+    50%{opacity:.5}
+}
+.timer.blink{animation:blink .45s ease-in-out infinite}
 
-.info{font-size:14px;color:#aaa;line-height:1.45;margin-top:6px;}
+.info{font-size:14px;color:#aaa;line-height:1.45;margin-top:6px}
+.info.done{color:#ff2c55;font-weight:700;font-size:16px}
 
-/* Giờ phút giây + ngày hết hạn (chữ nhỏ) */
-.end-time{
-    margin-top:14px;
-    font-size:12px;
-    color:#777;
-    line-height:1.5;
-}
-.end-time strong{color:#ccc;font-weight:600;}
+.end-time{margin-top:14px;font-size:12px;color:#777;line-height:1.5}
+.end-time strong{color:#ccc;font-weight:600}
 
 .adj{
-    display:flex;justify-content:center;gap:12px;margin-top:18px;
+    display:flex;justify-content:center;align-items:center;
+    gap:6px;margin-top:20px;flex-wrap:wrap;
 }
 .adj button{
-    width:42px;height:42px;border:0;border-radius:12px;
-    background:rgba(255,255,255,.08);color:#fff;
-    font-size:22px;font-weight:700;cursor:pointer;
+    border:0;border-radius:8px;padding:8px 10px;
+    font-size:13px;font-weight:700;cursor:pointer;
+    transition:transform .1s;
 }
-.adj button:active{transform:scale(.92);background:rgba(255,255,255,.15);}
-.adj-label{font-size:11px;color:#555;margin-top:8px;}
+.adj button:active{transform:scale(.93)}
+.adj .btn-minus{background:#ef4444;color:#fff}
+.adj .btn-plus{background:#22c55e;color:#fff}
+.adj .btn-reset{background:rgba(255,255,255,.12);color:#ddd;min-width:52px}
+.offset-label{font-size:11px;color:#666;margin-top:8px}
 
-.note{margin-top:14px;color:#444;font-size:11px;line-height:1.5;}
+.color-btn{
+    margin-top:16px;width:100%;padding:11px;border:0;border-radius:12px;
+    background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;
+    font-size:14px;font-weight:700;cursor:pointer;
+}
+.color-btn:active{transform:scale(.97)}
+
+.note{margin-top:14px;color:#444;font-size:11px;line-height:1.5}
+.hidden{display:none !important}
+
+/* ===== Modal chỉnh màu ===== */
+.modal-overlay{
+    display:none;position:fixed;inset:0;z-index:9999;
+    background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:16px;
+}
+.modal-overlay.show{display:flex}
+.modal{
+    background:#111;border:1px solid rgba(255,255,255,.12);
+    border-radius:18px;padding:20px;width:100%;max-width:360px;
+    max-height:90vh;overflow-y:auto;text-align:left;
+}
+.modal h3{margin:0 0 14px;font-size:16px;text-align:center;color:#fff}
+.modal label{display:block;font-size:12px;color:#aaa;margin-bottom:4px}
+.modal .row{display:flex;gap:8px;margin-bottom:10px;align-items:flex-end}
+.modal input[type="number"],.modal input[type="text"]{
+    width:100%;padding:9px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);
+    background:#1a1a1a;color:#fff;font-size:14px;outline:none;
+}
+.modal input[type="color"]{
+    width:48px;height:38px;border:0;border-radius:8px;padding:0;cursor:pointer;background:none;
+}
+.modal .actions{display:flex;gap:8px;margin-top:12px}
+.modal .actions button{
+    flex:1;padding:10px;border:0;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;
+}
+.btn-add{background:#22c55e;color:#fff}
+.btn-clear{background:#ef4444;color:#fff}
+.btn-close{background:rgba(255,255,255,.12);color:#ddd}
+.color-list{margin-top:14px}
+.color-item{
+    display:flex;align-items:center;gap:10px;padding:8px 10px;
+    background:rgba(255,255,255,.05);border-radius:10px;margin-bottom:6px;font-size:13px;
+}
+.color-item .swatch{
+    width:22px;height:22px;border-radius:6px;flex-shrink:0;
+    border:1px solid rgba(255,255,255,.2);
+}
+.color-item .del{
+    margin-left:auto;background:transparent;border:0;color:#f87171;
+    font-size:16px;cursor:pointer;padding:4px 8px;
+}
+.modal-hint{font-size:11px;color:#666;margin-top:8px;line-height:1.4}
 </style>
 </head>
 <body>
@@ -107,24 +152,57 @@ body{
     <div id="boxValue" class="box-value" style="display:none;"></div>
     <div id="ratioLine" class="ratio-line" style="display:none;"></div>
 
-    <div id="timer" class="timer">--.---</div>
+    <div id="timer" class="timer">--.-</div>
     <div id="info" class="info">Đang tải...</div>
-
-    <!-- Giờ phút giây + ngày hết hạn (chữ nhỏ) -->
     <div id="endTime" class="end-time"></div>
 
-    <div class="adj">
-      <button id="btnMinus" type="button">−</button>
-      <button id="btnPlus" type="button">+</button>
+    <div class="adj" id="adjBox">
+      <button type="button" class="btn-minus" data-v="-0.05">-0.05s</button>
+      <button type="button" class="btn-minus" data-v="-0.01">-0.01s</button>
+      <button type="button" class="btn-reset" id="btnReset">0.00s</button>
+      <button type="button" class="btn-plus" data-v="0.01">+0.01s</button>
+      <button type="button" class="btn-plus" data-v="0.05">+0.05s</button>
     </div>
-    <div class="adj-label">Chỉnh ±1 giây (nếu lệch giờ)</div>
+    <div class="offset-label" id="adjLabel">Offset: <span id="offsetVal">0.00</span>s</div>
+
+    <button type="button" class="color-btn" id="btnOpenColor">Thêm màu sắc theo thời gian</button>
 
     <div class="note">Thời gian theo giờ Việt Nam</div>
   </div>
 </div>
 
+<!-- Modal chỉnh màu tự do -->
+<div class="modal-overlay" id="colorModal">
+  <div class="modal">
+    <h3>Màu theo thời gian còn lại</h3>
+    <div class="row">
+      <div style="flex:1">
+        <label>Từ (giây)</label>
+        <input type="number" id="colorStart" placeholder="vd: 60" step="any">
+      </div>
+      <div style="flex:1">
+        <label>Đến (giây)</label>
+        <input type="number" id="colorEnd" placeholder="vd: 30" step="any">
+      </div>
+      <div>
+        <label>Màu</label>
+        <input type="color" id="colorPick" value="#ef4444">
+      </div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn-add" id="btnAddColor">+ Thêm</button>
+      <button type="button" class="btn-clear" id="btnClearColor">Xóa tất cả</button>
+      <button type="button" class="btn-close" id="btnCloseColor">Đóng</button>
+    </div>
+    <div class="color-list" id="colorList"></div>
+    <div class="modal-hint">
+      Ví dụ: Từ 60 → Đến 30 = khi còn 30–60 giây dùng màu đó.<br>
+      Khoảng nào khớp trước sẽ được áp dụng. Không có khoảng → màu cyan mặc định.
+    </div>
+  </div>
+</div>
+
 <script>
-/* ===== Chặn copy / chọn / chuột phải ===== */
 document.addEventListener("contextmenu", e => e.preventDefault());
 document.addEventListener("selectstart", e => e.preventDefault());
 document.addEventListener("copy", e => e.preventDefault());
@@ -132,39 +210,30 @@ document.addEventListener("cut", e => e.preventDefault());
 document.addEventListener("dragstart", e => e.preventDefault());
 
 const params = new URLSearchParams(window.location.search);
+const endStr = (params.get("end") || "").trim();
+const type   = (params.get("type") || "").trim();
+const box    = (params.get("box") || "").trim();
+const ratio  = (params.get("ratio") || "").trim();
+const name   = (params.get("name") || "").trim();
 
-const endStr  = (params.get("end") || "").trim();   // "19:17:02"
-const type    = (params.get("type") || "").trim();  // "RƯƠNG LỚN"
-const box     = (params.get("box") || "").trim();   // "30/10"
-const ratio   = (params.get("ratio") || "").trim(); // "3.0 xu"
-const name    = (params.get("name") || "").trim();
+const timerEl   = document.getElementById("timer");
+const infoEl    = document.getElementById("info");
+const endEl     = document.getElementById("endTime");
+const typeEl    = document.getElementById("typeBox");
+const boxEl     = document.getElementById("boxValue");
+const ratioEl   = document.getElementById("ratioLine");
+const adjBox    = document.getElementById("adjBox");
+const adjLabel  = document.getElementById("adjLabel");
+const offsetVal = document.getElementById("offsetVal");
 
-const timerEl = document.getElementById("timer");
-const infoEl  = document.getElementById("info");
-const endEl   = document.getElementById("endTime");
-const typeEl  = document.getElementById("typeBox");
-const boxEl   = document.getElementById("boxValue");
-const ratioEl = document.getElementById("ratioLine");
+if (type) { typeEl.style.display = "inline-block"; typeEl.textContent = type; }
+if (box)  { boxEl.style.display = "block"; boxEl.textContent = box; }
+if (ratio){ ratioEl.style.display = "block"; ratioEl.textContent = "Ratio: " + ratio; }
 
-if (type) {
-  typeEl.style.display = "inline-block";
-  typeEl.textContent = type;
-}
-if (box) {
-  boxEl.style.display = "block";
-  boxEl.textContent = box;
-}
-if (ratio) {
-  ratioEl.style.display = "block";
-  ratioEl.textContent = "Ratio: " + ratio;
-}
+function pad(n, len) { return String(n).padStart(len || 2, "0"); }
 
-function pad(n, len = 2) {
-  return String(n).padStart(len, "0");
-}
-
-/** Lấy thành phần giờ theo Asia/Ho_Chi_Minh */
-function getVNParts(date = new Date()) {
+function getVNParts(date) {
+  date = date || new Date();
   const fmt = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Ho_Chi_Minh",
     year: "numeric", month: "2-digit", day: "2-digit",
@@ -172,20 +241,15 @@ function getVNParts(date = new Date()) {
     hour12: false
   });
   const parts = {};
-  for (const p of fmt.formatToParts(date)) {
+  fmt.formatToParts(date).forEach(function(p) {
     if (p.type !== "literal") parts[p.type] = p.value;
-  }
+  });
   return {
-    year:  +parts.year,
-    month: +parts.month,
-    day:   +parts.day,
-    hour:  +parts.hour,
-    minute:+parts.minute,
-    second:+parts.second
+    year:+parts.year, month:+parts.month, day:+parts.day,
+    hour:+parts.hour, minute:+parts.minute, second:+parts.second
   };
 }
 
-/** VN time → UTC Date (offset +7) */
 function vnDateToUTC(y, m, d, h, mi, s) {
   return new Date(Date.UTC(y, m - 1, d, h - 7, mi, s, 0));
 }
@@ -196,71 +260,195 @@ function parseEndTime(endStr) {
   if (!m) return null;
   const h = +m[1], mi = +m[2], s = +m[3];
   if (h > 23 || mi > 59 || s > 59) return null;
-
   const now = getVNParts();
   let expire = vnDateToUTC(now.year, now.month, now.day, h, mi, s);
-
-  // Đã qua > 2 phút → ngày mai
   if (expire.getTime() < Date.now() - 120000) {
-    const tomorrow = new Date(Date.now() + 86400000);
-    const t = getVNParts(tomorrow);
+    const t = getVNParts(new Date(Date.now() + 86400000));
     expire = vnDateToUTC(t.year, t.month, t.day, h, mi, s);
   }
   return expire;
 }
 
-let expireDate = parseEndTime(endStr);
-let offsetSec = 0;
+/* ===== Màu tự do (lưu localStorage) ===== */
+var STORAGE_KEY = "tnam_countdown_colors";
+
+function getColorTimes() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) { return []; }
+}
+
+function setColorTimes(list) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+/** Tìm màu khớp với số giây còn lại (logic giống web mẫu) */
+function findColor(sec) {
+  var list = getColorTimes();
+  // sec nằm trong [end, start] (start >= end)
+  for (var i = 0; i < list.length; i++) {
+    var ct = list[i];
+    if (sec <= ct.start && sec >= ct.end) return ct.color;
+  }
+  return null; // null → dùng màu mặc định cyan
+}
+
+function renderColorList() {
+  var list = getColorTimes();
+  var el = document.getElementById("colorList");
+  el.innerHTML = "";
+  if (!list.length) {
+    el.innerHTML = '<div style="color:#666;font-size:12px;text-align:center;padding:8px">Chưa có khoảng màu nào</div>';
+    return;
+  }
+  list.forEach(function(item) {
+    var div = document.createElement("div");
+    div.className = "color-item";
+    div.innerHTML =
+      '<span class="swatch" style="background:' + item.color + '"></span>' +
+      '<span>' + item.start + 's → ' + item.end + 's</span>' +
+      '<button type="button" class="del" data-id="' + item.id + '">✕</button>';
+    el.appendChild(div);
+  });
+  el.querySelectorAll(".del").forEach(function(btn) {
+    btn.onclick = function() {
+      var id = +btn.dataset.id;
+      setColorTimes(getColorTimes().filter(function(x) { return x.id !== id; }));
+      renderColorList();
+    };
+  });
+}
+
+document.getElementById("btnOpenColor").onclick = function() {
+  document.getElementById("colorModal").classList.add("show");
+  renderColorList();
+};
+document.getElementById("btnCloseColor").onclick = function() {
+  document.getElementById("colorModal").classList.remove("show");
+};
+document.getElementById("btnAddColor").onclick = function() {
+  var s = parseFloat(document.getElementById("colorStart").value);
+  var e = parseFloat(document.getElementById("colorEnd").value);
+  var c = document.getElementById("colorPick").value;
+  if (!Number.isFinite(s) || !Number.isFinite(e)) return;
+  var start = Math.max(s, e);
+  var end = Math.min(s, e);
+  var list = getColorTimes();
+  list.push({ id: Date.now(), start: start, end: end, color: c });
+  setColorTimes(list);
+  renderColorList();
+  document.getElementById("colorStart").value = "";
+  document.getElementById("colorEnd").value = "";
+};
+document.getElementById("btnClearColor").onclick = function() {
+  setColorTimes([]);
+  renderColorList();
+};
+
+/* ===== Countdown ===== */
+var expireDate = parseEndTime(endStr);
+var offsetSec = 0;
+var finished = false;
+var tickTimer = null;
 
 if (expireDate) {
-  const p = getVNParts(expireDate);
-  // Chữ nhỏ: giờ phút giây + ngày
+  var p = getVNParts(expireDate);
   endEl.innerHTML =
-    `Hết hạn: <strong>${pad(p.hour)}:${pad(p.minute)}:${pad(p.second)}</strong>` +
-    ` &nbsp;•&nbsp; <strong>${pad(p.day)}/${pad(p.month)}/${p.year}</strong>`;
+    "Hết lúc: <strong>" + pad(p.hour) + ":" + pad(p.minute) + ":" + pad(p.second) + "</strong>" +
+    " &nbsp;•&nbsp; <strong>" + pad(p.day) + "/" + pad(p.month) + "/" + p.year + "</strong>";
 } else {
-  endEl.textContent = "Không nhận được thời gian hết hạn";
+  endEl.textContent = "Không nhận được thời gian";
   infoEl.textContent = "Thiếu tham số end=HH:MM:SS";
 }
 
+function updateOffsetLabel() {
+  var v = offsetSec.toFixed(2);
+  offsetVal.textContent = (offsetSec >= 0 ? "+" : "") + v;
+}
+
+function onTimeUp() {
+  if (finished) return;
+  finished = true;
+  if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
+
+  timerEl.textContent = "✕";
+  timerEl.className = "timer done";
+  timerEl.style.color = "";
+  infoEl.textContent = "Đã hết thời gian";
+  infoEl.className = "info done";
+  if (adjBox) adjBox.classList.add("hidden");
+  if (adjLabel) adjLabel.classList.add("hidden");
+  document.getElementById("btnOpenColor").classList.add("hidden");
+
+  setTimeout(function() {
+    try { window.close(); } catch (e) {}
+    setTimeout(function() {
+      try { window.location.replace("about:blank"); }
+      catch (e2) {
+        try { document.body.innerHTML = ""; document.title = ""; } catch (e3) {}
+      }
+    }, 300);
+  }, 800);
+}
+
 function tick() {
-  if (!expireDate) {
-    timerEl.textContent = "--.---";
-    timerEl.className = "timer expired";
+  if (finished || !expireDate) {
+    if (!expireDate) timerEl.textContent = "--.-";
     return;
   }
 
-  const target = expireDate.getTime() + offsetSec * 1000;
-  const leftMs = target - Date.now();
+  var target = expireDate.getTime() + offsetSec * 1000;
+  var leftMs = target - Date.now();
 
   if (leftMs <= 0) {
-    timerEl.innerHTML = "0<span class='ms'>.000</span>";
-    timerEl.className = "timer expired";
-    infoEl.textContent = "Đã hết hạn";
+    onTimeUp();
     return;
   }
 
-  // Chỉ hiện giây + mili giây (3 chữ số)
-  const totalSec = leftMs / 1000;
-  const sec = Math.floor(totalSec);
-  const ms  = Math.floor((totalSec - sec) * 1000);
+  var totalSec = leftMs / 1000;
+  var shown = totalSec.toFixed(1);
+  timerEl.innerHTML = shown.replace(".", "<span class='dot'>.</span>");
 
-  timerEl.innerHTML = `${sec}<span class="ms">.${pad(ms, 3)}</span>`;
+  // Màu: ưu tiên khoảng khách tự set, không có thì cyan mặc định
+  var custom = findColor(totalSec);
+  if (custom) {
+    timerEl.style.color = custom;
+    timerEl.className = "timer" + (totalSec <= 5 ? " blink" : "");
+  } else {
+    timerEl.style.color = "";
+    timerEl.className = "timer";
+    // Mặc định: cyan, dưới 5s nhấp nháy
+    if (totalSec <= 5) {
+      timerEl.style.color = "#ff0040";
+      timerEl.className = "timer blink";
+    } else {
+      timerEl.style.color = "#25f4ee";
+    }
+  }
 
-  if (totalSec <= 60)      timerEl.className = "timer danger";
-  else if (totalSec <= 300) timerEl.className = "timer warn";
-  else                      timerEl.className = "timer";
-
-  const label = type && box ? `${type} • ${box}` : (name || "Rương/Túi");
+  var label = type && box ? (type + " • " + box) : (name || "Rương/Túi");
   infoEl.textContent = label;
 }
 
-// Cập nhật rất nhanh để mili giây mượt
 tick();
-setInterval(tick, 33);   // ~30fps
+tickTimer = setInterval(tick, 50);
 
-document.getElementById("btnMinus").onclick = () => { offsetSec -= 1; tick(); };
-document.getElementById("btnPlus").onclick  = () => { offsetSec += 1; tick(); };
+document.querySelectorAll("#adjBox button[data-v]").forEach(function(btn) {
+  btn.onclick = function() {
+    if (finished) return;
+    offsetSec += parseFloat(btn.dataset.v);
+    updateOffsetLabel();
+    tick();
+  };
+});
+document.getElementById("btnReset").onclick = function() {
+  if (finished) return;
+  offsetSec = 0;
+  updateOffsetLabel();
+  tick();
+};
+updateOffsetLabel();
 </script>
 </body>
 </html>
