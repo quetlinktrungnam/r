@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Đếm ngược • Trung Nam</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;width:100%;min-height:100%;background:#050505;color:#fff;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+body{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+.container{width:100%;max-width:420px}
+.card{
+  background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));
+  border:1px solid rgba(255,255,255,.10);border-radius:24px;padding:28px 22px;
+  box-shadow:0 20px 70px rgba(0,0,0,.65),inset 0 1px rgba(255,255,255,.05);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);text-align:center
+}
+.logo{
+  font-size:28px;font-weight:900;letter-spacing:3px;margin-bottom:6px;
+  background:linear-gradient(90deg,#25f4ee,#fff,#ff2c55);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent
+}
+.sub{color:#888;font-size:13px;margin-bottom:22px}
+.timer{
+  font-size:52px;font-weight:800;letter-spacing:2px;margin:18px 0 8px;
+  font-variant-numeric:tabular-nums;color:#25f4ee
+}
+.timer.danger{color:#ff2c55}
+.timer.warn{color:#ffb347}
+.info{font-size:14px;color:#aaa;line-height:1.6;margin-top:12px}
+.ratio{
+  display:inline-block;margin-top:14px;padding:8px 18px;border-radius:999px;
+  background:rgba(37,244,238,.12);border:1px solid rgba(37,244,238,.25);
+  font-size:18px;font-weight:700;color:#25f4ee
+}
+.open-btn{
+  width:100%;margin-top:22px;padding:15px;font-size:15px;font-weight:800;border:0;
+  border-radius:14px;color:#fff;cursor:pointer;
+  background:linear-gradient(135deg,#25f4ee,#1677ff)
+}
+.open-btn:active{transform:scale(.97)}
+.note{margin-top:16px;color:#666;font-size:12px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <div class="logo">TRUNG NAM</div>
+    <div class="sub">ĐẾM NGƯỢC RƯƠNG / TÚI</div>
+
+    <div id="ratioBox" class="ratio">—</div>
+    <div id="timer" class="timer">--:--:--</div>
+    <div id="info" class="info">Đang tải...</div>
+
+    <button id="openBtn" class="open-btn" style="display:none">MỞ TIKTOK LIVE</button>
+    <div class="note">Thời gian theo giờ Việt Nam (API)</div>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const expire = parseInt(params.get("expire") || "0", 10);   // unix timestamp (seconds)
+const room   = params.get("room") || "";
+const ratio  = params.get("ratio") || "";
+const name   = params.get("name") || "";
+
+const timerEl = document.getElementById("timer");
+const infoEl  = document.getElementById("info");
+const ratioEl = document.getElementById("ratioBox");
+const openBtn = document.getElementById("openBtn");
+
+if (ratio) ratioEl.textContent = ratio;
+if (name)  infoEl.textContent = name;
+
+function pad(n){ return String(n).padStart(2,"0"); }
+
+function tick(){
+  if (!expire) {
+    timerEl.textContent = "N/A";
+    infoEl.textContent = "Không có thời gian hết hạn";
+    return;
+  }
+  const now = Math.floor(Date.now() / 1000);
+  let left = expire - now;
+
+  if (left <= 0) {
+    timerEl.textContent = "00:00:00";
+    timerEl.className = "timer danger";
+    infoEl.textContent = "Đã hết hạn";
+    return;
+  }
+
+  const h = Math.floor(left / 3600);
+  const m = Math.floor((left % 3600) / 60);
+  const s = left % 60;
+  timerEl.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+
+  if (left <= 60)      timerEl.className = "timer danger";
+  else if (left <= 300) timerEl.className = "timer warn";
+  else                 timerEl.className = "timer";
+
+  infoEl.textContent = `Còn lại ${h}h ${m}m ${s}s`;
+}
+
+tick();
+setInterval(tick, 250);
+
+if (room) {
+  openBtn.style.display = "block";
+  openBtn.onclick = () => {
+    location.href = "snssdk1180://live?room_id=" + encodeURIComponent(room);
+  };
+}
+</script>
+</body>
+</html>
