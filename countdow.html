@@ -37,7 +37,6 @@ body{
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
 .sub{color:#888;font-size:13px;margin-bottom:18px;}
-
 .type-box{
     display:inline-block;margin-bottom:6px;padding:8px 18px;border-radius:999px;
     background:rgba(37,244,238,.12);border:1px solid rgba(37,244,238,.28);
@@ -45,7 +44,6 @@ body{
 }
 .box-value{font-size:26px;font-weight:900;color:#fff;margin:6px 0 2px;letter-spacing:1px;}
 .ratio-line{font-size:13px;color:#aaa;margin-bottom:12px;}
-
 .timer{
     font-size:72px;font-weight:700;letter-spacing:-0.02em;
     font-variant-numeric:tabular-nums;margin:18px 0 6px;
@@ -66,14 +64,10 @@ body{
     50%{opacity:.5}
 }
 .timer.blink{animation:blink .45s ease-in-out infinite}
-
 .info{font-size:14px;color:#aaa;line-height:1.45;margin-top:6px}
 .info.done{color:#ff2c55;font-weight:700;font-size:16px}
-
 .end-time{margin-top:14px;font-size:12px;color:#777;line-height:1.5}
 .end-time strong{color:#ccc;font-weight:600}
-
-/* Nút ± giống web mẫu */
 .adj{
     display:flex;justify-content:center;align-items:center;
     gap:6px;margin-top:20px;flex-wrap:wrap;
@@ -87,29 +81,17 @@ body{
 .adj .btn-minus{background:#ef4444;color:#fff}
 .adj .btn-plus{background:#22c55e;color:#fff}
 .adj .btn-reset{background:rgba(255,255,255,.12);color:#ddd;min-width:52px}
-
-.offset-label{
-    font-size:12px;margin-top:10px;
-    color:#888;
-}
-.offset-label .val{
-    color:#25f4ee;font-weight:700;
-}
-.offset-hint{
-    font-size:11px;color:#555;margin-top:4px;line-height:1.4;
-}
-
+.offset-label{font-size:12px;margin-top:10px;color:#888}
+.offset-label .val{color:#25f4ee;font-weight:700}
+.offset-hint{font-size:11px;color:#555;margin-top:4px;line-height:1.4}
 .color-btn{
     margin-top:16px;width:100%;padding:11px;border:0;border-radius:12px;
     background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;
     font-size:14px;font-weight:700;cursor:pointer;
 }
 .color-btn:active{transform:scale(.97)}
-
 .note{margin-top:14px;color:#444;font-size:11px;line-height:1.5}
 .hidden{display:none !important}
-
-/* Modal màu */
 .modal-overlay{
     display:none;position:fixed;inset:0;z-index:9999;
     background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:16px;
@@ -157,17 +139,13 @@ body{
 <div class="container">
   <div class="card">
     <div class="logo">Quét Link Trung Nam</div>
-    <div class="sub">ĐẾM NGƯỢC RƯƠNG / TÚI</div>
-
+    <div class="sub">ĐẾM NGƯỢC</div>
     <div id="typeBox" class="type-box" style="display:none;"></div>
     <div id="boxValue" class="box-value" style="display:none;"></div>
     <div id="ratioLine" class="ratio-line" style="display:none;"></div>
-
     <div id="timer" class="timer">--.-</div>
     <div id="info" class="info">Đang tải...</div>
     <div id="endTime" class="end-time"></div>
-
-    <!-- Nút ± giống web mẫu: chỉnh lệch đồng hồ -->
     <div class="adj" id="adjBox">
       <button type="button" class="btn-minus" data-v="-0.05">-0.05s</button>
       <button type="button" class="btn-minus" data-v="-0.01">-0.01s</button>
@@ -179,15 +157,13 @@ body{
       Lệch: <span class="val" id="offsetVal">0.00s</span>
     </div>
     <div class="offset-hint" id="offsetHint">
-      + làm chậm hết · − làm nhanh hết<br>
+      + làm chậm · − làm nhanh<br>
       (chỉnh cho khớp lúc rương mở thật)
     </div>
-
     <button type="button" class="color-btn" id="btnOpenColor">Thêm màu sắc theo thời gian</button>
     <div class="note">Thời gian theo giờ Việt Nam</div>
   </div>
 </div>
-
 <div class="modal-overlay" id="colorModal">
   <div class="modal">
     <h3>Màu theo thời gian còn lại</h3>
@@ -217,7 +193,6 @@ body{
     </div>
   </div>
 </div>
-
 <script>
 document.addEventListener("contextmenu", e => e.preventDefault());
 document.addEventListener("selectstart", e => e.preventDefault());
@@ -286,7 +261,6 @@ function parseEndTime(endStr) {
   return expire;
 }
 
-/* ===== Màu tự do ===== */
 var STORAGE_KEY = "tnam_countdown_colors";
 function getColorTimes() {
   try { var raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : []; }
@@ -351,19 +325,16 @@ document.getElementById("btnClearColor").onclick = function() {
   renderColorList();
 };
 
-/* ===== Countdown + Offset ===== */
 var expireDate = parseEndTime(endStr);
 var offsetSec = 0;
 var finished = false;
 var tickTimer = null;
 
-/** Cập nhật dòng "Hết lúc" theo offset (giống web mẫu) */
 function updateEndTimeDisplay() {
   if (!expireDate) {
     endEl.textContent = "Không nhận được thời gian";
     return;
   }
-  // Thời điểm hết = expire gốc + offset
   var adjusted = new Date(expireDate.getTime() + offsetSec * 1000);
   var p = getVNParts(adjusted);
   endEl.innerHTML =
@@ -374,7 +345,7 @@ function updateEndTimeDisplay() {
 function updateOffsetLabel() {
   var sign = offsetSec > 0 ? "+" : "";
   offsetVal.textContent = sign + offsetSec.toFixed(2) + "s";
-  updateEndTimeDisplay(); // đổi luôn giờ hết khi chỉnh
+  updateEndTimeDisplay();
 }
 
 if (expireDate) {
@@ -392,14 +363,24 @@ function onTimeUp() {
   timerEl.textContent = "✕";
   timerEl.className = "timer done";
   timerEl.style.color = "";
-  infoEl.textContent = "Đã hết thời gian";
   infoEl.className = "info done";
   if (adjBox) adjBox.classList.add("hidden");
   if (adjLabel) adjLabel.classList.add("hidden");
   if (offsetHint) offsetHint.classList.add("hidden");
-  document.getElementById("btnOpenColor").classList.add("hidden");
+  var colorBtn = document.getElementById("btnOpenColor");
+  if (colorBtn) colorBtn.classList.add("hidden");
 
-  setTimeout(function() {
+  // Đếm ngược 5 giây rồi mới đóng tab
+  var left = 5;
+  infoEl.textContent = "Đã hết thời gian · đóng sau " + left + "s";
+  var closeTimer = setInterval(function() {
+    left -= 1;
+    if (left > 0) {
+      infoEl.textContent = "Đã hết thời gian · đóng sau " + left + "s";
+      return;
+    }
+    clearInterval(closeTimer);
+    infoEl.textContent = "Đang đóng...";
     try { window.close(); } catch (e) {}
     setTimeout(function() {
       try { window.location.replace("about:blank"); }
@@ -407,7 +388,7 @@ function onTimeUp() {
         try { document.body.innerHTML = ""; document.title = ""; } catch (e3) {}
       }
     }, 300);
-  }, 800);
+  }, 1000);
 }
 
 function tick() {
@@ -415,16 +396,12 @@ function tick() {
     if (!expireDate) timerEl.textContent = "--.-";
     return;
   }
-
-  // target = hết hạn gốc + offset (bấm + làm chậm, bấm − làm nhanh)
   var target = expireDate.getTime() + offsetSec * 1000;
   var leftMs = target - Date.now();
-
   if (leftMs <= 0) {
     onTimeUp();
     return;
   }
-
   var totalSec = leftMs / 1000;
   var shown = totalSec.toFixed(1);
   timerEl.innerHTML = shown.replace(".", "<span class='dot'>.</span>");
@@ -450,15 +427,13 @@ function tick() {
 tick();
 tickTimer = setInterval(tick, 50);
 
-/* Nút ± — hoạt động giống web mẫu */
 document.querySelectorAll("#adjBox button[data-v]").forEach(function(btn) {
   btn.onclick = function() {
     if (finished) return;
     offsetSec += parseFloat(btn.dataset.v);
-    // Làm tròn 2 chữ số thập phân tránh lỗi float
     offsetSec = Math.round(offsetSec * 100) / 100;
     updateOffsetLabel();
-    tick(); // cập nhật số đếm ngay
+    tick();
   };
 });
 document.getElementById("btnReset").onclick = function() {
