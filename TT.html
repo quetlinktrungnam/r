@@ -3,15 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
   <title>Bot Thuê – Quét Link Trung Nam</title>
-
+  <link rel="dns-prefetch" href="https://utctime.app">
+  <link rel="dns-prefetch" href="https://worldtime.timezone.io">
   <style>
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
     }
-
     body {
       margin: 0;
       min-height: 100vh;
@@ -23,7 +22,6 @@
       justify-content: center;
       padding: 16px;
     }
-
     .card {
       width: 100%;
       max-width: 420px;
@@ -34,7 +32,6 @@
       box-shadow: 0 0 40px rgba(255,44,85,.1);
       text-align: center;
     }
-
     .logo {
       width: 56px;
       height: 56px;
@@ -47,26 +44,19 @@
       font-weight: 900;
       font-size: 18px;
     }
-
-    h1 {
-      margin: 0;
-      font-size: 18px;
-    }
-
+    h1 { margin: 0; font-size: 18px; }
     .botname {
       color: #25f4ee;
       font-size: 13px;
       margin-top: 4px;
       font-weight: 600;
     }
-
     .sub {
       color: #888;
       font-size: 12px;
       margin-top: 6px;
       line-height: 1.45;
     }
-
     .countdown {
       margin-top: 14px;
       padding: 14px 12px;
@@ -74,13 +64,11 @@
       background: #1a1208;
       border: 1px solid #f59e0b55;
     }
-
     .countdown .label {
       font-size: 12px;
       color: #fbbf24;
       margin-bottom: 4px;
     }
-
     .countdown .time {
       font-size: 36px;
       font-weight: 800;
@@ -88,16 +76,11 @@
       font-variant-numeric: tabular-nums;
       color: #fbbf24;
     }
-
-    .countdown.urgent .time {
-      color: #f87171;
-    }
-
+    .countdown.urgent .time { color: #f87171; }
     .countdown.expired .time {
       color: #f87171;
       font-size: 20px;
     }
-
     .box {
       margin-top: 14px;
       padding: 12px;
@@ -107,11 +90,7 @@
       text-align: left;
       font-size: 13px;
     }
-
-    .box b {
-      color: #25f4ee;
-    }
-
+    .box b { color: #25f4ee; }
     .ck {
       font-family: ui-monospace, monospace;
       font-size: 13px;
@@ -123,7 +102,6 @@
       user-select: all;
       word-break: break-all;
     }
-
     #qrWrap {
       margin: 16px auto 0;
       width: 220px;
@@ -135,13 +113,11 @@
       align-items: center;
       justify-content: center;
     }
-
     #qrWrap img {
       width: 100%;
       height: 100%;
       object-fit: contain;
     }
-
     .status {
       margin-top: 14px;
       padding: 12px;
@@ -151,28 +127,22 @@
       font-size: 14px;
       line-height: 1.5;
     }
-
     .status.wait {
       border-color: #f59e0b;
       color: #fbbf24;
     }
-
     .status.ok {
       border-color: #22c55e;
       color: #4ade80;
     }
-
     .status.err {
       border-color: #ef4444;
       color: #f87171;
     }
-
-    /* Màn hình thành công / hết hạn */
     #successView {
       display: none;
       padding: 12px 0 4px;
     }
-
     .check {
       width: 88px;
       height: 88px;
@@ -186,21 +156,18 @@
       color: #fff;
       box-shadow: 0 0 30px rgba(34,197,94,.35);
     }
-
     .ok-title {
       font-size: 20px;
       font-weight: 800;
       color: #4ade80;
       margin: 0 0 10px;
     }
-
     .ok-msg {
       color: #ccc;
       font-size: 14px;
       line-height: 1.6;
       margin: 0 0 8px;
     }
-
     .ok-bot {
       display: inline-block;
       margin-top: 8px;
@@ -213,7 +180,6 @@
       font-size: 14px;
       text-decoration: none;
     }
-
     button {
       margin-top: 10px;
       width: 100%;
@@ -224,129 +190,69 @@
       font-size: 14px;
       cursor: pointer;
     }
-
     .btn-copy {
       background: #3b82f6;
       color: #fff;
     }
-
     .hint {
       margin-top: 14px;
       color: #666;
       font-size: 12px;
     }
-
-    #payBlock {
-      display: block;
+    #payBlock { display: block; }
+    .sync-hint {
+      font-size: 11px;
+      color: #555;
+      margin-top: 6px;
     }
   </style>
 </head>
-
 <body>
-
 <div class="card">
-
   <div class="logo">TN</div>
-
   <h1>Thanh toán thuê bot</h1>
+  <div class="botname">Bot Thuê – Quét Link Trung Nam</div>
+  <p class="sub">@thuebotquetlinktrungnam1_bot</p>
 
-  <div class="botname">
-    Bot Thuê – Quét Link Trung Nam
-  </div>
-
-  <p class="sub">
-    @thuebotquetlinktrungnam1_bot
-  </p>
-
-  <!-- =========================
-       KHU VỰC THANH TOÁN
-  ========================== -->
   <div id="payBlock">
-
     <div class="countdown" id="cdBox">
-      <div class="label">
-        THỜI HẠN THANH TOÁN
-      </div>
-
-      <div class="time" id="cdTime">
-        10:00
-      </div>
+      <div class="label">THỜI HẠN THANH TOÁN</div>
+      <div class="time" id="cdTime">--:--</div>
+      <div class="sync-hint" id="syncHint">Đang đồng bộ giờ server...</div>
     </div>
 
-    <div class="box" id="infoBox">
-      Đang tải...
-    </div>
+    <div class="box" id="infoBox">Đang tải...</div>
 
     <div id="qrWrap">
-      <span style="color:#333;font-size:12px">
-        QR...
-      </span>
+      <span style="color:#333;font-size:12px">QR...</span>
     </div>
 
-    <div class="status wait" id="statusBox">
-      ⏳ Quét QR và chuyển khoản...
-    </div>
+    <div class="status wait" id="statusBox">⏳ Quét QR và chuyển khoản...</div>
 
-    <button
-      class="btn-copy"
-      type="button"
-      id="btnCopy">
-      📋 Copy nội dung CK
-    </button>
-
+    <button class="btn-copy" type="button" id="btnCopy">📋 Copy nội dung CK</button>
   </div>
 
-
-  <!-- =========================
-       MÀN HÌNH THÀNH CÔNG / HẾT HẠN
-  ========================== -->
   <div id="successView">
-
-    <div class="check">
-      ✓
-    </div>
-
-    <p class="ok-title">
-      Thanh toán thành công
-    </p>
-
+    <div class="check">✓</div>
+    <p class="ok-title">Thanh toán thành công</p>
     <p class="ok-msg">
       Xin mời bạn vào bot để nhận link nhóm<br>
       và xác minh thiết bị.
     </p>
-
     <p class="ok-msg" id="autoCloseMsg" style="color:#fbbf24;margin-top:12px">
       Trang sẽ tự đóng sau <b id="closeSec">5</b> giây...
     </p>
-
-    <a
-      class="ok-bot"
-      href="https://t.me/thuebotquetlinktrungnam1_bot"
-      target="_blank"
-      rel="noopener">
+    <a class="ok-bot" href="https://t.me/thuebotquetlinktrungnam1_bot" target="_blank" rel="noopener">
       @thuebotquetlinktrungnam1_bot
     </a>
-
-    <p class="hint" style="margin-top:18px">
-      Admin hỗ trợ: @dvmxhnam
-    </p>
-
+    <p class="hint" style="margin-top:18px">Admin hỗ trợ: @dvmxhnam</p>
   </div>
 
-
-  <p class="hint" id="adminHint">
-    Admin hỗ trợ: @dvmxhnam
-  </p>
-
+  <p class="hint" id="adminHint">Admin hỗ trợ: @dvmxhnam</p>
 </div>
-
 
 <script>
 (function () {
-
-  /* =========================
-     CẤU HÌNH
-  ========================== */
 
   const SHEET_CSV =
     "https://docs.google.com/spreadsheets/d/1EXAZOdc36TmXwsZCmnyqbgwFoE6bOvFH96E2s7m559c/export?format=csv";
@@ -354,126 +260,96 @@
   const BANK_ACC = "033159";
   const BANK_NAME = "MBBank";
   const BANK_HOLDER = "BUI TRUNG NAM";
-
-  const BOT_USERNAME =
-    "thuebotquetlinktrungnam1_bot";
+  const BOT_USERNAME = "thuebotquetlinktrungnam1_bot";
 
   const POLL_MS = 2000;
   const LAST_ROWS = 60;
   const DEFAULT_SEC = 600;
 
-  /*
-    Cột Google Sheet:
-
-    F = index 5
-    G = index 6
-    H = index 7
-  */
-
   const COL_F = 5;
   const COL_G = 6;
   const COL_H = 7;
 
+  const params = new URLSearchParams(location.search);
+  const orderId = params.get("order") || "";
+  const ck = (params.get("ck") || "").trim().toLowerCase();
+  const amount = parseInt(params.get("amount") || "0", 10) || 0;
+  let until = parseInt(params.get("until") || "0", 10) || 0;
 
-  /* =========================
-     ĐỌC PARAM URL
-  ========================== */
+  /* ========== GIỜ SERVER + MONOTONIC ========== */
+  var serverOffsetMs = 0;
+  var remainingAtSync = null;
+  var basePerf = 0;
+  var untilSec = until;
 
-  const params =
-    new URLSearchParams(location.search);
-
-  const orderId =
-    params.get("order") || "";
-
-  const ck =
-    (params.get("ck") || "")
-      .trim()
-      .toLowerCase();
-
-  const amount =
-    parseInt(
-      params.get("amount") || "0",
-      10
-    ) || 0;
-
-  let until =
-    parseInt(
-      params.get("until") || "0",
-      10
-    ) || 0;
-
-
-  /*
-    Nếu URL không có until
-    → mặc định 10 phút
-  */
-
-  if (!until || until < 1e9) {
-
-    until =
-      Math.floor(Date.now() / 1000)
-      + DEFAULT_SEC;
-
+  async function getServerMs(){
+    try{
+      const t0 = Date.now();
+      const res = await fetch(
+        "https://utctime.app/api/now/Asia/Ho_Chi_Minh?t=" + Date.now(),
+        { method:"GET", cache:"no-store" }
+      );
+      if(!res.ok) throw new Error();
+      const data = await res.json();
+      const t1 = Date.now();
+      const rtt = t1 - t0;
+      return (data.unix_ms || data.unix * 1000) + rtt / 2;
+    }catch(e1){
+      try{
+        const t0 = Date.now();
+        const res = await fetch(
+          "https://worldtime.timezone.io/api/timezone/Asia/Ho_Chi_Minh?t=" + Date.now(),
+          { method:"GET", cache:"no-store" }
+        );
+        if(!res.ok) throw new Error();
+        const data = await res.json();
+        const t1 = Date.now();
+        const rtt = t1 - t0;
+        return data.unixtime * 1000 + rtt / 2;
+      }catch(e2){
+        return Date.now();
+      }
+    }
   }
 
+  function nowMs(){
+    return Date.now() + serverOffsetMs;
+  }
 
-  /* =========================
-     STORAGE
-  ========================== */
+  function applyDeadline(serverMs){
+    if(!untilSec || untilSec < 1e9){
+      untilSec = Math.floor(serverMs / 1000) + DEFAULT_SEC;
+    }
+    remainingAtSync = (untilSec * 1000) - serverMs;
+    basePerf = performance.now();
+    serverOffsetMs = serverMs - Date.now();
+  }
 
-  const storageKey =
-    "tn_paid_" +
-    (orderId || ck || "x");
+  function getRemainSec(){
+    if(remainingAtSync === null) return 0;
+    const leftMs = remainingAtSync - (performance.now() - basePerf);
+    return Math.max(0, Math.floor(leftMs / 1000));
+  }
 
+  const storageKey = "tn_paid_" + (orderId || ck || "x");
 
-  /* =========================
-     DOM
-  ========================== */
+  const payBlock = document.getElementById("payBlock");
+  const successView = document.getElementById("successView");
+  const adminHint = document.getElementById("adminHint");
+  const infoBox = document.getElementById("infoBox");
+  const statusBox = document.getElementById("statusBox");
+  const qrWrap = document.getElementById("qrWrap");
+  const btnCopy = document.getElementById("btnCopy");
+  const cdBox = document.getElementById("cdBox");
+  const cdTime = document.getElementById("cdTime");
+  const syncHint = document.getElementById("syncHint");
 
-  const payBlock =
-    document.getElementById("payBlock");
-
-  const successView =
-    document.getElementById("successView");
-
-  const adminHint =
-    document.getElementById("adminHint");
-
-  const infoBox =
-    document.getElementById("infoBox");
-
-  const statusBox =
-    document.getElementById("statusBox");
-
-  const qrWrap =
-    document.getElementById("qrWrap");
-
-  const btnCopy =
-    document.getElementById("btnCopy");
-
-  const cdBox =
-    document.getElementById("cdBox");
-
-  const cdTime =
-    document.getElementById("cdTime");
-
-
-  /* =========================
-     HIỆN MÀN THÀNH CÔNG
-  ========================== */
-
-  function showSuccessOnly() {
-
+  function showSuccessOnly(){
     payBlock.style.display = "none";
-
     successView.style.display = "block";
-
     adminHint.style.display = "none";
+    document.title = "✅ Thanh toán thành công";
 
-    document.title =
-      "✅ Thanh toán thành công";
-
-    /* Đếm ngược 5 giây rồi tự đóng tab */
     let sec = 5;
     const secEl = document.getElementById("closeSec");
     const timer = setInterval(function () {
@@ -481,699 +357,157 @@
       if (secEl) secEl.textContent = sec;
       if (sec <= 0) {
         clearInterval(timer);
-        try {
-          window.close();
-        } catch (e) {}
-        /* Nếu không đóng được (tab do user mở) thì đổi thông báo */
+        try { window.close(); } catch (e) {}
         const msg = document.getElementById("autoCloseMsg");
-        if (msg) {
-          msg.textContent = "Bạn có thể đóng trang này.";
-        }
+        if (msg) msg.textContent = "Bạn có thể đóng trang này.";
       }
     }, 1000);
-
   }
 
-
-  /* =========================
-     HIỆN MÀN HẾT HẠN
-  ========================== */
-
-  function showExpiredOnly() {
-
+  function showExpiredOnly(){
     payBlock.style.display = "none";
-
     successView.style.display = "block";
-
     adminHint.style.display = "none";
-
     successView.innerHTML = `
-
-      <div
-        class="check"
-        style="
-          background:
-            linear-gradient(
-              135deg,
-              #ef4444,
-              #b91c1c
-            );
-
-          box-shadow:
-            0 0 30px
-            rgba(239,68,68,.35);
-        ">
-        ×
-      </div>
-
-      <p
-        class="ok-title"
-        style="color:#f87171">
-        Đơn thanh toán đã hết hạn
-      </p>
-
+      <div class="check" style="background:linear-gradient(135deg,#ef4444,#b91c1c);box-shadow:0 0 30px rgba(239,68,68,.35);">×</div>
+      <p class="ok-title" style="color:#f87171">Đơn thanh toán đã hết hạn</p>
       <p class="ok-msg">
         Thời gian thanh toán 10 phút đã kết thúc.<br>
         Vui lòng quay lại bot để tạo đơn mới.
       </p>
-
-      <a
-        class="ok-bot"
-        href="https://t.me/thuebotquetlinktrungnam1_bot"
-        target="_blank"
-        rel="noopener">
+      <a class="ok-bot" href="https://t.me/thuebotquetlinktrungnam1_bot" target="_blank" rel="noopener">
         @thuebotquetlinktrungnam1_bot
       </a>
-
-      <p
-        class="hint"
-        style="margin-top:18px">
-        Admin hỗ trợ: @dvmxhnam
-      </p>
-
+      <p class="hint" style="margin-top:18px">Admin hỗ trợ: @dvmxhnam</p>
     `;
-
-    document.title =
-      "⏰ Đơn thanh toán hết hạn";
-
+    document.title = "⏰ Đơn thanh toán hết hạn";
   }
-
-
-  /* =========================
-     KIỂM TRA ĐÃ THANH TOÁN
-  ========================== */
 
   try {
-
-    if (
-      localStorage.getItem(storageKey)
-      === "1"
-    ) {
-
+    if (localStorage.getItem(storageKey) === "1") {
       showSuccessOnly();
-
       return;
-
     }
-
   } catch (e) {}
 
-
-  /* =========================
-     KIỂM TRA LINK
-  ========================== */
-
   if (!ck || !amount) {
-
-    infoBox.innerHTML =
-      "❌ Link không hợp lệ. Mở lại từ bot thuê.";
-
-    statusBox.className =
-      "status err";
-
-    statusBox.textContent =
-      "Thiếu thông tin đơn";
-
-    qrWrap.style.display =
-      "none";
-
-    btnCopy.style.display =
-      "none";
-
+    infoBox.innerHTML = "❌ Link không hợp lệ. Mở lại từ bot thuê.";
+    statusBox.className = "status err";
+    statusBox.textContent = "Thiếu thông tin đơn";
+    qrWrap.style.display = "none";
+    btnCopy.style.display = "none";
     return;
-
   }
-
-
-  /* =========================
-     THÔNG TIN THANH TOÁN
-  ========================== */
 
   infoBox.innerHTML =
+    (orderId ? "<div>Mã đơn: <b>#" + orderId + "</b></div>" : "") +
+    "<div>Số tiền: <b>" + amount.toLocaleString("vi-VN") + "đ</b></div>" +
+    "<div>STK: <b>" + BANK_ACC + "</b> · " + BANK_NAME + "</div>" +
+    "<div style='margin-top:6px'>Nội dung chuyển khoản:</div>" +
+    "<span class='ck'>" + ck + "</span>";
 
-    (orderId
-      ? "<div>Mã đơn: <b>#"
-        + orderId
-        + "</b></div>"
-      : "") +
-
-    "<div>Số tiền: <b>"
-    + amount.toLocaleString("vi-VN")
-    + "đ</b></div>" +
-
-    "<div>STK: <b>"
-    + BANK_ACC
-    + "</b> · "
-    + BANK_NAME
-    + "</div>" +
-
-    "<div style='margin-top:6px'>"
-    + "Nội dung chuyển khoản:"
-    + "</div>" +
-
-    "<span class='ck'>"
-    + ck
-    + "</span>";
-
-
-  /* =========================
-     TẠO QR
-  ========================== */
-
-  const img =
-    document.createElement("img");
-
+  const img = document.createElement("img");
   img.alt = "QR";
-
   img.src =
     "https://img.vietqr.io/image/" +
-
-    encodeURIComponent(BANK_NAME)
-    + "-"
-    + encodeURIComponent(BANK_ACC)
-    + "-compact2.png?amount="
-    + amount
-    + "&addInfo="
-    + encodeURIComponent(ck)
-    + "&accountName="
-    + encodeURIComponent(BANK_HOLDER);
-
+    encodeURIComponent(BANK_NAME) + "-" +
+    encodeURIComponent(BANK_ACC) +
+    "-compact2.png?amount=" + amount +
+    "&addInfo=" + encodeURIComponent(ck) +
+    "&accountName=" + encodeURIComponent(BANK_HOLDER);
 
   img.onerror = function () {
-
     qrWrap.innerHTML =
-      "<span style='color:#666;font-size:12px'>"
-      + "CK thủ công theo STK + nội dung"
-      + "</span>";
-
+      "<span style='color:#666;font-size:12px'>CK thủ công theo STK + nội dung</span>";
   };
-
-
   qrWrap.innerHTML = "";
-
   qrWrap.appendChild(img);
 
-
-  /* =========================
-     COPY NỘI DUNG
-  ========================== */
-
-  btnCopy.onclick =
-    function () {
-
-      if (
-        navigator.clipboard &&
-        window.isSecureContext
-      ) {
-
-        navigator.clipboard
-          .writeText(ck)
-          .then(function () {
-
-            btnCopy.textContent =
-              "✅ Đã copy";
-
-          });
-
-      } else {
-
-        const ta =
-          document.createElement("textarea");
-
-        ta.value = ck;
-
-        document.body.appendChild(ta);
-
-        ta.select();
-
-        document.execCommand("copy");
-
-        document.body.removeChild(ta);
-
-        btnCopy.textContent =
-          "✅ Đã copy";
-
-      }
-
-    };
-
-
-  /* =========================
-     STATUS
-  ========================== */
+  btnCopy.onclick = function () {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(ck).then(function () {
+        btnCopy.textContent = "✅ Đã copy";
+      });
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = ck;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      btnCopy.textContent = "✅ Đã copy";
+    }
+  };
 
   function setStatus(k, h) {
-
-    statusBox.className =
-      "status " + k;
-
+    statusBox.className = "status " + k;
     statusBox.innerHTML = h;
-
   }
-
-
-  /* =========================
-     TIME
-  ========================== */
 
   function pad(n) {
-
-    return n < 10
-      ? "0" + n
-      : "" + n;
-
+    return n < 10 ? "0" + n : "" + n;
   }
-
 
   function fmtRemain(s) {
-
     s = Math.max(0, s | 0);
-
-    return (
-      pad(Math.floor(s / 60))
-      + ":"
-      + pad(s % 60)
-    );
-
+    return pad(Math.floor(s / 60)) + ":" + pad(s % 60);
   }
-
-
-  /* =========================
-     CSV PARSER
-  ========================== */
 
   function parseCsvLine(line) {
-
     const out = [];
-
     let cur = "";
-
     let inQ = false;
-
-
-    for (
-      let i = 0;
-      i < line.length;
-      i++
-    ) {
-
+    for (let i = 0; i < line.length; i++) {
       const c = line[i];
-
-
-      if (c === '"') {
-
-        inQ = !inQ;
-
-        continue;
-
-      }
-
-
-      if (
-        c === ","
-        && !inQ
-      ) {
-
-        out.push(cur);
-
-        cur = "";
-
-        continue;
-
-      }
-
-
+      if (c === '"') { inQ = !inQ; continue; }
+      if (c === "," && !inQ) { out.push(cur); cur = ""; continue; }
       cur += c;
-
     }
-
-
     out.push(cur);
-
     return out;
-
   }
-
-
-  /* =========================
-     LẤY MÃ CK
-  ========================== */
 
   function ckFromColF(content) {
-
-    const s =
-      String(content || "")
-        .trim()
-        .toLowerCase();
-
-
-    const first =
-      (s.split(/\s+/)[0] || "");
-
-
-    if (
-      /^quetlinktrungnam\d{7}$/
-        .test(first)
-    ) {
-
-      return first;
-
-    }
-
-
-    const m =
-      s.replace(/\s+/g, "")
-       .match(
-         /quetlinktrungnam\d{7}/
-       );
-
-
-    return m
-      ? m[0]
-      : "";
-
+    const s = String(content || "").trim().toLowerCase();
+    const first = (s.split(/\s+/)[0] || "");
+    if (/^quetlinktrungnam\d{7}$/.test(first)) return first;
+    const m = s.replace(/\s+/g, "").match(/quetlinktrungnam\d{7}/);
+    return m ? m[0] : "";
   }
-
-
-  /* =========================
-     LẤY SỐ TIỀN
-  ========================== */
 
   function moneyFromColH(raw) {
-
-    const d =
-      String(raw || "")
-        .replace(/[^\d]/g, "");
-
-
-    return d
-      ? parseInt(d, 10)
-      : 0;
-
+    const d = String(raw || "").replace(/[^\d]/g, "");
+    return d ? parseInt(d, 10) : 0;
   }
-
-
-  /* =========================
-     TRẠNG THÁI
-  ========================== */
 
   let done = false;
-
   let expired = false;
 
-
-  /* =========================
-     THANH TOÁN THÀNH CÔNG
-  ========================== */
-
   function markPaidUI() {
-
     done = true;
-
-
-    try {
-
-      localStorage.setItem(
-        storageKey,
-        "1"
-      );
-
-    } catch (e) {}
-
-
+    try { localStorage.setItem(storageKey, "1"); } catch (e) {}
     showSuccessOnly();
-
   }
-
-
-  /* =========================
-     COUNTDOWN
-  ========================== */
 
   function tickCountdown() {
-
-    if (done || expired)
-      return;
-
-
-    const remain =
-      until -
-      Math.floor(Date.now() / 1000);
-
-
-    /*
-      HẾT GIỜ
-    */
-
+    if (done || expired) return;
+    const remain = getRemainSec();
     if (remain <= 0) {
-
       expired = true;
-
-      /*
-        Dừng kiểm tra thanh toán
-        và ẩn toàn bộ phần thanh toán
-      */
-
       showExpiredOnly();
-
       return;
-
     }
-
-
-    /*
-      CÒN THỜI GIAN
-    */
-
-    cdTime.textContent =
-      fmtRemain(remain);
-
-
-    cdBox.className =
-      remain <= 60
-        ? "countdown urgent"
-        : "countdown";
-
+    cdTime.textContent = fmtRemain(remain);
+    cdBox.className = remain <= 60 ? "countdown urgent" : "countdown";
   }
-
-
-  /* =========================
-     KIỂM TRA DÒNG SHEET
-  ========================== */
 
   function rowMatches(parts) {
-
-    if (
-      parts.length <= COL_H
-    ) {
-
-      return false;
-
-    }
-
-
-    const code =
-      ckFromColF(
-        parts[COL_F]
-      );
-
-
-    if (
-      !code ||
-      code !==
-      ck.replace(/\s+/g, "")
-    ) {
-
-      return false;
-
-    }
-
-
-    const typ =
-      String(parts[COL_G] || "")
-        .trim()
-        .toLowerCase();
-
-
-    /*
-      OUT / CHI = tiền ra
-      → Không tính là thanh toán
-    */
-
-    if (
-      typ === "out" ||
-      typ === "chi"
-    ) {
-
-      return false;
-
-    }
-
-
-    /*
-      Tiền giao dịch >= số tiền đơn
-    */
-
-    return (
-      moneyFromColH(
-        parts[COL_H]
-      ) >= amount
-    );
-
+    if (parts.length <= COL_H) return false;
+    const code = ckFromColF(parts[COL_F]);
+    if (!code || code !== ck.replace(/\s+/g, "")) return false;
+    const typ = String(parts[COL_G] || "").trim().toLowerCase();
+    if (typ === "out" || typ === "chi") return false;
+    return moneyFromColH(parts[COL_H]) >= amount;
   }
 
-
-  /* =========================
-     KIỂM TRA GOOGLE SHEET
-  ========================== */
-
-  async function checkSheet() {
-
-    if (
-      done ||
-      expired
-    ) {
-
-      return;
-
-    }
-
-
-    try {
-
-      const res =
-        await fetch(
-
-          SHEET_CSV
-          +
-          (
-            SHEET_CSV.indexOf("?")
-            >= 0
-              ? "&"
-              : "?"
-          )
-          +
-          "_t="
-          +
-          Date.now(),
-
-          {
-            cache: "no-store"
-          }
-
-        );
-
-
-      if (!res.ok) {
-
-        throw new Error(
-          "HTTP " + res.status
-        );
-
-      }
-
-
-      const lines =
-        (
-          await res.text()
-        )
-        .split(/\r?\n/)
-        .filter(Boolean)
-        .slice(1)
-        .slice(-LAST_ROWS);
-
-
-      for (
-        let i = lines.length - 1;
-        i >= 0;
-        i--
-      ) {
-
-        if (
-          rowMatches(
-            parseCsvLine(
-              lines[i]
-            )
-          )
-        ) {
-
-          markPaidUI();
-
-          return;
-
-        }
-
-      }
-
-
-      /*
-        Nếu chưa thanh toán
-      */
-
-      const remain =
-        until -
-        Math.floor(
-          Date.now() / 1000
-        );
-
-
-      if (remain <= 0) {
-
-        return;
-
-      }
-
-
-      setStatus(
-        "wait",
-
-        "⏳ Chưa thấy giao dịch · còn "
-        + fmtRemain(remain)
-      );
-
-
-    } catch (e) {
-
-      /*
-        Không ghi đè màn hình hết hạn
-      */
-
-      if (!expired) {
-
-        setStatus(
-          "err",
-          "⚠️ "
-          + (e.message || e)
-        );
-
-      }
-
-    }
-
-  }
-
-
-  /* =========================
-     KHỞI CHẠY
-  ========================== */
-
-  tickCountdown();
-
-  setInterval(
-    tickCountdown,
-    1000
-  );
-
-
-  checkSheet();
-
-  setInterval(
-    checkSheet,
-    POLL_MS
-  );
-
-})();
-</script>
-
-</body>
-</html>
+  async
