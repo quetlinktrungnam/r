@@ -116,6 +116,7 @@ const SHEET_ID = "1-e7G6GYM9eJSKOF1AOdATM4H2X-7erAaqj0VJUCD6T8";
 const SHEET_NAME = "Sheet1";
 const CACHE_KEY = "tnam_auth_cache_v2";
 const CACHE_TTL_MS = 15000;
+const SHOW_APPROVED_MS = 1000; // hiện giao diện 4 ký tự khoảng 1 giây
 
 function generateDeviceId(){
     const uuid = crypto.randomUUID();
@@ -354,6 +355,14 @@ function openTikTok(){
     closePageAfterOpen();
 }
 
+/** Hiện giao diện approved ~1s rồi mới mở TikTok */
+function showApprovedThenOpen(note, expiry){
+    showApproved(note, expiry, true); // skipOpen = true
+    setTimeout(function(){
+        openTikTok();
+    }, SHOW_APPROVED_MS);
+}
+
 async function checkFromNetwork(deviceId){
     const vietnamNowPromise = getVietnamNowMs();
     const devices = await readGoogleSheet();
@@ -372,7 +381,7 @@ async function checkFromNetwork(deviceId){
             note: found.note || "",
             expiryMs: null
         });
-        showApproved(found.note, null);
+        showApprovedThenOpen(found.note, null);
         return;
     }
     const nowMs = await vietnamNowPromise;
@@ -396,7 +405,7 @@ async function checkFromNetwork(deviceId){
             note: found.note || "",
             expiryMs: expiry.getTime()
         });
-        showApproved(found.note, expiry);
+        showApprovedThenOpen(found.note, expiry);
     }
 }
 
@@ -408,6 +417,7 @@ async function checkDevice(){
 
     const cached = readCache(deviceId);
 
+    // Cache approved → hiện UI 1 giây rồi mở TikTok
     if(cached && cached.status === "approved"){
         if(cached.expiryMs){
             const nowMs = await getVietnamNowMs();
@@ -416,8 +426,11 @@ async function checkDevice(){
                 return;
             }
         }
-        openTikTok();
-        showApproved(cached.note || "", cached.expiryMs ? new Date(cached.expiryMs) : null, true);
+        showApprovedThenOpen(
+            cached.note || "",
+            cached.expiryMs ? new Date(cached.expiryMs) : null
+        );
+        // Re-check nền sau TTL
         setTimeout(function(){
             checkFromNetwork(deviceId).catch(function(){});
         }, CACHE_TTL_MS);
@@ -436,8 +449,7 @@ async function checkDevice(){
         await checkFromNetwork(deviceId);
     }catch(err){
         if(cached && cached.status === "approved" && !cached.expiryMs){
-            openTikTok();
-            showApproved(cached.note || "", null, true);
+            showApprovedThenOpen(cached.note || "", null);
             return;
         }
         showError();
