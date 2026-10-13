@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -194,47 +193,80 @@ body{
   </div>
 </div>
 <script>
-document.addEventListener("contextmenu", e => e.preventDefault());
-document.addEventListener("selectstart", e => e.preventDefault());
-document.addEventListener("copy", e => e.preventDefault());
-document.addEventListener("cut", e => e.preventDefault());
-document.addEventListener("dragstart", e => e.preventDefault());
+document.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+document.addEventListener("selectstart", function(e){ e.preventDefault(); });
+document.addEventListener("copy", function(e){ e.preventDefault(); });
+document.addEventListener("cut", function(e){ e.preventDefault(); });
+document.addEventListener("dragstart", function(e){ e.preventDefault(); });
 
-const params = new URLSearchParams(window.location.search);
-const endStr = (params.get("end") || "").trim();
-const type   = (params.get("type") || "").trim();
-const box    = (params.get("box") || "").trim();
-const ratio  = (params.get("ratio") || "").trim();
-const name   = (params.get("name") || "").trim();
+function b64Decode(s){
+  if(!s) return "";
+  var t = String(s).replace(/-/g, "+").replace(/_/g, "/");
+  while(t.length % 4) t += "=";
+  try{ return decodeURIComponent(escape(atob(t))); }
+  catch(e){
+    try{ return atob(t); }catch(e2){ return ""; }
+  }
+}
 
-const timerEl   = document.getElementById("timer");
-const infoEl    = document.getElementById("info");
-const endEl     = document.getElementById("endTime");
-const typeEl    = document.getElementById("typeBox");
-const boxEl     = document.getElementById("boxValue");
-const ratioEl   = document.getElementById("ratioLine");
-const adjBox    = document.getElementById("adjBox");
-const adjLabel  = document.getElementById("adjLabel");
-const offsetVal = document.getElementById("offsetVal");
-const offsetHint= document.getElementById("offsetHint");
+function loadParams(){
+  var params = new URLSearchParams(window.location.search);
+  var c = (params.get("c") || "").trim();
+  if(c){
+    var raw = b64Decode(c);
+    var parts = raw.split("|");
+    return {
+      end: (parts[0] || "").trim(),
+      type: (parts[1] || "").trim(),
+      box: (parts[2] || "").trim(),
+      ratio: (parts[3] || "").trim(),
+      name: ""
+    };
+  }
+  return {
+    end: (params.get("end") || "").trim(),
+    type: (params.get("type") || "").trim(),
+    box: (params.get("box") || "").trim(),
+    ratio: (params.get("ratio") || "").trim(),
+    name: (params.get("name") || "").trim()
+  };
+}
 
-if (type) { typeEl.style.display = "inline-block"; typeEl.textContent = type; }
-if (box)  { boxEl.style.display = "block"; boxEl.textContent = box; }
-if (ratio){ ratioEl.style.display = "block"; ratioEl.textContent = "Ratio: " + ratio; }
+var P = loadParams();
+var endStr = P.end;
+var type = P.type;
+var box = P.box;
+var ratio = P.ratio;
+var name = P.name;
 
-function pad(n, len) { return String(n).padStart(len || 2, "0"); }
+var timerEl = document.getElementById("timer");
+var infoEl = document.getElementById("info");
+var endEl = document.getElementById("endTime");
+var typeEl = document.getElementById("typeBox");
+var boxEl = document.getElementById("boxValue");
+var ratioEl = document.getElementById("ratioLine");
+var adjBox = document.getElementById("adjBox");
+var adjLabel = document.getElementById("adjLabel");
+var offsetVal = document.getElementById("offsetVal");
+var offsetHint = document.getElementById("offsetHint");
 
-function getVNParts(date) {
+if(type){ typeEl.style.display = "inline-block"; typeEl.textContent = type; }
+if(box){ boxEl.style.display = "block"; boxEl.textContent = box; }
+if(ratio){ ratioEl.style.display = "block"; ratioEl.textContent = "Ratio: " + ratio; }
+
+function pad(n, len){ return String(n).padStart(len || 2, "0"); }
+
+function getVNParts(date){
   date = date || new Date();
-  const fmt = new Intl.DateTimeFormat("en-CA", {
+  var fmt = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Ho_Chi_Minh",
     year: "numeric", month: "2-digit", day: "2-digit",
     hour: "2-digit", minute: "2-digit", second: "2-digit",
     hour12: false
   });
-  const parts = {};
-  fmt.formatToParts(date).forEach(function(p) {
-    if (p.type !== "literal") parts[p.type] = p.value;
+  var parts = {};
+  fmt.formatToParts(date).forEach(function(p){
+    if(p.type !== "literal") parts[p.type] = p.value;
   });
   return {
     year:+parts.year, month:+parts.month, day:+parts.day,
@@ -242,45 +274,47 @@ function getVNParts(date) {
   };
 }
 
-function vnDateToUTC(y, m, d, h, mi, s) {
+function vnDateToUTC(y, m, d, h, mi, s){
   return new Date(Date.UTC(y, m - 1, d, h - 7, mi, s, 0));
 }
 
-function parseEndTime(endStr) {
-  if (!endStr) return null;
-  const m = endStr.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
-  if (!m) return null;
-  const h = +m[1], mi = +m[2], s = +m[3];
-  if (h > 23 || mi > 59 || s > 59) return null;
-
-  // LUÔN lấy ngày HÔM NAY theo giờ VN — không nhảy ngày mai
-  const nowParts = getVNParts();
+function parseEndTime(endStr){
+  if(!endStr) return null;
+  var m = endStr.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
+  if(!m) return null;
+  var h = +m[1], mi = +m[2], s = +m[3];
+  if(h > 23 || mi > 59 || s > 59) return null;
+  var nowParts = getVNParts();
   return vnDateToUTC(nowParts.year, nowParts.month, nowParts.day, h, mi, s);
 }
 
 var STORAGE_KEY = "tnam_countdown_colors";
-function getColorTimes() {
-  try { var raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : []; }
-  catch (e) { return []; }
+function getColorTimes(){
+  try{
+    var raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
 }
-function setColorTimes(list) { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
-function findColor(sec) {
+function setColorTimes(list){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+function findColor(sec){
   var list = getColorTimes();
-  for (var i = 0; i < list.length; i++) {
+  for(var i = 0; i < list.length; i++){
     var ct = list[i];
-    if (sec <= ct.start && sec >= ct.end) return ct.color;
+    if(sec <= ct.start && sec >= ct.end) return ct.color;
   }
   return null;
 }
-function renderColorList() {
+function renderColorList(){
   var list = getColorTimes();
   var el = document.getElementById("colorList");
   el.innerHTML = "";
-  if (!list.length) {
+  if(!list.length){
     el.innerHTML = '<div style="color:#666;font-size:12px;text-align:center;padding:8px">Chưa có khoảng màu nào</div>';
     return;
   }
-  list.forEach(function(item) {
+  list.forEach(function(item){
     var div = document.createElement("div");
     div.className = "color-item";
     div.innerHTML =
@@ -289,26 +323,26 @@ function renderColorList() {
       '<button type="button" class="del" data-id="' + item.id + '">✕</button>';
     el.appendChild(div);
   });
-  el.querySelectorAll(".del").forEach(function(btn) {
-    btn.onclick = function() {
-      setColorTimes(getColorTimes().filter(function(x) { return x.id !== +btn.dataset.id; }));
+  el.querySelectorAll(".del").forEach(function(btn){
+    btn.onclick = function(){
+      setColorTimes(getColorTimes().filter(function(x){ return x.id !== +btn.dataset.id; }));
       renderColorList();
     };
   });
 }
 
-document.getElementById("btnOpenColor").onclick = function() {
+document.getElementById("btnOpenColor").onclick = function(){
   document.getElementById("colorModal").classList.add("show");
   renderColorList();
 };
-document.getElementById("btnCloseColor").onclick = function() {
+document.getElementById("btnCloseColor").onclick = function(){
   document.getElementById("colorModal").classList.remove("show");
 };
-document.getElementById("btnAddColor").onclick = function() {
+document.getElementById("btnAddColor").onclick = function(){
   var s = parseFloat(document.getElementById("colorStart").value);
   var e = parseFloat(document.getElementById("colorEnd").value);
   var c = document.getElementById("colorPick").value;
-  if (!Number.isFinite(s) || !Number.isFinite(e)) return;
+  if(!Number.isFinite(s) || !Number.isFinite(e)) return;
   var start = Math.max(s, e), end = Math.min(s, e);
   var list = getColorTimes();
   list.push({ id: Date.now(), start: start, end: end, color: c });
@@ -317,7 +351,7 @@ document.getElementById("btnAddColor").onclick = function() {
   document.getElementById("colorStart").value = "";
   document.getElementById("colorEnd").value = "";
 };
-document.getElementById("btnClearColor").onclick = function() {
+document.getElementById("btnClearColor").onclick = function(){
   setColorTimes([]);
   renderColorList();
 };
@@ -327,8 +361,8 @@ var offsetSec = 0;
 var finished = false;
 var tickTimer = null;
 
-function updateEndTimeDisplay() {
-  if (!expireDate) {
+function updateEndTimeDisplay(){
+  if(!expireDate){
     endEl.textContent = "Không nhận được thời gian";
     return;
   }
@@ -339,63 +373,62 @@ function updateEndTimeDisplay() {
     " &nbsp;•&nbsp; <strong>" + pad(p.day) + "/" + pad(p.month) + "/" + p.year + "</strong>";
 }
 
-function updateOffsetLabel() {
+function updateOffsetLabel(){
   var sign = offsetSec > 0 ? "+" : "";
   offsetVal.textContent = sign + offsetSec.toFixed(2) + "s";
   updateEndTimeDisplay();
 }
 
-if (expireDate) {
+if(expireDate){
   updateEndTimeDisplay();
-} else {
+}else{
   endEl.textContent = "Không nhận được thời gian";
-  infoEl.textContent = "Thiếu tham số end=HH:MM:SS";
+  infoEl.textContent = "Thiếu dữ liệu đếm ngược";
 }
 
-function onTimeUp() {
-  if (finished) return;
+function onTimeUp(){
+  if(finished) return;
   finished = true;
-  if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
+  if(tickTimer){ clearInterval(tickTimer); tickTimer = null; }
 
   timerEl.textContent = "✕";
   timerEl.className = "timer done";
   timerEl.style.color = "";
   infoEl.className = "info done";
-  if (adjBox) adjBox.classList.add("hidden");
-  if (adjLabel) adjLabel.classList.add("hidden");
-  if (offsetHint) offsetHint.classList.add("hidden");
+  if(adjBox) adjBox.classList.add("hidden");
+  if(adjLabel) adjLabel.classList.add("hidden");
+  if(offsetHint) offsetHint.classList.add("hidden");
   var colorBtn = document.getElementById("btnOpenColor");
-  if (colorBtn) colorBtn.classList.add("hidden");
+  if(colorBtn) colorBtn.classList.add("hidden");
 
-  // Đếm ngược 5 giây rồi mới đóng tab
   var left = 5;
   infoEl.textContent = "Đã hết thời gian · đóng sau " + left + "s";
-  var closeTimer = setInterval(function() {
+  var closeTimer = setInterval(function(){
     left -= 1;
-    if (left > 0) {
+    if(left > 0){
       infoEl.textContent = "Đã hết thời gian · đóng sau " + left + "s";
       return;
     }
     clearInterval(closeTimer);
     infoEl.textContent = "Đang đóng...";
-    try { window.close(); } catch (e) {}
-    setTimeout(function() {
-      try { window.location.replace("about:blank"); }
-      catch (e2) {
-        try { document.body.innerHTML = ""; document.title = ""; } catch (e3) {}
+    try{ window.close(); }catch(e){}
+    setTimeout(function(){
+      try{ window.location.replace("about:blank"); }
+      catch(e2){
+        try{ document.body.innerHTML = ""; document.title = ""; }catch(e3){}
       }
     }, 300);
   }, 1000);
 }
 
-function tick() {
-  if (finished || !expireDate) {
-    if (!expireDate) timerEl.textContent = "--.-";
+function tick(){
+  if(finished || !expireDate){
+    if(!expireDate) timerEl.textContent = "--.-";
     return;
   }
   var target = expireDate.getTime() + offsetSec * 1000;
   var leftMs = target - Date.now();
-  if (leftMs <= 0) {
+  if(leftMs <= 0){
     onTimeUp();
     return;
   }
@@ -404,15 +437,15 @@ function tick() {
   timerEl.innerHTML = shown.replace(".", "<span class='dot'>.</span>");
 
   var custom = findColor(totalSec);
-  if (custom) {
+  if(custom){
     timerEl.style.color = custom;
     timerEl.className = "timer" + (totalSec <= 5 ? " blink" : "");
-  } else {
+  }else{
     timerEl.className = "timer";
-    if (totalSec <= 5) {
+    if(totalSec <= 5){
       timerEl.style.color = "#ff0040";
       timerEl.className = "timer blink";
-    } else {
+    }else{
       timerEl.style.color = "#25f4ee";
     }
   }
@@ -424,17 +457,17 @@ function tick() {
 tick();
 tickTimer = setInterval(tick, 50);
 
-document.querySelectorAll("#adjBox button[data-v]").forEach(function(btn) {
-  btn.onclick = function() {
-    if (finished) return;
+document.querySelectorAll("#adjBox button[data-v]").forEach(function(btn){
+  btn.onclick = function(){
+    if(finished) return;
     offsetSec += parseFloat(btn.dataset.v);
     offsetSec = Math.round(offsetSec * 100) / 100;
     updateOffsetLabel();
     tick();
   };
 });
-document.getElementById("btnReset").onclick = function() {
-  if (finished) return;
+document.getElementById("btnReset").onclick = function(){
+  if(finished) return;
   offsetSec = 0;
   updateOffsetLabel();
   tick();
