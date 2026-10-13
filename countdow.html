@@ -83,6 +83,9 @@ body{
 .offset-label{font-size:12px;margin-top:10px;color:#888}
 .offset-label .val{color:#25f4ee;font-weight:700}
 .offset-hint{font-size:11px;color:#555;margin-top:4px;line-height:1.4}
+.sync-status{font-size:11px;color:#555;margin-top:6px}
+.sync-status.ok{color:#22c55e}
+.sync-status.fail{color:#f87171}
 .color-btn{
     margin-top:16px;width:100%;padding:11px;border:0;border-radius:12px;
     background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;
@@ -159,8 +162,9 @@ body{
       + làm chậm · − làm nhanh<br>
       (chỉnh cho khớp lúc rương mở thật)
     </div>
+    <div id="syncStatus" class="sync-status">Đang đồng bộ giờ server...</div>
     <button type="button" class="color-btn" id="btnOpenColor">Thêm màu sắc theo thời gian</button>
-    <div class="note">Thời gian theo giờ Việt Nam</div>
+    <div class="note">Thời gian theo giờ Việt Nam (đồng bộ server)</div>
   </div>
 </div>
 <div class="modal-overlay" id="colorModal">
@@ -249,6 +253,7 @@ var adjBox = document.getElementById("adjBox");
 var adjLabel = document.getElementById("adjLabel");
 var offsetVal = document.getElementById("offsetVal");
 var offsetHint = document.getElementById("offsetHint");
+var syncStatusEl = document.getElementById("syncStatus");
 
 if(type){ typeEl.style.display = "inline-block"; typeEl.textContent = type; }
 if(box){ boxEl.style.display = "block"; boxEl.textContent = box; }
@@ -284,10 +289,62 @@ function parseEndTime(endStr){
   if(!m) return null;
   var h = +m[1], mi = +m[2], s = +m[3];
   if(h > 23 || mi > 59 || s > 59) return null;
-  var nowParts = getVNParts();
+  var nowParts = getVNParts(new Date(nowMs()));
   return vnDateToUTC(nowParts.year, nowParts.month, nowParts.day, h, mi, s);
 }
 
+/* ========== SERVER TIME SYNC ========== */
+var serverOffsetMs = 0;   // serverTime - localTime
+var serverSynced = false;
+var SYNC_INTERVAL = 45000; // re-sync mỗi 45 giây
+
+function nowMs(){
+  return Date.now() + serverOffsetMs;
+}
+
+function setSyncStatus(ok, msg){
+  syncStatusEl.textContent = msg;
+  syncStatusEl.className = "sync-status " + (ok ? "ok" : "fail");
+}
+
+function syncServerTime(){
+  var t0 = Date.now();
+  // API 1: utctime.app (ưu tiên)
+  return fetch("https://utctime.app/api/now/Asia/Ho_Chi_Minh", { cache: "no-store" })
+    .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(function(data){
+      var t1 = Date.now();
+      var rtt = t1 - t0;
+      var serverMs = data.unix_ms || (data.unix * 1000);
+      // bù nửa RTT để giảm lỗi mạng
+      serverOffsetMs = (serverMs + rtt / 2) - t1;
+      serverSynced = true;
+      setSyncStatus(true, "Đã đồng bộ giờ server (±" + Math.round(rtt/2) + "ms)");
+      return true;
+    })
+    .catch(function(){
+      // API 2: fallback worldtime.timezone.io
+      var t0b = Date.now();
+      return fetch("https://worldtime.timezone.io/api/timezone/Asia/Ho_Chi_Minh", { cache: "no-store" })
+        .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        .then(function(data){
+          var t1b = Date.now();
+          var rtt = t1b - t0b;
+          var serverMs = (data.unixtime * 1000) + (Date.now() % 1000);
+          serverOffsetMs = (serverMs + rtt / 2) - t1b;
+          serverSynced = true;
+          setSyncStatus(true, "Đã đồng bộ giờ server (fallback ±" + Math.round(rtt/2) + "ms)");
+          return true;
+        })
+        .catch(function(){
+          serverSynced = false;
+          setSyncStatus(false, "Không đồng bộ được · dùng giờ máy");
+          return false;
+        });
+    });
+}
+
+/* ========== COLOR ========== */
 var STORAGE_KEY = "tnam_countdown_colors";
 function getColorTimes(){
   try{
@@ -356,7 +413,8 @@ document.getElementById("btnClearColor").onclick = function(){
   renderColorList();
 };
 
-var expireDate = parseEndTime(endStr);
+/* ========== COUNTDOWN ========== */
+var expireDate = null;
 var offsetSec = 0;
 var finished = false;
 var tickTimer = null;
@@ -379,13 +437,6 @@ function updateOffsetLabel(){
   updateEndTimeDisplay();
 }
 
-if(expireDate){
-  updateEndTimeDisplay();
-}else{
-  endEl.textContent = "Không nhận được thời gian";
-  infoEl.textContent = "Thiếu dữ liệu đếm ngược";
-}
-
 function onTimeUp(){
   if(finished) return;
   finished = true;
@@ -398,6 +449,7 @@ function onTimeUp(){
   if(adjBox) adjBox.classList.add("hidden");
   if(adjLabel) adjLabel.classList.add("hidden");
   if(offsetHint) offsetHint.classList.add("hidden");
+  if(syncStatusEl) syncStatusEl.classList.add("hidden");
   var colorBtn = document.getElementById("btnOpenColor");
   if(colorBtn) colorBtn.classList.add("hidden");
 
@@ -427,7 +479,7 @@ function tick(){
     return;
   }
   var target = expireDate.getTime() + offsetSec * 1000;
-  var leftMs = target - Date.now();
+  var leftMs = target - nowMs();   // ← dùng giờ đã đồng bộ server
   if(leftMs <= 0){
     onTimeUp();
     return;
@@ -454,9 +506,6 @@ function tick(){
   infoEl.textContent = label;
 }
 
-tick();
-tickTimer = setInterval(tick, 50);
-
 document.querySelectorAll("#adjBox button[data-v]").forEach(function(btn){
   btn.onclick = function(){
     if(finished) return;
@@ -472,7 +521,30 @@ document.getElementById("btnReset").onclick = function(){
   updateOffsetLabel();
   tick();
 };
-updateOffsetLabel();
+
+/* ========== INIT ========== */
+function startCountdown(){
+  expireDate = parseEndTime(endStr);
+  if(expireDate){
+    updateEndTimeDisplay();
+  }else{
+    endEl.textContent = "Không nhận được thời gian";
+    infoEl.textContent = "Thiếu dữ liệu đếm ngược";
+  }
+  updateOffsetLabel();
+  tick();
+  if(tickTimer) clearInterval(tickTimer);
+  tickTimer = setInterval(tick, 50);
+}
+
+// Đồng bộ giờ server trước, rồi mới chạy đếm ngược
+syncServerTime().then(function(){
+  startCountdown();
+  // re-sync định kỳ
+  setInterval(function(){
+    if(!finished) syncServerTime();
+  }, SYNC_INTERVAL);
+});
 </script>
 </body>
 </html>
