@@ -6,6 +6,7 @@
 <title>Quét Link Trung Nam</title>
 <link rel="dns-prefetch" href="https://docs.google.com">
 <link rel="dns-prefetch" href="https://utctime.app">
+<link rel="dns-prefetch" href="https://worldtime.timezone.io">
 <link rel="preconnect" href="https://docs.google.com" crossorigin>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -113,7 +114,7 @@ Vui lòng liên hệ admin @dvmxhnam để gia hạn.
 <script>
 const SHEET_ID = "1-e7G6GYM9eJSKOF1AOdATM4H2X-7erAaqj0VJUCD6T8";
 const SHEET_NAME = "Sheet1";
-const CACHE_KEY = "tnam_auth_cache_v1";
+const CACHE_KEY = "tnam_auth_cache_v2";
 const CACHE_TTL_MS = 15000;
 
 function generateDeviceId(){
@@ -169,29 +170,53 @@ function readCache(deviceId){
         if(!raw) return null;
         const data = JSON.parse(raw);
         if(!data || data.deviceId !== deviceId) return null;
-        if(Date.now() - (data.checkedAt || 0) > CACHE_TTL_MS) return null;
+        if(typeof data.perfAt === "number"){
+            if(performance.now() - data.perfAt > CACHE_TTL_MS) return null;
+        }else if(Date.now() - (data.checkedAt || 0) > CACHE_TTL_MS){
+            return null;
+        }
         return data;
     }catch(e){ return null; }
 }
 
 function writeCache(payload){
     try{
+        payload.perfAt = performance.now();
+        payload.checkedAt = Date.now();
         localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
     }catch(e){}
 }
 
-async function getVietnamNow(){
+/* ========== GIỜ SERVER (không dựa vào máy) ========== */
+async function getVietnamNowMs(){
     try{
+        const t0 = Date.now();
         const res = await fetch(
             "https://utctime.app/api/now/Asia/Ho_Chi_Minh?t=" + Date.now(),
             { method:"GET", cache:"no-store" }
         );
         if(!res.ok) throw new Error();
         const data = await res.json();
-        if(data && typeof data.unix === "number") return new Date(data.unix * 1000);
-        throw new Error();
-    }catch(e){
-        return new Date();
+        const t1 = Date.now();
+        const rtt = t1 - t0;
+        const serverMs = (data.unix_ms || data.unix * 1000) + rtt / 2;
+        return serverMs;
+    }catch(e1){
+        try{
+            const t0 = Date.now();
+            const res = await fetch(
+                "https://worldtime.timezone.io/api/timezone/Asia/Ho_Chi_Minh?t=" + Date.now(),
+                { method:"GET", cache:"no-store" }
+            );
+            if(!res.ok) throw new Error();
+            const data = await res.json();
+            const t1 = Date.now();
+            const rtt = t1 - t0;
+            const serverMs = data.unixtime * 1000 + rtt / 2;
+            return serverMs;
+        }catch(e2){
+            return Date.now();
+        }
     }
 }
 
@@ -330,13 +355,13 @@ function openTikTok(){
 }
 
 async function checkFromNetwork(deviceId){
-    const vietnamNowPromise = getVietnamNow();
+    const vietnamNowPromise = getVietnamNowMs();
     const devices = await readGoogleSheet();
     const found = devices.find(function(item){
         return item.device.trim() === deviceId.trim();
     });
     if(!found){
-        writeCache({ deviceId: deviceId, status: "denied", checkedAt: Date.now() });
+        writeCache({ deviceId: deviceId, status: "denied" });
         showDenied();
         return;
     }
@@ -345,25 +370,23 @@ async function checkFromNetwork(deviceId){
             deviceId: deviceId,
             status: "approved",
             note: found.note || "",
-            expiryMs: null,
-            checkedAt: Date.now()
+            expiryMs: null
         });
         showApproved(found.note, null);
         return;
     }
-    const now = await vietnamNowPromise;
+    const nowMs = await vietnamNowPromise;
     const expiry = parseExpiry(found.expiry);
     if(!expiry){
         showError();
         return;
     }
-    if(now.getTime() > expiry.getTime()){
+    if(nowMs > expiry.getTime()){
         writeCache({
             deviceId: deviceId,
             status: "expired",
             note: found.note || "",
-            expiryMs: expiry.getTime(),
-            checkedAt: Date.now()
+            expiryMs: expiry.getTime()
         });
         showExpired(found.note, expiry);
     }else{
@@ -371,8 +394,7 @@ async function checkFromNetwork(deviceId){
             deviceId: deviceId,
             status: "approved",
             note: found.note || "",
-            expiryMs: expiry.getTime(),
-            checkedAt: Date.now()
+            expiryMs: expiry.getTime()
         });
         showApproved(found.note, expiry);
     }
@@ -385,25 +407,37 @@ async function checkDevice(){
     document.getElementById("deviceCodeApproved").textContent = "(" + deviceId.substring(0,4) + ")";
 
     const cached = readCache(deviceId);
+
     if(cached && cached.status === "approved"){
-        if(cached.expiryMs && Date.now() > cached.expiryMs){
-            showExpired(cached.note || "", new Date(cached.expiryMs));
-        }else{
-            openTikTok();
-            showApproved(cached.note || "", cached.expiryMs ? new Date(cached.expiryMs) : null, true);
-            setTimeout(function(){
-                checkFromNetwork(deviceId).catch(function(){});
-            }, CACHE_TTL_MS);
-            return;
+        if(cached.expiryMs){
+            const nowMs = await getVietnamNowMs();
+            if(nowMs > cached.expiryMs){
+                showExpired(cached.note || "", new Date(cached.expiryMs));
+                return;
+            }
         }
+        openTikTok();
+        showApproved(cached.note || "", cached.expiryMs ? new Date(cached.expiryMs) : null, true);
+        setTimeout(function(){
+            checkFromNetwork(deviceId).catch(function(){});
+        }, CACHE_TTL_MS);
+        return;
+    }
+
+    if(cached && cached.status === "expired"){
+        showExpired(cached.note || "", cached.expiryMs ? new Date(cached.expiryMs) : null);
+        setTimeout(function(){
+            checkFromNetwork(deviceId).catch(function(){});
+        }, 500);
+        return;
     }
 
     try{
         await checkFromNetwork(deviceId);
     }catch(err){
-        if(cached && cached.status === "approved" && (!cached.expiryMs || Date.now() <= cached.expiryMs)){
+        if(cached && cached.status === "approved" && !cached.expiryMs){
             openTikTok();
-            showApproved(cached.note || "", cached.expiryMs ? new Date(cached.expiryMs) : null, true);
+            showApproved(cached.note || "", null, true);
             return;
         }
         showError();
