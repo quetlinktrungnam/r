@@ -116,7 +116,7 @@ const SHEET_ID = "1-e7G6GYM9eJSKOF1AOdATM4H2X-7erAaqj0VJUCD6T8";
 const SHEET_NAME = "Sheet1";
 const CACHE_KEY = "tnam_auth_cache_v2";
 const CACHE_TTL_MS = 15000;
-const SHOW_APPROVED_MS = 1000; // hiện giao diện 4 ký tự khoảng 1 giây
+const SHOW_APPROVED_MS = 400; // chỉ nhìn thoáng ~0.4s rồi mở
 
 function generateDeviceId(){
     const uuid = crypto.randomUUID();
@@ -188,7 +188,6 @@ function writeCache(payload){
     }catch(e){}
 }
 
-/* ========== GIỜ SERVER (không dựa vào máy) ========== */
 async function getVietnamNowMs(){
     try{
         const t0 = Date.now();
@@ -200,8 +199,7 @@ async function getVietnamNowMs(){
         const data = await res.json();
         const t1 = Date.now();
         const rtt = t1 - t0;
-        const serverMs = (data.unix_ms || data.unix * 1000) + rtt / 2;
-        return serverMs;
+        return (data.unix_ms || data.unix * 1000) + rtt / 2;
     }catch(e1){
         try{
             const t0 = Date.now();
@@ -213,8 +211,7 @@ async function getVietnamNowMs(){
             const data = await res.json();
             const t1 = Date.now();
             const rtt = t1 - t0;
-            const serverMs = data.unixtime * 1000 + rtt / 2;
-            return serverMs;
+            return data.unixtime * 1000 + rtt / 2;
         }catch(e2){
             return Date.now();
         }
@@ -316,14 +313,13 @@ function showDenied(){
     document.getElementById("deniedBox").classList.remove("hidden");
 }
 
-function showApproved(note, expiry, skipOpen){
+function showApproved(note, expiry){
     hideAll();
     document.getElementById("approvedBox").classList.remove("hidden");
     document.getElementById("approvedNote").textContent = note ? "Ghi chú: " + note : "";
     document.getElementById("expiryBox").innerHTML = expiry
         ? "Hạn sử dụng: <strong>" + formatDate(expiry) + "</strong>"
         : "Hạn sử dụng: <strong>VÔ HẠN</strong>";
-    if(!skipOpen) openTikTok();
 }
 
 function showExpired(note, expiry){
@@ -355,12 +351,9 @@ function openTikTok(){
     closePageAfterOpen();
 }
 
-/** Hiện giao diện approved ~1s rồi mới mở TikTok */
 function showApprovedThenOpen(note, expiry){
-    showApproved(note, expiry, true); // skipOpen = true
-    setTimeout(function(){
-        openTikTok();
-    }, SHOW_APPROVED_MS);
+    showApproved(note, expiry);
+    setTimeout(openTikTok, SHOW_APPROVED_MS);
 }
 
 async function checkFromNetwork(deviceId){
@@ -409,7 +402,7 @@ async function checkFromNetwork(deviceId){
     }
 }
 
-async function checkDevice(){
+function checkDevice(){
     const deviceId = getDeviceId();
     document.getElementById("deviceCode").textContent = deviceId;
     document.getElementById("deviceCodeExpired").textContent = deviceId;
@@ -417,21 +410,25 @@ async function checkDevice(){
 
     const cached = readCache(deviceId);
 
-    // Cache approved → hiện UI 1 giây rồi mở TikTok
+    // ĐƯỜNG NHANH: cache approved → hiện UI NGAY, không chờ mạng
     if(cached && cached.status === "approved"){
-        if(cached.expiryMs){
-            const nowMs = await getVietnamNowMs();
-            if(nowMs > cached.expiryMs){
-                showExpired(cached.note || "", new Date(cached.expiryMs));
-                return;
-            }
-        }
         showApprovedThenOpen(
             cached.note || "",
             cached.expiryMs ? new Date(cached.expiryMs) : null
         );
-        // Re-check nền sau TTL
         setTimeout(function(){
+            if(cached.expiryMs){
+                getVietnamNowMs().then(function(nowMs){
+                    if(nowMs > cached.expiryMs){
+                        writeCache({
+                            deviceId: deviceId,
+                            status: "expired",
+                            note: cached.note || "",
+                            expiryMs: cached.expiryMs
+                        });
+                    }
+                }).catch(function(){});
+            }
             checkFromNetwork(deviceId).catch(function(){});
         }, CACHE_TTL_MS);
         return;
@@ -441,19 +438,17 @@ async function checkDevice(){
         showExpired(cached.note || "", cached.expiryMs ? new Date(cached.expiryMs) : null);
         setTimeout(function(){
             checkFromNetwork(deviceId).catch(function(){});
-        }, 500);
+        }, 300);
         return;
     }
 
-    try{
-        await checkFromNetwork(deviceId);
-    }catch(err){
+    checkFromNetwork(deviceId).catch(function(){
         if(cached && cached.status === "approved" && !cached.expiryMs){
             showApprovedThenOpen(cached.note || "", null);
             return;
         }
         showError();
-    }
+    });
 }
 
 async function copyDevice(){
