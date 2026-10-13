@@ -164,7 +164,7 @@ body{
     </div>
     <div id="syncStatus" class="sync-status">Đang đồng bộ giờ server...</div>
     <button type="button" class="color-btn" id="btnOpenColor">Thêm màu sắc theo thời gian</button>
-    <div class="note">Thời gian theo giờ Việt Nam (đồng bộ server)</div>
+    <div class="note">Thời gian theo giờ Việt Nam (đồng bộ server · kháng chỉnh giờ máy)</div>
   </div>
 </div>
 <div class="modal-overlay" id="colorModal">
@@ -283,20 +283,26 @@ function vnDateToUTC(y, m, d, h, mi, s){
   return new Date(Date.UTC(y, m - 1, d, h - 7, mi, s, 0));
 }
 
-function parseEndTime(endStr){
-  if(!endStr) return null;
-  var m = endStr.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
-  if(!m) return null;
-  var h = +m[1], mi = +m[2], s = +m[3];
-  if(h > 23 || mi > 59 || s > 59) return null;
-  var nowParts = getVNParts(new Date(nowMs()));
-  return vnDateToUTC(nowParts.year, nowParts.month, nowParts.day, h, mi, s);
-}
-
-/* ========== SERVER TIME SYNC ========== */
-var serverOffsetMs = 0;   // serverTime - localTime
+/* ========== SERVER TIME + MONOTONIC COUNTDOWN ========== */
+/*
+  Cách hoạt động:
+  - Lấy giờ server → tính remainingMs (thời gian còn lại)
+  - Lưu remainingMs + performance.now() lúc đó
+  - Mỗi tick: remaining = remainingMs - (performance.now() - basePerf)
+  → Thay đổi đồng hồ máy KHÔNG ảnh hưởng đến đếm ngược
+  - Vẫn re-sync định kỳ để sửa drift
+*/
+var serverOffsetMs = 0;
 var serverSynced = false;
-var SYNC_INTERVAL = 45000; // re-sync mỗi 45 giây
+var SYNC_INTERVAL = 30000; // 30 giây
+
+// Monotonic state
+var remainingAtSync = null;   // ms còn lại lúc sync (đã trừ offsetSec)
+var basePerf = 0;             // performance.now() lúc sync
+var expireDate = null;        // Date object của thời điểm hết (để hiển thị)
+var offsetSec = 0;            // lệch thủ công (giây)
+var finished = false;
+var tickTimer = null;
 
 function nowMs(){
   return Date.now() + serverOffsetMs;
@@ -307,38 +313,76 @@ function setSyncStatus(ok, msg){
   syncStatusEl.className = "sync-status " + (ok ? "ok" : "fail");
 }
 
+function parseEndTime(endStr, serverMs){
+  if(!endStr) return null;
+  var m = endStr.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
+  if(!m) return null;
+  var h = +m[1], mi = +m[2], s = +m[3];
+  if(h > 23 || mi > 59 || s > 59) return null;
+
+  // Dùng giờ server để lấy ngày hiện tại (VN)
+  var nowParts = getVNParts(new Date(serverMs));
+  var endUTC = vnDateToUTC(nowParts.year, nowParts.month, nowParts.day, h, mi, s);
+  return endUTC;
+}
+
+function applySync(serverMs){
+  expireDate = parseEndTime(endStr, serverMs);
+  if(!expireDate){
+    remainingAtSync = null;
+    return;
+  }
+  // remaining = (end + offsetSec) - serverNow
+  var target = expireDate.getTime() + offsetSec * 1000;
+  remainingAtSync = target - serverMs;
+  basePerf = performance.now();
+}
+
+function getRemainingMs(){
+  if(remainingAtSync === null) return null;
+  return remainingAtSync - (performance.now() - basePerf);
+}
+
 function syncServerTime(){
   var t0 = Date.now();
-  // API 1: utctime.app (ưu tiên)
   return fetch("https://utctime.app/api/now/Asia/Ho_Chi_Minh", { cache: "no-store" })
     .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
     .then(function(data){
       var t1 = Date.now();
       var rtt = t1 - t0;
       var serverMs = data.unix_ms || (data.unix * 1000);
-      // bù nửa RTT để giảm lỗi mạng
-      serverOffsetMs = (serverMs + rtt / 2) - t1;
+      // bù nửa RTT
+      serverMs = serverMs + rtt / 2;
+      serverOffsetMs = serverMs - t1;
       serverSynced = true;
+      applySync(serverMs);
       setSyncStatus(true, "Đã đồng bộ giờ server (±" + Math.round(rtt/2) + "ms)");
+      updateEndTimeDisplay();
       return true;
     })
     .catch(function(){
-      // API 2: fallback worldtime.timezone.io
+      // fallback
       var t0b = Date.now();
       return fetch("https://worldtime.timezone.io/api/timezone/Asia/Ho_Chi_Minh", { cache: "no-store" })
         .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
         .then(function(data){
           var t1b = Date.now();
           var rtt = t1b - t0b;
-          var serverMs = (data.unixtime * 1000) + (Date.now() % 1000);
-          serverOffsetMs = (serverMs + rtt / 2) - t1b;
+          var serverMs = data.unixtime * 1000 + rtt / 2;
+          serverOffsetMs = serverMs - t1b;
           serverSynced = true;
+          applySync(serverMs);
           setSyncStatus(true, "Đã đồng bộ giờ server (fallback ±" + Math.round(rtt/2) + "ms)");
+          updateEndTimeDisplay();
           return true;
         })
         .catch(function(){
+          // fallback cuối: dùng giờ máy
           serverSynced = false;
+          serverOffsetMs = 0;
+          applySync(Date.now());
           setSyncStatus(false, "Không đồng bộ được · dùng giờ máy");
+          updateEndTimeDisplay();
           return false;
         });
     });
@@ -413,12 +457,7 @@ document.getElementById("btnClearColor").onclick = function(){
   renderColorList();
 };
 
-/* ========== COUNTDOWN ========== */
-var expireDate = null;
-var offsetSec = 0;
-var finished = false;
-var tickTimer = null;
-
+/* ========== UI ========== */
 function updateEndTimeDisplay(){
   if(!expireDate){
     endEl.textContent = "Không nhận được thời gian";
@@ -434,6 +473,13 @@ function updateEndTimeDisplay(){
 function updateOffsetLabel(){
   var sign = offsetSec > 0 ? "+" : "";
   offsetVal.textContent = sign + offsetSec.toFixed(2) + "s";
+  // Khi chỉnh lệch thủ công → cập nhật lại remaining
+  if(remainingAtSync !== null && expireDate){
+    var serverNowApprox = nowMs();
+    var target = expireDate.getTime() + offsetSec * 1000;
+    remainingAtSync = target - serverNowApprox;
+    basePerf = performance.now();
+  }
   updateEndTimeDisplay();
 }
 
@@ -474,16 +520,19 @@ function onTimeUp(){
 }
 
 function tick(){
-  if(finished || !expireDate){
-    if(!expireDate) timerEl.textContent = "--.-";
+  if(finished) return;
+
+  var leftMs = getRemainingMs();
+  if(leftMs === null){
+    timerEl.textContent = "--.-";
     return;
   }
-  var target = expireDate.getTime() + offsetSec * 1000;
-  var leftMs = target - nowMs();   // ← dùng giờ đã đồng bộ server
+
   if(leftMs <= 0){
     onTimeUp();
     return;
   }
+
   var totalSec = leftMs / 1000;
   var shown = totalSec.toFixed(1);
   timerEl.innerHTML = shown.replace(".", "<span class='dot'>.</span>");
@@ -524,10 +573,7 @@ document.getElementById("btnReset").onclick = function(){
 
 /* ========== INIT ========== */
 function startCountdown(){
-  expireDate = parseEndTime(endStr);
-  if(expireDate){
-    updateEndTimeDisplay();
-  }else{
+  if(!endStr){
     endEl.textContent = "Không nhận được thời gian";
     infoEl.textContent = "Thiếu dữ liệu đếm ngược";
   }
@@ -537,10 +583,10 @@ function startCountdown(){
   tickTimer = setInterval(tick, 50);
 }
 
-// Đồng bộ giờ server trước, rồi mới chạy đếm ngược
+// Đồng bộ giờ server trước → rồi mới chạy
 syncServerTime().then(function(){
   startCountdown();
-  // re-sync định kỳ
+  // re-sync định kỳ (chỉ sửa drift, không bị ảnh hưởng bởi chỉnh giờ máy)
   setInterval(function(){
     if(!finished) syncServerTime();
   }, SYNC_INTERVAL);
