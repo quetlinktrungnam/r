@@ -114,7 +114,7 @@ Vui lòng liên hệ admin @dvmxhnam để gia hạn.
 const SHEET_ID = "1-e7G6GYM9eJSKOF1AOdATM4H2X-7erAaqj0VJUCD6T8";
 const SHEET_NAME = "Sheet1";
 const CACHE_KEY = "tnam_auth_cache_v1";
-const CACHE_TTL_MS = 60000;
+const CACHE_TTL_MS = 15000;
 
 function generateDeviceId(){
     const uuid = crypto.randomUUID();
@@ -329,14 +329,6 @@ function openTikTok(){
     closePageAfterOpen();
 }
 
-function applyResult(status, note, expiryMs){
-    const expiry = expiryMs ? new Date(expiryMs) : null;
-    if(status === "approved") showApproved(note || "", expiry);
-    else if(status === "expired") showExpired(note || "", expiry);
-    else if(status === "denied") showDenied();
-    else showError();
-}
-
 async function checkFromNetwork(deviceId){
     const vietnamNowPromise = getVietnamNow();
     const devices = await readGoogleSheet();
@@ -399,7 +391,9 @@ async function checkDevice(){
         }else{
             openTikTok();
             showApproved(cached.note || "", cached.expiryMs ? new Date(cached.expiryMs) : null, true);
-            checkFromNetwork(deviceId).catch(function(){});
+            setTimeout(function(){
+                checkFromNetwork(deviceId).catch(function(){});
+            }, CACHE_TTL_MS);
             return;
         }
     }
