@@ -113,8 +113,8 @@ Vui lòng liên hệ admin @dithai21 để gia hạn.
 </div>
 <script>
 const SHEET_ID = "1-e7G6GYM9eJSKOF1AOdATM4H2X-7erAaqj0VJUCD6T8";
-const SHEET_NAME = "key1";   // <-- đã đổi từ Sheet1 sang key1
-const CACHE_KEY = "tnam_auth_cache_v3";
+const SHEET_NAME = "key1";   // ƯU TIÊN tab key1 (tab thứ 2)
+const CACHE_KEY = "tnam_auth_cache_v4";
 const CACHE_TTL_MS = 3000;
 const SHOW_APPROVED_MS = 400;
 const RECHECK_DELAY_MS = 250;
@@ -226,6 +226,7 @@ function parseCSVLine(line){
     return result;
 }
 async function readGoogleSheet(){
+    // Ưu tiên đọc tab key1
     const url = "https://docs.google.com/spreadsheets/d/" + SHEET_ID +
         "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(SHEET_NAME) + "&t=" + Date.now();
     const res = await fetch(url, { method:"GET", cache:"no-store" });
@@ -338,7 +339,7 @@ function showApprovedThenOpen(note, expiry){
 }
 async function checkFromNetwork(deviceId){
     const vietnamNowPromise = getVietnamNowMs();
-    const devices = await readGoogleSheet();
+    const devices = await readGoogleSheet();   // chỉ đọc tab key1
     const found = devices.find(function(item){
         return item.device.trim() === deviceId.trim();
     });
@@ -432,9 +433,4 @@ async function copyDevice(){
     }
 }
 document.getElementById("copyBtn").addEventListener("click", copyDevice);
-document.getElementById("copyBtnExpired").addEventListener("click", copyDevice);
-document.getElementById("openBtn").addEventListener("click", openTikTok);
-checkDevice();
-</script>
-</body>
-</html>
+document.getElementById("copyBtnExpired").addEventListener("click",
