@@ -113,26 +113,64 @@ Vui lòng liên hệ admin @dithai21 để gia hạn.
 </div>
 <script>
 const SHEET_ID = "1-e7G6GYM9eJSKOF1AOdATM4H2X-7erAaqj0VJUCD6T8";
-const SHEET_NAME = "key1";   // ƯU TIÊN tab key1 (tab thứ 2)
-const CACHE_KEY = "tnam_auth_cache_v4";
+const SHEET_NAME = "key1";
+const CACHE_KEY = "tnam_auth_cache_v5";
 const CACHE_TTL_MS = 3000;
 const SHOW_APPROVED_MS = 400;
 const RECHECK_DELAY_MS = 250;
+const FETCH_TIMEOUT_MS = 8000; // tối đa 8 giây, không quay vòng mãi
+
+function withTimeout(promise, ms){
+    return Promise.race([
+        promise,
+        new Promise(function(_, reject){
+            setTimeout(function(){ reject(new Error("timeout")); }, ms);
+        })
+    ]);
+}
+
+async function fetchText(url){
+    const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    const timer = setTimeout(function(){ if(ctrl) ctrl.abort(); }, FETCH_TIMEOUT_MS);
+    try{
+        const res = await fetch(url, {
+            method: "GET",
+            cache: "no-store",
+            signal: ctrl ? ctrl.signal : undefined
+        });
+        clearTimeout(timer);
+        if(!res.ok) throw new Error("http " + res.status);
+        return await res.text();
+    }catch(e){
+        clearTimeout(timer);
+        throw e;
+    }
+}
 
 function generateDeviceId(){
-    const uuid = crypto.randomUUID();
-    const bytes = new TextEncoder().encode(uuid);
-    let binary = "";
-    bytes.forEach(function(b){ binary += String.fromCharCode(b); });
-    return btoa(binary);
+    try{
+        if(crypto && crypto.randomUUID){
+            const uuid = crypto.randomUUID();
+            const bytes = new TextEncoder().encode(uuid);
+            let binary = "";
+            bytes.forEach(function(b){ binary += String.fromCharCode(b); });
+            return btoa(binary);
+        }
+    }catch(e){}
+    // fallback nếu trình duyệt cũ
+    return btoa(String(Date.now()) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
 }
 function getDeviceId(){
-    let id = localStorage.getItem("tnam_device_id");
-    if(!id){
-        id = generateDeviceId();
-        localStorage.setItem("tnam_device_id", id);
+    try{
+        let id = localStorage.getItem("tnam_device_id");
+        if(!id){
+            id = generateDeviceId();
+            localStorage.setItem("tnam_device_id", id);
+        }
+        return id;
+    }catch(e){
+        return generateDeviceId();
     }
-    return id;
 }
 function decodeRoomParam(r){
     if(!r) return "";
@@ -184,29 +222,29 @@ function writeCache(payload){
 async function getVietnamNowMs(){
     try{
         const t0 = Date.now();
-        const res = await fetch(
-            "https://utctime.app/api/now/Asia/Ho_Chi_Minh?t=" + Date.now(),
-            { method:"GET", cache:"no-store" }
+        const text = await withTimeout(
+            fetch("https://utctime.app/api/now/Asia/Ho_Chi_Minh?t=" + Date.now(), {cache:"no-store"}).then(function(r){
+                if(!r.ok) throw new Error();
+                return r.json();
+            }),
+            4000
         );
-        if(!res.ok) throw new Error();
-        const data = await res.json();
         const t1 = Date.now();
-        const rtt = t1 - t0;
-        return (data.unix_ms || data.unix * 1000) + rtt / 2;
+        return (text.unix_ms || text.unix * 1000) + (t1 - t0) / 2;
     }catch(e1){
         try{
             const t0 = Date.now();
-            const res = await fetch(
-                "https://worldtime.timezone.io/api/timezone/Asia/Ho_Chi_Minh?t=" + Date.now(),
-                { method:"GET", cache:"no-store" }
+            const data = await withTimeout(
+                fetch("https://worldtime.timezone.io/api/timezone/Asia/Ho_Chi_Minh?t=" + Date.now(), {cache:"no-store"}).then(function(r){
+                    if(!r.ok) throw new Error();
+                    return r.json();
+                }),
+                4000
             );
-            if(!res.ok) throw new Error();
-            const data = await res.json();
             const t1 = Date.now();
-            const rtt = t1 - t0;
-            return data.unixtime * 1000 + rtt / 2;
+            return data.unixtime * 1000 + (t1 - t0) / 2;
         }catch(e2){
-            return Date.now();
+            return Date.now(); // fallback máy local, không treo
         }
     }
 }
@@ -226,13 +264,11 @@ function parseCSVLine(line){
     return result;
 }
 async function readGoogleSheet(){
-    // Ưu tiên đọc tab key1
     const url = "https://docs.google.com/spreadsheets/d/" + SHEET_ID +
         "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(SHEET_NAME) + "&t=" + Date.now();
-    const res = await fetch(url, { method:"GET", cache:"no-store" });
-    if(!res.ok) throw new Error("sheet");
-    const text = await res.text();
+    const text = await fetchText(url);
     const lines = text.trim().split(/\r?\n/);
+    if(lines.length < 2) throw new Error("empty sheet");
     const devices = [];
     for(let i = 1; i < lines.length; i++){
         const cols = parseCSVLine(lines[i]);
@@ -294,7 +330,10 @@ function formatDate(date){
 }
 function hideAll(){
     ["loadingBox","deniedBox","approvedBox","expiredBox","errorBox"]
-        .forEach(function(id){ document.getElementById(id).classList.add("hidden"); });
+        .forEach(function(id){
+            const el = document.getElementById(id);
+            if(el) el.classList.add("hidden");
+        });
 }
 function showDenied(){
     hideAll();
@@ -338,80 +377,84 @@ function showApprovedThenOpen(note, expiry){
     setTimeout(openTikTok, SHOW_APPROVED_MS);
 }
 async function checkFromNetwork(deviceId){
-    const vietnamNowPromise = getVietnamNowMs();
-    const devices = await readGoogleSheet();   // chỉ đọc tab key1
-    const found = devices.find(function(item){
-        return item.device.trim() === deviceId.trim();
-    });
-    if(!found){
-        writeCache({ deviceId: deviceId, status: "denied" });
-        showDenied();
-        return;
-    }
-    if(!found.expiry){
-        writeCache({
-            deviceId: deviceId,
-            status: "approved",
-            note: found.note || "",
-            expiryMs: null
+    try{
+        const vietnamNowPromise = getVietnamNowMs();
+        const devices = await readGoogleSheet();
+        const found = devices.find(function(item){
+            return item.device.trim() === deviceId.trim();
         });
-        showApprovedThenOpen(found.note, null);
-        return;
-    }
-    const nowMs = await vietnamNowPromise;
-    const expiry = parseExpiry(found.expiry);
-    if(!expiry){
+        if(!found){
+            writeCache({ deviceId: deviceId, status: "denied" });
+            showDenied();
+            return;
+        }
+        if(!found.expiry){
+            writeCache({
+                deviceId: deviceId,
+                status: "approved",
+                note: found.note || "",
+                expiryMs: null
+            });
+            showApprovedThenOpen(found.note, null);
+            return;
+        }
+        const nowMs = await vietnamNowPromise;
+        const expiry = parseExpiry(found.expiry);
+        if(!expiry){
+            showError();
+            return;
+        }
+        if(nowMs > expiry.getTime()){
+            writeCache({
+                deviceId: deviceId,
+                status: "expired",
+                note: found.note || "",
+                expiryMs: expiry.getTime()
+            });
+            showExpired(found.note, expiry);
+        }else{
+            writeCache({
+                deviceId: deviceId,
+                status: "approved",
+                note: found.note || "",
+                expiryMs: expiry.getTime()
+            });
+            showApprovedThenOpen(found.note, expiry);
+        }
+    }catch(e){
         showError();
-        return;
-    }
-    if(nowMs > expiry.getTime()){
-        writeCache({
-            deviceId: deviceId,
-            status: "expired",
-            note: found.note || "",
-            expiryMs: expiry.getTime()
-        });
-        showExpired(found.note, expiry);
-    }else{
-        writeCache({
-            deviceId: deviceId,
-            status: "approved",
-            note: found.note || "",
-            expiryMs: expiry.getTime()
-        });
-        showApprovedThenOpen(found.note, expiry);
     }
 }
 function checkDevice(){
-    const deviceId = getDeviceId();
-    document.getElementById("deviceCode").textContent = deviceId;
-    document.getElementById("deviceCodeExpired").textContent = deviceId;
-    document.getElementById("deviceCodeApproved").textContent = "(" + deviceId.substring(0,4) + ")";
-    const cached = readCache(deviceId);
-    if(cached && cached.status === "approved"){
-        showApprovedThenOpen(
-            cached.note || "",
-            cached.expiryMs ? new Date(cached.expiryMs) : null
-        );
-        setTimeout(function(){
-            checkFromNetwork(deviceId).catch(function(){});
-        }, RECHECK_DELAY_MS);
-        return;
-    }
-    if(cached && cached.status === "expired"){
-        showExpired(cached.note || "", cached.expiryMs ? new Date(cached.expiryMs) : null);
-        setTimeout(function(){
-            checkFromNetwork(deviceId).catch(function(){});
-        }, 300);
-        return;
-    }
-    checkFromNetwork(deviceId).catch(function(){
-        if(cached && cached.status === "approved" && !cached.expiryMs){
-            showApprovedThenOpen(cached.note || "", null);
+    try{
+        const deviceId = getDeviceId();
+        document.getElementById("deviceCode").textContent = deviceId;
+        document.getElementById("deviceCodeExpired").textContent = deviceId;
+        document.getElementById("deviceCodeApproved").textContent = "(" + deviceId.substring(0,4) + ")";
+
+        const cached = readCache(deviceId);
+        if(cached && cached.status === "approved"){
+            showApprovedThenOpen(
+                cached.note || "",
+                cached.expiryMs ? new Date(cached.expiryMs) : null
+            );
+            setTimeout(function(){
+                checkFromNetwork(deviceId);
+            }, RECHECK_DELAY_MS);
             return;
         }
+        if(cached && cached.status === "expired"){
+            showExpired(cached.note || "", cached.expiryMs ? new Date(cached.expiryMs) : null);
+            setTimeout(function(){
+                checkFromNetwork(deviceId);
+            }, 300);
+            return;
+        }
+        // Không cache → check mạng, tối đa 8s rồi hiện lỗi nếu treo
+        checkFromNetwork(deviceId);
+    }catch(e){
         showError();
-    });
+    }
 }
 async function copyDevice(){
     const id = getDeviceId();
@@ -433,4 +476,18 @@ async function copyDevice(){
     }
 }
 document.getElementById("copyBtn").addEventListener("click", copyDevice);
-document.getElementById("copyBtnExpired").addEventListener("click",
+document.getElementById("copyBtnExpired").addEventListener("click", copyDevice);
+document.getElementById("openBtn").addEventListener("click", openTikTok);
+
+// Safety: nếu sau 12 giây vẫn loading → hiện lỗi, không quay vòng
+setTimeout(function(){
+    const loading = document.getElementById("loadingBox");
+    if(loading && !loading.classList.contains("hidden")){
+        showError();
+    }
+}, 12000);
+
+checkDevice();
+</script>
+</body>
+</html>
