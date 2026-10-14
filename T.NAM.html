@@ -114,9 +114,10 @@ Vui lòng liên hệ admin @dvmxhnam để gia hạn.
 <script>
 const SHEET_ID = "1-e7G6GYM9eJSKOF1AOdATM4H2X-7erAaqj0VJUCD6T8";
 const SHEET_NAME = "Sheet1";
-const CACHE_KEY = "tnam_auth_cache_v2";
-const CACHE_TTL_MS = 15000;
-const SHOW_APPROVED_MS = 400; // chỉ nhìn thoáng ~0.4s rồi mở
+const CACHE_KEY = "tnam_auth_cache_v3";
+const CACHE_TTL_MS = 3000;          // chỉ giữ 3 giây
+const SHOW_APPROVED_MS = 400;       // chỉ nhìn thoáng ~0.4s rồi mở
+const RECHECK_DELAY_MS = 250;       // check lại sheet gần như ngay
 
 function generateDeviceId(){
     const uuid = crypto.randomUUID();
@@ -416,21 +417,10 @@ function checkDevice(){
             cached.note || "",
             cached.expiryMs ? new Date(cached.expiryMs) : null
         );
+        // Check lại sheet gần như ngay (250ms) để khi admin xóa thì ghi denied ngay
         setTimeout(function(){
-            if(cached.expiryMs){
-                getVietnamNowMs().then(function(nowMs){
-                    if(nowMs > cached.expiryMs){
-                        writeCache({
-                            deviceId: deviceId,
-                            status: "expired",
-                            note: cached.note || "",
-                            expiryMs: cached.expiryMs
-                        });
-                    }
-                }).catch(function(){});
-            }
             checkFromNetwork(deviceId).catch(function(){});
-        }, CACHE_TTL_MS);
+        }, RECHECK_DELAY_MS);
         return;
     }
 
