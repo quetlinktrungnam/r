@@ -315,6 +315,17 @@ function setSyncStatus(ok, msg){
 
 function parseEndTime(endStr, serverMs){
   if(!endStr) return null;
+
+  // Định dạng mới: "HH:MM:SS DD/MM/YYYY"
+  var mFull = endStr.match(/^(\d{1,2}):(\d{2}):(\d{2})\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(mFull){
+    var h = +mFull[1], mi = +mFull[2], s = +mFull[3];
+    var day = +mFull[4], month = +mFull[5], year = +mFull[6];
+    if(h > 23 || mi > 59 || s > 59 || day < 1 || day > 31 || month < 1 || month > 12) return null;
+    return vnDateToUTC(year, month, day, h, mi, s);
+  }
+
+  // Định dạng cũ (chỉ giờ) – giữ tương thích ngược
   var m = endStr.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
   if(!m) return null;
   var h = +m[1], mi = +m[2], s = +m[3];
