@@ -8,6 +8,7 @@
 <link rel="dns-prefetch" href="https://utctime.app">
 <link rel="dns-prefetch" href="https://worldtime.timezone.io">
 <link rel="preconnect" href="https://docs.google.com" crossorigin>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;width:100%;min-height:100%;background:#050505;color:#fff;
@@ -115,9 +116,32 @@ Vui lòng liên hệ admin @dvmxhnam để gia hạn.
 const SHEET_ID = "1-e7G6GYM9eJSKOF1AOdATM4H2X-7erAaqj0VJUCD6T8";
 const SHEET_NAME = "Sheet1";
 const CACHE_KEY = "tnam_auth_cache_v3";
-const CACHE_TTL_MS = 3000;          // chỉ giữ 3 giây
-const SHOW_APPROVED_MS = 400;       // chỉ nhìn thoáng ~0.4s rồi mở
-const RECHECK_DELAY_MS = 250;       // check lại sheet gần như ngay
+const CACHE_TTL_MS = 3000;
+const SHOW_APPROVED_MS = 400;
+const RECHECK_DELAY_MS = 250;
+
+// ===== AES KEY (giống bot) =====
+const AES_KEY_HEX = "a8f3c91e7b2d4f6a9c0e1b3d5f7a8c9e0b1d2f3a4c5e6b7d8f9a0c1e2b3d4f5a";
+const AES_IV_HEX  = "1a2b3c4d5e6f708192a3b4c5d6e7f809";
+const AES_KEY = CryptoJS.enc.Hex.parse(AES_KEY_HEX);
+const AES_IV  = CryptoJS.enc.Hex.parse(AES_IV_HEX);
+
+function aesDecrypt(encrypted) {
+    if (!encrypted) return "";
+    try {
+        let b64 = String(encrypted).replace(/-/g, "+").replace(/_/g, "/");
+        while (b64.length % 4) b64 += "=";
+        const decrypted = CryptoJS.AES.decrypt(b64, AES_KEY, {
+            iv: AES_IV,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+        return decrypted.toString(CryptoJS.enc.Utf8);
+    } catch (e) {
+        console.error("AES decrypt error:", e);
+        return "";
+    }
+}
 
 function generateDeviceId(){
     const uuid = crypto.randomUUID();
@@ -126,7 +150,6 @@ function generateDeviceId(){
     bytes.forEach(function(b){ binary += String.fromCharCode(b); });
     return btoa(binary);
 }
-
 function getDeviceId(){
     let id = localStorage.getItem("tnam_device_id");
     if(!id){
@@ -135,19 +158,10 @@ function getDeviceId(){
     }
     return id;
 }
-
-function decodeRoomParam(r){
-    if(!r) return "";
-    let s = String(r).replace(/-/g, "+").replace(/_/g, "/");
-    while(s.length % 4) s += "=";
-    try{ return atob(s); }catch(e){ return ""; }
-}
-
 function getTikTokUrl(){
     const params = new URLSearchParams(window.location.search);
     return params.get("url") || params.get("u") || "";
 }
-
 function getRoomIdFromUrl(url){
     if(!url) return "";
     let m = url.match(/room_id=(\d+)/i);
@@ -155,17 +169,15 @@ function getRoomIdFromUrl(url){
     m = url.match(/\/live\/(\d+)/i);
     return m ? m[1] : "";
 }
-
 function getRoomId(){
     const params = new URLSearchParams(window.location.search);
     const r = params.get("r");
     if(r){
-        const decoded = decodeRoomParam(r);
-        if(decoded && /^\d+$/.test(decoded)) return decoded;
+        const decoded = aesDecrypt(r);
+        if(decoded && /^\d{10,}$/.test(decoded)) return decoded;
     }
     return getRoomIdFromUrl(getTikTokUrl());
 }
-
 function readCache(deviceId){
     try{
         const raw = localStorage.getItem(CACHE_KEY);
@@ -180,7 +192,6 @@ function readCache(deviceId){
         return data;
     }catch(e){ return null; }
 }
-
 function writeCache(payload){
     try{
         payload.perfAt = performance.now();
@@ -188,7 +199,6 @@ function writeCache(payload){
         localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
     }catch(e){}
 }
-
 async function getVietnamNowMs(){
     try{
         const t0 = Date.now();
@@ -218,7 +228,6 @@ async function getVietnamNowMs(){
         }
     }
 }
-
 function parseCSVLine(line){
     const result = [];
     let current = "", inQuotes = false;
@@ -234,7 +243,6 @@ function parseCSVLine(line){
     result.push(current);
     return result;
 }
-
 async function readGoogleSheet(){
     const url = "https://docs.google.com/spreadsheets/d/" + SHEET_ID +
         "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(SHEET_NAME) + "&t=" + Date.now();
@@ -255,7 +263,6 @@ async function readGoogleSheet(){
     }
     return devices;
 }
-
 function parseExpiry(value){
     if(!value) return null;
     const text = String(value).trim();
@@ -287,7 +294,6 @@ function parseExpiry(value){
     const native = new Date(text);
     return isNaN(native.getTime()) ? null : native;
 }
-
 function formatDate(date){
     if(!date) return "";
     const opts = {
@@ -303,17 +309,14 @@ function formatDate(date){
     };
     return get("hour") + ":" + get("minute") + " " + get("day") + "/" + get("month") + "/" + get("year");
 }
-
 function hideAll(){
     ["loadingBox","deniedBox","approvedBox","expiredBox","errorBox"]
         .forEach(function(id){ document.getElementById(id).classList.add("hidden"); });
 }
-
 function showDenied(){
     hideAll();
     document.getElementById("deniedBox").classList.remove("hidden");
 }
-
 function showApproved(note, expiry){
     hideAll();
     document.getElementById("approvedBox").classList.remove("hidden");
@@ -322,7 +325,6 @@ function showApproved(note, expiry){
         ? "Hạn sử dụng: <strong>" + formatDate(expiry) + "</strong>"
         : "Hạn sử dụng: <strong>VÔ HẠN</strong>";
 }
-
 function showExpired(note, expiry){
     hideAll();
     document.getElementById("expiredBox").classList.remove("hidden");
@@ -330,12 +332,10 @@ function showExpired(note, expiry){
     document.getElementById("expiredDate").innerHTML =
         "Đã hết hạn lúc: <strong>" + formatDate(expiry) + "</strong>";
 }
-
 function showError(){
     hideAll();
     document.getElementById("errorBox").classList.remove("hidden");
 }
-
 function closePageAfterOpen(){
     setTimeout(function(){
         try{ window.close(); }catch(e){}
@@ -344,19 +344,16 @@ function closePageAfterOpen(){
         }, 150);
     }, 400);
 }
-
 function openTikTok(){
     const roomId = getRoomId();
     if(!roomId) return;
     window.location.href = "snssdk1180://live?room_id=" + encodeURIComponent(roomId);
     closePageAfterOpen();
 }
-
 function showApprovedThenOpen(note, expiry){
     showApproved(note, expiry);
     setTimeout(openTikTok, SHOW_APPROVED_MS);
 }
-
 async function checkFromNetwork(deviceId){
     const vietnamNowPromise = getVietnamNowMs();
     const devices = await readGoogleSheet();
@@ -402,28 +399,22 @@ async function checkFromNetwork(deviceId){
         showApprovedThenOpen(found.note, expiry);
     }
 }
-
 function checkDevice(){
     const deviceId = getDeviceId();
     document.getElementById("deviceCode").textContent = deviceId;
     document.getElementById("deviceCodeExpired").textContent = deviceId;
     document.getElementById("deviceCodeApproved").textContent = "(" + deviceId.substring(0,4) + ")";
-
     const cached = readCache(deviceId);
-
-    // ĐƯỜNG NHANH: cache approved → hiện UI NGAY, không chờ mạng
     if(cached && cached.status === "approved"){
         showApprovedThenOpen(
             cached.note || "",
             cached.expiryMs ? new Date(cached.expiryMs) : null
         );
-        // Check lại sheet gần như ngay (250ms) để khi admin xóa thì ghi denied ngay
         setTimeout(function(){
             checkFromNetwork(deviceId).catch(function(){});
         }, RECHECK_DELAY_MS);
         return;
     }
-
     if(cached && cached.status === "expired"){
         showExpired(cached.note || "", cached.expiryMs ? new Date(cached.expiryMs) : null);
         setTimeout(function(){
@@ -431,7 +422,6 @@ function checkDevice(){
         }, 300);
         return;
     }
-
     checkFromNetwork(deviceId).catch(function(){
         if(cached && cached.status === "approved" && !cached.expiryMs){
             showApprovedThenOpen(cached.note || "", null);
@@ -440,7 +430,6 @@ function checkDevice(){
         showError();
     });
 }
-
 async function copyDevice(){
     const id = getDeviceId();
     try{
@@ -460,7 +449,6 @@ async function copyDevice(){
         ta.remove();
     }
 }
-
 document.getElementById("copyBtn").addEventListener("click", copyDevice);
 document.getElementById("copyBtnExpired").addEventListener("click", copyDevice);
 document.getElementById("openBtn").addEventListener("click", openTikTok);
