@@ -120,7 +120,7 @@ const CACHE_TTL_MS = 3000;
 const SHOW_APPROVED_MS = 400;
 const RECHECK_DELAY_MS = 250;
 
-// ===== AES KEY =====
+// ===== AES KEY (giống bot) =====
 const AES_KEY_HEX = "a8f3c91e7b2d4f6a9c0e1b3d5f7a8c9e0b1d2f3a4c5e6b7d8f9a0c1e2b3d4f5a";
 const AES_IV_HEX  = "1a2b3c4d5e6f708192a3b4c5d6e7f809";
 const AES_KEY = CryptoJS.enc.Hex.parse(AES_KEY_HEX);
@@ -169,23 +169,15 @@ function getRoomIdFromUrl(url){
     m = url.match(/\/live\/(\d+)/i);
     return m ? m[1] : "";
 }
-
-function getTarget(){
+function getRoomId(){
     const params = new URLSearchParams(window.location.search);
     const r = params.get("r");
     if(r){
-        const decoded = (aesDecrypt(r) || "").trim();
-        if(decoded.indexOf("u:") === 0){
-            const u = decoded.slice(2).replace(/^@/, "");
-            if(/^[A-Za-z0-9_.]{2,40}$/.test(u)) return { type:"user", value:u };
-            return null;
-        }
-        if(/^\d{10,}$/.test(decoded)) return { type:"room", value:decoded };
+        const decoded = aesDecrypt(r);
+        if(decoded && /^\d{10,}$/.test(decoded)) return decoded;
     }
-    const rid = getRoomIdFromUrl(getTikTokUrl());
-    return rid ? { type:"room", value:rid } : null;
+    return getRoomIdFromUrl(getTikTokUrl());
 }
-
 function readCache(deviceId){
     try{
         const raw = localStorage.getItem(CACHE_KEY);
@@ -344,48 +336,23 @@ function showError(){
     hideAll();
     document.getElementById("errorBox").classList.remove("hidden");
 }
-
-// ===== HÀM ĐÓNG TRANG SAU KHI MỞ APP =====
 function closePageAfterOpen(){
     setTimeout(function(){
         try{ window.close(); }catch(e){}
         setTimeout(function(){
             try{ window.location.replace("about:blank"); }catch(e){}
         }, 150);
-    }, 500);
+    }, 400);
 }
-
-// ===== XỬ LÝ MỞ APP TIKTOK CHO CẢ 2 NGUỒN VÀ TỰ ĐỘNG ĐÓNG TAB =====
 function openTikTok(){
-    const t = getTarget();
-    if(!t) return;
-
-    if(t.type === "user"){
-        // 1. NGUỒN JUNB (theo username)
-        const username = encodeURIComponent(t.value);
-        const webUrl = "https://www.tiktok.com/@" + username + "/live";
-        const intentUrl = "intent://www.tiktok.com/@" + username + "/live#Intent;scheme=https;package=com.zhiliaoapp.musically;end;";
-
-        const isAndroid = /Android/i.test(navigator.userAgent);
-
-        if (isAndroid) {
-            window.location.href = intentUrl;
-        } else {
-            window.location.href = webUrl;
-        }
-
-        closePageAfterOpen();
-
-    } else if(t.type === "room"){
-        // 2. NGUỒN CŨ (theo room_id)
-        window.location.href = "snssdk1180://live?room_id=" + encodeURIComponent(t.value);
-        closePageAfterOpen();
-    }
+    const roomId = getRoomId();
+    if(!roomId) return;
+    window.location.href = "snssdk1180://live?room_id=" + encodeURIComponent(roomId);
+    closePageAfterOpen();
 }
-
 function showApprovedThenOpen(note, expiry){
     showApproved(note, expiry);
-    // Bỏ tự động nhảy ngầm để tránh bị trình duyệt chặn, ép người dùng bấm nút MỞ TIKTOK thực tế
+    setTimeout(openTikTok, SHOW_APPROVED_MS);
 }
 async function checkFromNetwork(deviceId){
     const vietnamNowPromise = getVietnamNowMs();
@@ -405,7 +372,7 @@ async function checkFromNetwork(deviceId){
             note: found.note || "",
             expiryMs: null
         });
-        showApproved(found.note, null);
+        showApprovedThenOpen(found.note, null);
         return;
     }
     const nowMs = await vietnamNowPromise;
@@ -429,7 +396,7 @@ async function checkFromNetwork(deviceId){
             note: found.note || "",
             expiryMs: expiry.getTime()
         });
-        showApproved(found.note, expiry);
+        showApprovedThenOpen(found.note, expiry);
     }
 }
 function checkDevice(){
@@ -439,7 +406,7 @@ function checkDevice(){
     document.getElementById("deviceCodeApproved").textContent = "(" + deviceId.substring(0,4) + ")";
     const cached = readCache(deviceId);
     if(cached && cached.status === "approved"){
-        showApproved(
+        showApprovedThenOpen(
             cached.note || "",
             cached.expiryMs ? new Date(cached.expiryMs) : null
         );
@@ -457,7 +424,7 @@ function checkDevice(){
     }
     checkFromNetwork(deviceId).catch(function(){
         if(cached && cached.status === "approved" && !cached.expiryMs){
-            showApproved(cached.note || "", null);
+            showApprovedThenOpen(cached.note || "", null);
             return;
         }
         showError();
