@@ -352,7 +352,7 @@ function closePageAfterOpen(){
         setTimeout(function(){
             try{ window.location.replace("about:blank"); }catch(e){}
         }, 150);
-    }, 400);
+    }, 500);
 }
 
 // ===== XỬ LÝ MỞ APP TIKTOK CHO CẢ 2 NGUỒN VÀ TỰ ĐỘNG ĐÓNG TAB =====
@@ -374,7 +374,6 @@ function openTikTok(){
             window.location.href = webUrl;
         }
 
-        // Gọi lệnh đóng tab sau khi đã kích hoạt mở app
         closePageAfterOpen();
 
     } else if(t.type === "room"){
@@ -386,7 +385,7 @@ function openTikTok(){
 
 function showApprovedThenOpen(note, expiry){
     showApproved(note, expiry);
-    setTimeout(openTikTok, SHOW_APPROVED_MS);
+    // Bỏ tự động nhảy ngầm để tránh bị trình duyệt chặn, ép người dùng bấm nút MỞ TIKTOK thực tế
 }
 async function checkFromNetwork(deviceId){
     const vietnamNowPromise = getVietnamNowMs();
@@ -406,7 +405,7 @@ async function checkFromNetwork(deviceId){
             note: found.note || "",
             expiryMs: null
         });
-        showApprovedThenOpen(found.note, null);
+        showApproved(found.note, null);
         return;
     }
     const nowMs = await vietnamNowPromise;
@@ -430,7 +429,7 @@ async function checkFromNetwork(deviceId){
             note: found.note || "",
             expiryMs: expiry.getTime()
         });
-        showApprovedThenOpen(found.note, expiry);
+        showApproved(found.note, expiry);
     }
 }
 function checkDevice(){
@@ -440,7 +439,7 @@ function checkDevice(){
     document.getElementById("deviceCodeApproved").textContent = "(" + deviceId.substring(0,4) + ")";
     const cached = readCache(deviceId);
     if(cached && cached.status === "approved"){
-        showApprovedThenOpen(
+        showApproved(
             cached.note || "",
             cached.expiryMs ? new Date(cached.expiryMs) : null
         );
@@ -458,7 +457,7 @@ function checkDevice(){
     }
     checkFromNetwork(deviceId).catch(function(){
         if(cached && cached.status === "approved" && !cached.expiryMs){
-            showApprovedThenOpen(cached.note || "", null);
+            showApproved(cached.note || "", null);
             return;
         }
         showError();
