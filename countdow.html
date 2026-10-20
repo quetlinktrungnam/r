@@ -296,7 +296,20 @@ var SYNC_INTERVAL = 30000;
 var remainingAtSync = null;
 var basePerf = 0;
 var expireDate = null;
-var offsetSec = 0;
+
+// ===== ĐỘ LỆCH GIÂY (lưu localStorage, dùng chung mọi link) =====
+var OFFSET_KEY = "tnam_countdown_offset";
+function loadOffset(){
+  try{
+    var v = parseFloat(localStorage.getItem(OFFSET_KEY));
+    return Number.isFinite(v) ? Math.round(v * 100) / 100 : 0;
+  }catch(e){ return 0; }
+}
+function saveOffset(){
+  try{ localStorage.setItem(OFFSET_KEY, String(offsetSec)); }catch(e){}
+}
+var offsetSec = loadOffset();
+
 var finished = false;
 var tickTimer = null;
 function nowMs(){
@@ -386,7 +399,7 @@ function getColorTimes(){
   }catch(e){ return []; }
 }
 function setColorTimes(list){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }catch(e){}
 }
 function findColor(sec){
   var list = getColorTimes();
@@ -456,6 +469,7 @@ function updateEndTimeDisplay(){
     " &nbsp;•&nbsp; <strong>" + pad(p.day) + "/" + pad(p.month) + "/" + p.year + "</strong>";
 }
 function updateOffsetLabel(){
+  saveOffset();
   var sign = offsetSec > 0 ? "+" : "";
   offsetVal.textContent = sign + offsetSec.toFixed(2) + "s";
   if(remainingAtSync !== null && expireDate){
