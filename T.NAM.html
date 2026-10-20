@@ -120,7 +120,7 @@ const CACHE_TTL_MS = 3000;
 const SHOW_APPROVED_MS = 400;
 const RECHECK_DELAY_MS = 250;
 
-// ===== AES KEY (giống bot) =====
+// ===== AES KEY =====
 const AES_KEY_HEX = "a8f3c91e7b2d4f6a9c0e1b3d5f7a8c9e0b1d2f3a4c5e6b7d8f9a0c1e2b3d4f5a";
 const AES_IV_HEX  = "1a2b3c4d5e6f708192a3b4c5d6e7f809";
 const AES_KEY = CryptoJS.enc.Hex.parse(AES_KEY_HEX);
@@ -170,9 +170,6 @@ function getRoomIdFromUrl(url){
     return m ? m[1] : "";
 }
 
-// Trả về {type:"room", value} | {type:"user", value} | null
-//  - Nguồn cũ: payload = room_id (toàn số)  -> mở app theo room_id
-//  - Junb:     payload = "u:username"       -> mở link web @username/live
 function getTarget(){
     const params = new URLSearchParams(window.location.search);
     const r = params.get("r");
@@ -355,18 +352,33 @@ function closePageAfterOpen(){
         }, 150);
     }, 400);
 }
+
+// ===== XỬ LÝ MỞ APP TIKTOK CHO CẢ 2 NGUỒN =====
 function openTikTok(){
     const t = getTarget();
     if(!t) return;
+
     if(t.type === "user"){
-        // Junb: link web @username/live (điện thoại có app sẽ tự mở app).
-        // Không đóng trang để tránh cắt ngang việc chuyển hướng.
-        window.location.href = "https://www.tiktok.com/@" + encodeURIComponent(t.value) + "/live";
-        return;
+        // 1. NGUỒN JUNB (theo username)
+        const username = encodeURIComponent(t.value);
+        const appUrl = "snssdk1180://user/detail/" + username;
+        const webUrl = "https://www.tiktok.com/@" + username + "/live";
+
+        // Thử mở bằng App Scheme trước
+        window.location.href = appUrl;
+
+        // Dự phòng mở bằng Web nếu máy chưa cài App
+        setTimeout(function(){
+            window.location.href = webUrl;
+        }, 600);
+
+    } else if(t.type === "room"){
+        // 2. NGUỒN CỦ (theo room_id)
+        window.location.href = "snssdk1180://live?room_id=" + encodeURIComponent(t.value);
+        closePageAfterOpen();
     }
-    window.location.href = "snssdk1180://live?room_id=" + encodeURIComponent(t.value);
-    closePageAfterOpen();
 }
+
 function showApprovedThenOpen(note, expiry){
     showApproved(note, expiry);
     setTimeout(openTikTok, SHOW_APPROVED_MS);
