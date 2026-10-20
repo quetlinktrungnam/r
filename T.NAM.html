@@ -344,6 +344,8 @@ function showError(){
     hideAll();
     document.getElementById("errorBox").classList.remove("hidden");
 }
+
+// ===== HÀM ĐÓNG TRANG SAU KHI MỞ APP =====
 function closePageAfterOpen(){
     setTimeout(function(){
         try{ window.close(); }catch(e){}
@@ -353,7 +355,7 @@ function closePageAfterOpen(){
     }, 400);
 }
 
-// ===== XỬ LÝ MỞ APP TIKTOK CHO CẢ 2 NGUỒN =====
+// ===== XỬ LÝ MỞ APP TIKTOK CHO CẢ 2 NGUỒN VÀ TỰ ĐỘNG ĐÓNG TAB =====
 function openTikTok(){
     const t = getTarget();
     if(!t) return;
@@ -361,19 +363,22 @@ function openTikTok(){
     if(t.type === "user"){
         // 1. NGUỒN JUNB (theo username)
         const username = encodeURIComponent(t.value);
-        const appUrl = "snssdk1180://user/detail/" + username;
         const webUrl = "https://www.tiktok.com/@" + username + "/live";
+        const intentUrl = "intent://www.tiktok.com/@" + username + "/live#Intent;scheme=https;package=com.zhiliaoapp.musically;end;";
 
-        // Thử mở bằng App Scheme trước
-        window.location.href = appUrl;
+        const isAndroid = /Android/i.test(navigator.userAgent);
 
-        // Dự phòng mở bằng Web nếu máy chưa cài App
-        setTimeout(function(){
+        if (isAndroid) {
+            window.location.href = intentUrl;
+        } else {
             window.location.href = webUrl;
-        }, 600);
+        }
+
+        // Gọi lệnh đóng tab sau khi đã kích hoạt mở app
+        closePageAfterOpen();
 
     } else if(t.type === "room"){
-        // 2. NGUỒN CỦ (theo room_id)
+        // 2. NGUỒN CŨ (theo room_id)
         window.location.href = "snssdk1180://live?room_id=" + encodeURIComponent(t.value);
         closePageAfterOpen();
     }
