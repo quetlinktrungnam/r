@@ -169,15 +169,26 @@ function getRoomIdFromUrl(url){
     m = url.match(/\/live\/(\d+)/i);
     return m ? m[1] : "";
 }
-function getRoomId(){
+
+// Trả về {type:"room", value} | {type:"user", value} | null
+//  - Nguồn cũ: payload = room_id (toàn số)  -> mở app theo room_id
+//  - Junb:     payload = "u:username"       -> mở link web @username/live
+function getTarget(){
     const params = new URLSearchParams(window.location.search);
     const r = params.get("r");
     if(r){
-        const decoded = aesDecrypt(r);
-        if(decoded && /^\d{10,}$/.test(decoded)) return decoded;
+        const decoded = (aesDecrypt(r) || "").trim();
+        if(decoded.indexOf("u:") === 0){
+            const u = decoded.slice(2).replace(/^@/, "");
+            if(/^[A-Za-z0-9_.]{2,40}$/.test(u)) return { type:"user", value:u };
+            return null;
+        }
+        if(/^\d{10,}$/.test(decoded)) return { type:"room", value:decoded };
     }
-    return getRoomIdFromUrl(getTikTokUrl());
+    const rid = getRoomIdFromUrl(getTikTokUrl());
+    return rid ? { type:"room", value:rid } : null;
 }
+
 function readCache(deviceId){
     try{
         const raw = localStorage.getItem(CACHE_KEY);
@@ -345,9 +356,15 @@ function closePageAfterOpen(){
     }, 400);
 }
 function openTikTok(){
-    const roomId = getRoomId();
-    if(!roomId) return;
-    window.location.href = "snssdk1180://live?room_id=" + encodeURIComponent(roomId);
+    const t = getTarget();
+    if(!t) return;
+    if(t.type === "user"){
+        // Junb: link web @username/live (điện thoại có app sẽ tự mở app).
+        // Không đóng trang để tránh cắt ngang việc chuyển hướng.
+        window.location.href = "https://www.tiktok.com/@" + encodeURIComponent(t.value) + "/live";
+        return;
+    }
+    window.location.href = "snssdk1180://live?room_id=" + encodeURIComponent(t.value);
     closePageAfterOpen();
 }
 function showApprovedThenOpen(note, expiry){
