@@ -292,7 +292,7 @@ function vnDateToUTC(y, m, d, h, mi, s){
 }
 var serverOffsetMs = 0;
 var serverSynced = false;
-var SYNC_INTERVAL = 30000;
+var SYNC_INTERVAL = 15000; // đồng bộ thường xuyên hơn
 var remainingAtSync = null;
 var basePerf = 0;
 var expireDate = null;
@@ -351,45 +351,67 @@ function getRemainingMs(){
   return remainingAtSync - (performance.now() - basePerf);
 }
 function syncServerTime(){
-  var t0 = Date.now();
-  return fetch("https://utctime.app/api/now/Asia/Ho_Chi_Minh", { cache: "no-store" })
-    .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .then(function(data){
-      var t1 = Date.now();
-      var rtt = t1 - t0;
-      var serverMs = data.unix_ms || (data.unix * 1000);
-      serverMs = serverMs + rtt / 2;
-      serverOffsetMs = serverMs - t1;
-      serverSynced = true;
-      applySync(serverMs);
-      setSyncStatus(true, "Đã đồng bộ giờ server (±" + Math.round(rtt/2) + "ms)");
-      updateEndTimeDisplay();
-      return true;
-    })
-    .catch(function(){
-      var t0b = Date.now();
-      return fetch("https://worldtime.timezone.io/api/timezone/Asia/Ho_Chi_Minh", { cache: "no-store" })
-        .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-        .then(function(data){
-          var t1b = Date.now();
-          var rtt = t1b - t0b;
-          var serverMs = data.unixtime * 1000 + rtt / 2;
-          serverOffsetMs = serverMs - t1b;
-          serverSynced = true;
-          applySync(serverMs);
-          setSyncStatus(true, "Đã đồng bộ giờ server (fallback ±" + Math.round(rtt/2) + "ms)");
-          updateEndTimeDisplay();
-          return true;
-        })
-        .catch(function(){
-          serverSynced = false;
-          serverOffsetMs = 0;
-          applySync(Date.now());
-          setSyncStatus(false, "Không đồng bộ được · dùng giờ máy");
-          updateEndTimeDisplay();
-          return false;
+  // Nhiều nguồn giờ + chọn nguồn RTT thấp nhất
+  var sources = [
+    {
+      name: "utctime",
+      url: "https://utctime.app/api/now/Asia/Ho_Chi_Minh",
+      parse: function(data, rtt){
+        var ms = data.unix_ms || (data.unix * 1000);
+        return ms + rtt / 2;
+      }
+    },
+    {
+      name: "timezone.io",
+      url: "https://worldtime.timezone.io/api/timezone/Asia/Ho_Chi_Minh",
+      parse: function(data, rtt){
+        return (data.unixtime * 1000) + rtt / 2;
+      }
+    },
+    {
+      name: "worldtimeapi",
+      url: "https://worldtimeapi.org/api/timezone/Asia/Ho_Chi_Minh",
+      parse: function(data, rtt){
+        return (data.unixtime * 1000) + rtt / 2;
+      }
+    }
+  ];
+
+  function trySource(src){
+    var t0 = Date.now();
+    return fetch(src.url, { cache: "no-store", mode: "cors" })
+      .then(function(r){
+        if(!r.ok) throw new Error("HTTP " + r.status);
+        return r.json().then(function(data){
+          var t1 = Date.now();
+          var rtt = t1 - t0;
+          var serverMs = src.parse(data, rtt);
+          return { ok: true, serverMs: serverMs, rtt: rtt, name: src.name, t1: t1 };
         });
-    });
+      })
+      .catch(function(){ return { ok: false, name: src.name }; });
+  }
+
+  return Promise.all(sources.map(trySource)).then(function(results){
+    var good = results.filter(function(r){ return r.ok; });
+    if(!good.length){
+      serverSynced = false;
+      serverOffsetMs = 0;
+      applySync(Date.now());
+      setSyncStatus(false, "Không đồng bộ được · dùng giờ máy");
+      updateEndTimeDisplay();
+      return false;
+    }
+    // Chọn nguồn có RTT thấp nhất
+    good.sort(function(a,b){ return a.rtt - b.rtt; });
+    var best = good[0];
+    serverOffsetMs = best.serverMs - best.t1;
+    serverSynced = true;
+    applySync(best.serverMs);
+    setSyncStatus(true, "Đã đồng bộ (" + best.name + " ±" + Math.round(best.rtt/2) + "ms)");
+    updateEndTimeDisplay();
+    return true;
+  });
 }
 var STORAGE_KEY = "tnam_countdown_colors";
 function getColorTimes(){
@@ -570,9 +592,19 @@ function startCountdown(){
 }
 syncServerTime().then(function(){
   startCountdown();
-  setInterval(function(){
-    if(!finished) syncServerTime();
-  }, SYNC_INTERVAL);
+  // Đồng bộ nhanh hơn trong 60s đầu (mỗi 8s), sau đó mỗi 15s
+  var syncCount = 0;
+  var fastSync = setInterval(function(){
+    if(finished){ clearInterval(fastSync); return; }
+    syncServerTime();
+    syncCount++;
+    if(syncCount >= 8){ // ~64s
+      clearInterval(fastSync);
+      setInterval(function(){
+        if(!finished) syncServerTime();
+      }, SYNC_INTERVAL);
+    }
+  }, 8000);
 });
 </script>
 </body>
