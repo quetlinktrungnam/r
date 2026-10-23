@@ -1,611 +1,1365 @@
+
+
 <!DOCTYPE html>
+
 <html lang="vi">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
 <title>Quét Link Trung Nam • Đếm ngược</title>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
 <style>
+
 *{
+
     box-sizing:border-box;
+
     -webkit-tap-highlight-color:transparent;
+
     -webkit-user-select:none;
+
     -moz-user-select:none;
+
     -ms-user-select:none;
+
     user-select:none;
+
 }
+
 html,body{
+
     margin:0;padding:0;width:100%;min-height:100%;
+
     background:#050505;color:#fff;
+
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+
 }
+
 body{
+
     min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;
+
 }
+
 .container{width:100%;max-width:430px;}
+
 .card{
+
     background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));
+
     border:1px solid rgba(255,255,255,.10);
+
     border-radius:24px;padding:28px 22px;
+
     box-shadow:0 20px 70px rgba(0,0,0,.65),inset 0 1px rgba(255,255,255,.05);
+
     backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+
     text-align:center;
+
 }
+
 .logo{
+
     font-size:26px;font-weight:900;letter-spacing:1px;margin-bottom:4px;
+
     background:linear-gradient(90deg,#25f4ee,#fff,#ff2c55);
+
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+
 }
+
 .sub{color:#888;font-size:13px;margin-bottom:18px;}
+
 .type-box{
+
     display:inline-block;margin-bottom:6px;padding:8px 18px;border-radius:999px;
+
     background:rgba(37,244,238,.12);border:1px solid rgba(37,244,238,.28);
+
     font-size:15px;font-weight:800;color:#25f4ee;
+
 }
+
 .box-value{font-size:26px;font-weight:900;color:#fff;margin:6px 0 2px;letter-spacing:1px;}
+
 .ratio-line{font-size:13px;color:#aaa;margin-bottom:12px;}
+
 .timer{
+
     font-size:72px;font-weight:700;letter-spacing:-0.02em;
+
     font-variant-numeric:tabular-nums;margin:18px 0 6px;
+
     color:#25f4ee;transition:color .15s ease;line-height:1;
+
 }
+
 .timer .dot{letter-spacing:0.08em;}
+
 .timer.done{
+
     color:#ff2c55;font-size:90px;
+
     animation:popX .35s ease-out;
+
 }
+
 @keyframes popX{
+
     0%{transform:scale(.3);opacity:0}
+
     70%{transform:scale(1.15)}
+
     100%{transform:scale(1);opacity:1}
+
 }
+
 @keyframes blink{
+
     0%,100%{opacity:1}
+
     50%{opacity:.5}
+
 }
+
 .timer.blink{animation:blink .45s ease-in-out infinite}
+
 .info{font-size:14px;color:#aaa;line-height:1.45;margin-top:6px}
+
 .info.done{color:#ff2c55;font-weight:700;font-size:16px}
+
 .end-time{margin-top:14px;font-size:12px;color:#777;line-height:1.5}
+
 .end-time strong{color:#ccc;font-weight:600}
+
 .adj{
+
     display:flex;justify-content:center;align-items:center;
+
     gap:6px;margin-top:20px;flex-wrap:wrap;
+
 }
+
 .adj button{
+
     border:0;border-radius:8px;padding:8px 10px;
+
     font-size:13px;font-weight:700;cursor:pointer;
+
     transition:transform .1s, filter .1s;
+
 }
+
 .adj button:active{transform:scale(.93);filter:brightness(1.15)}
+
 .adj .btn-minus{background:#ef4444;color:#fff}
+
 .adj .btn-plus{background:#22c55e;color:#fff}
+
 .adj .btn-reset{background:rgba(255,255,255,.12);color:#ddd;min-width:52px}
+
 .offset-label{font-size:12px;margin-top:10px;color:#888}
+
 .offset-label .val{color:#25f4ee;font-weight:700}
+
 .offset-hint{font-size:11px;color:#555;margin-top:4px;line-height:1.4}
+
 .sync-status{font-size:11px;color:#555;margin-top:6px}
+
 .sync-status.ok{color:#22c55e}
+
 .sync-status.fail{color:#f87171}
+
 .color-btn{
+
     margin-top:16px;width:100%;padding:11px;border:0;border-radius:12px;
+
     background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;
+
     font-size:14px;font-weight:700;cursor:pointer;
+
 }
+
 .color-btn:active{transform:scale(.97)}
+
 .note{margin-top:14px;color:#444;font-size:11px;line-height:1.5}
+
 .hidden{display:none !important}
+
 .modal-overlay{
+
     display:none;position:fixed;inset:0;z-index:9999;
+
     background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:16px;
+
 }
+
 .modal-overlay.show{display:flex}
+
 .modal{
+
     background:#111;border:1px solid rgba(255,255,255,.12);
+
     border-radius:18px;padding:20px;width:100%;max-width:360px;
+
     max-height:90vh;overflow-y:auto;text-align:left;
+
 }
+
 .modal h3{margin:0 0 14px;font-size:16px;text-align:center;color:#fff}
+
 .modal label{display:block;font-size:12px;color:#aaa;margin-bottom:4px}
+
 .modal .row{display:flex;gap:8px;margin-bottom:10px;align-items:flex-end}
+
 .modal input[type="number"]{
+
     width:100%;padding:9px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);
+
     background:#1a1a1a;color:#fff;font-size:14px;outline:none;
+
 }
+
 .modal input[type="color"]{
+
     width:48px;height:38px;border:0;border-radius:8px;padding:0;cursor:pointer;background:none;
+
 }
+
 .modal .actions{display:flex;gap:8px;margin-top:12px}
+
 .modal .actions button{
+
     flex:1;padding:10px;border:0;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;
+
 }
+
 .btn-add{background:#22c55e;color:#fff}
+
 .btn-clear{background:#ef4444;color:#fff}
+
 .btn-close{background:rgba(255,255,255,.12);color:#ddd}
+
 .color-list{margin-top:14px}
+
 .color-item{
+
     display:flex;align-items:center;gap:10px;padding:8px 10px;
+
     background:rgba(255,255,255,.05);border-radius:10px;margin-bottom:6px;font-size:13px;
+
 }
+
 .color-item .swatch{
+
     width:22px;height:22px;border-radius:6px;flex-shrink:0;
+
     border:1px solid rgba(255,255,255,.2);
+
 }
+
 .color-item .del{
+
     margin-left:auto;background:transparent;border:0;color:#f87171;
+
     font-size:16px;cursor:pointer;padding:4px 8px;
+
 }
+
 .modal-hint{font-size:11px;color:#666;margin-top:8px;line-height:1.4}
+
 </style>
+
 </head>
+
 <body>
+
 <div class="container">
+
   <div class="card">
+
     <div class="logo">Quét Link Trung Nam</div>
+
     <div class="sub">ĐẾM NGƯỢC</div>
+
     <div id="typeBox" class="type-box" style="display:none;"></div>
+
     <div id="boxValue" class="box-value" style="display:none;"></div>
+
     <div id="ratioLine" class="ratio-line" style="display:none;"></div>
+
     <div id="timer" class="timer">--.-</div>
+
     <div id="info" class="info">Đang tải...</div>
+
     <div id="endTime" class="end-time"></div>
+
     <div class="adj" id="adjBox">
+
       <button type="button" class="btn-minus" data-v="-0.05">-0.05s</button>
+
       <button type="button" class="btn-minus" data-v="-0.01">-0.01s</button>
+
       <button type="button" class="btn-reset" id="btnReset">0.00s</button>
+
       <button type="button" class="btn-plus" data-v="0.01">+0.01s</button>
+
       <button type="button" class="btn-plus" data-v="0.05">+0.05s</button>
+
     </div>
+
     <div class="offset-label" id="adjLabel">
+
       Lệch: <span class="val" id="offsetVal">0.00s</span>
+
     </div>
+
     <div class="offset-hint" id="offsetHint">
+
       + làm chậm · − làm nhanh<br>
+
       (chỉnh cho khớp lúc rương mở thật)
+
     </div>
+
     <div id="syncStatus" class="sync-status">Đang đồng bộ giờ server...</div>
+
     <button type="button" class="color-btn" id="btnOpenColor">Thêm màu sắc theo thời gian</button>
+
     <div class="note">Thời gian theo giờ Việt Nam (đồng bộ server · kháng chỉnh giờ máy)</div>
+
   </div>
+
 </div>
+
 <div class="modal-overlay" id="colorModal">
+
   <div class="modal">
+
     <h3>Màu theo thời gian còn lại</h3>
+
     <div class="row">
+
       <div style="flex:1">
+
         <label>Từ (giây)</label>
+
         <input type="number" id="colorStart" placeholder="vd: 60" step="any">
+
       </div>
+
       <div style="flex:1">
+
         <label>Đến (giây)</label>
+
         <input type="number" id="colorEnd" placeholder="vd: 30" step="any">
+
       </div>
+
       <div>
+
         <label>Màu</label>
+
         <input type="color" id="colorPick" value="#ef4444">
+
       </div>
+
     </div>
+
     <div class="actions">
+
       <button type="button" class="btn-add" id="btnAddColor">+ Thêm</button>
+
       <button type="button" class="btn-clear" id="btnClearColor">Xóa tất cả</button>
+
       <button type="button" class="btn-close" id="btnCloseColor">Đóng</button>
+
     </div>
+
     <div class="color-list" id="colorList"></div>
+
     <div class="modal-hint">
+
       Ví dụ: Từ 60 → Đến 30 = khi còn 30–60 giây dùng màu đó.<br>
+
       Không có khoảng → màu cyan mặc định.
+
     </div>
+
   </div>
+
 </div>
+
 <script>
+
 document.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+
 document.addEventListener("selectstart", function(e){ e.preventDefault(); });
+
 document.addEventListener("copy", function(e){ e.preventDefault(); });
+
 document.addEventListener("cut", function(e){ e.preventDefault(); });
+
 document.addEventListener("dragstart", function(e){ e.preventDefault(); });
 
-// ===== AES KEY (giống bot) =====
+// ===== AES KEY (giữ nguyên) =====
+
 const AES_KEY_HEX = "a8f3c91e7b2d4f6a9c0e1b3d5f7a8c9e0b1d2f3a4c5e6b7d8f9a0c1e2b3d4f5a";
+
 const AES_IV_HEX  = "1a2b3c4d5e6f708192a3b4c5d6e7f809";
+
 const AES_KEY = CryptoJS.enc.Hex.parse(AES_KEY_HEX);
+
 const AES_IV  = CryptoJS.enc.Hex.parse(AES_IV_HEX);
 
 function aesDecrypt(encrypted) {
+
     if (!encrypted) return "";
+
     try {
+
         let b64 = String(encrypted).replace(/-/g, "+").replace(/_/g, "/");
+
         while (b64.length % 4) b64 += "=";
+
         const decrypted = CryptoJS.AES.decrypt(b64, AES_KEY, {
+
             iv: AES_IV,
+
             mode: CryptoJS.mode.CBC,
+
             padding: CryptoJS.pad.Pkcs7
+
         });
+
         return decrypted.toString(CryptoJS.enc.Utf8);
+
     } catch (e) {
+
         console.error("AES decrypt error:", e);
+
         return "";
+
     }
+
 }
 
 function loadParams(){
+
   var params = new URLSearchParams(window.location.search);
+
   var c = (params.get("c") || "").trim();
+
   if(c){
+
     var raw = aesDecrypt(c);
+
     var parts = raw.split("|");
+
     return {
+
       end: (parts[0] || "").trim(),
+
       type: (parts[1] || "").trim(),
+
       box: (parts[2] || "").trim(),
+
       ratio: (parts[3] || "").trim(),
+
       name: ""
+
     };
+
   }
+
   return {
+
     end: (params.get("end") || "").trim(),
+
     type: (params.get("type") || "").trim(),
+
     box: (params.get("box") || "").trim(),
+
     ratio: (params.get("ratio") || "").trim(),
+
     name: (params.get("name") || "").trim()
+
   };
+
 }
+
 var P = loadParams();
+
 var endStr = P.end;
+
 var type = P.type;
+
 var box = P.box;
+
 var ratio = P.ratio;
+
 var name = P.name;
+
 var timerEl = document.getElementById("timer");
+
 var infoEl = document.getElementById("info");
+
 var endEl = document.getElementById("endTime");
+
 var typeEl = document.getElementById("typeBox");
+
 var boxEl = document.getElementById("boxValue");
+
 var ratioEl = document.getElementById("ratioLine");
+
 var adjBox = document.getElementById("adjBox");
+
 var adjLabel = document.getElementById("adjLabel");
+
 var offsetVal = document.getElementById("offsetVal");
+
 var offsetHint = document.getElementById("offsetHint");
+
 var syncStatusEl = document.getElementById("syncStatus");
+
 if(type){ typeEl.style.display = "inline-block"; typeEl.textContent = type; }
+
 if(box){ boxEl.style.display = "block"; boxEl.textContent = box; }
+
 if(ratio){ ratioEl.style.display = "block"; ratioEl.textContent = "Ratio: " + ratio; }
+
 function pad(n, len){ return String(n).padStart(len || 2, "0"); }
+
 function getVNParts(date){
+
   date = date || new Date();
+
   var fmt = new Intl.DateTimeFormat("en-CA", {
+
     timeZone: "Asia/Ho_Chi_Minh",
+
     year: "numeric", month: "2-digit", day: "2-digit",
+
     hour: "2-digit", minute: "2-digit", second: "2-digit",
+
     hour12: false
+
   });
+
   var parts = {};
+
   fmt.formatToParts(date).forEach(function(p){
+
     if(p.type !== "literal") parts[p.type] = p.value;
+
   });
+
   return {
+
     year:+parts.year, month:+parts.month, day:+parts.day,
+
     hour:+parts.hour, minute:+parts.minute, second:+parts.second
+
   };
+
 }
+
 function vnDateToUTC(y, m, d, h, mi, s){
+
   return new Date(Date.UTC(y, m - 1, d, h - 7, mi, s, 0));
+
 }
+
+// =====================================================
+
+// ĐỒNG BỘ GIỜ: CHỈ DÙNG timeapi.world
+
+// =====================================================
+
+const TIME_API_URL =
+
+  "https://gateway.timeapi.world/timezone/Asia/Ho_Chi_Minh";
+
 var serverOffsetMs = 0;
+
 var serverSynced = false;
-var SYNC_INTERVAL = 15000; // đồng bộ thường xuyên hơn
+
+var SYNC_INTERVAL = 15000;
+
 var remainingAtSync = null;
+
 var basePerf = 0;
+
 var expireDate = null;
 
-// ===== ĐỘ LỆCH GIÂY (lưu localStorage, dùng chung mọi link) =====
-var OFFSET_KEY = "tnam_countdown_offset";
-function loadOffset(){
+function nowMs(){
+
+  return Date.now() + serverOffsetMs;
+
+}
+
+function setSyncStatus(ok, msg){
+
+  syncStatusEl.textContent = msg;
+
+  syncStatusEl.className = "sync-status " + (ok ? "ok" : "fail");
+
+}
+
+function parseEndTime(endStr, serverMs){
+
+  if(!endStr) return null;
+
+  var mFull = endStr.match(
+
+    /^(\d{1,2}):(\d{2}):(\d{2})\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+
+  );
+
+  if(mFull){
+
+    var h = +mFull[1], mi = +mFull[2], s = +mFull[3];
+
+    var day = +mFull[4], month = +mFull[5], year = +mFull[6];
+
+    if(h > 23 || mi > 59 || s > 59 ||
+
+       day < 1 || day > 31 || month < 1 || month > 12){
+
+      return null;
+
+    }
+
+    var fullDate = vnDateToUTC(year, month, day, h, mi, s);
+
+    // Kiểm tra ngày hợp lệ, tránh tự cuộn ngày sai như 31/02.
+
+    var check = getVNParts(fullDate);
+
+    if(check.year !== year || check.month !== month || check.day !== day){
+
+      return null;
+
+    }
+
+    return fullDate;
+
+  }
+
+  var m = endStr.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
+
+  if(!m) return null;
+
+  var h = +m[1], mi = +m[2], s = +m[3];
+
+  if(h > 23 || mi > 59 || s > 59) return null;
+
+  var nowParts = getVNParts(new Date(serverMs));
+
+  return vnDateToUTC(
+
+    nowParts.year, nowParts.month, nowParts.day, h, mi, s
+
+  );
+
+}
+
+function applySync(serverMs){
+
+  expireDate = parseEndTime(endStr, serverMs);
+
+  if(!expireDate){
+
+    remainingAtSync = null;
+
+    return;
+
+  }
+
+  var target = expireDate.getTime() + offsetSec * 1000;
+
+  remainingAtSync = target - serverMs;
+
+  // Đếm thời gian bằng đồng hồ đơn điệu, không phụ thuộc giờ máy
+
+  // thay đổi trong lúc trang đang chạy.
+
+  basePerf = performance.now();
+
+}
+
+function getRemainingMs(){
+
+  if(remainingAtSync === null) return null;
+
+  return remainingAtSync - (performance.now() - basePerf);
+
+}
+
+var syncInProgress = false;
+
+async function syncServerTime(){
+
+  if(syncInProgress) return false;
+
+  syncInProgress = true;
+
+  var startPerf = performance.now();
+
+  var startWall = Date.now();
+
   try{
+
+    var response = await fetch(TIME_API_URL, {
+
+      method: "GET",
+
+      cache: "no-store",
+
+      headers: { "Accept": "application/json" }
+
+    });
+
+    if(!response.ok){
+
+      throw new Error("HTTP " + response.status);
+
+    }
+
+    var data = await response.json();
+
+    var endPerf = performance.now();
+
+    var endWall = Date.now();
+
+    var rtt = Math.max(0, endPerf - startPerf);
+
+    // Ưu tiên datetime vì có độ chính xác mili-giây.
+
+    // Không dùng unixtime làm nguồn chính vì trường này thường
+
+    // chỉ có độ chính xác đến giây.
+
+    var apiTime = Date.parse(data.datetime);
+
+    if(!Number.isFinite(apiTime)){
+
+      throw new Error("API trả về datetime không hợp lệ");
+
+    }
+
+    if(data.timezone !== "Asia/Ho_Chi_Minh"){
+
+      throw new Error("API trả về sai múi giờ");
+
+    }
+
+    // Ước lượng thời gian server tại thời điểm nhận phản hồi:
+
+    // datetime + một nửa RTT.
+
+    var estimatedServerMs = apiTime + rtt / 2;
+
+    // Chuyển thành độ lệch so với đồng hồ máy tại cùng thời điểm.
+
+    // Đồng hồ đếm thực tế vẫn dùng performance.now().
+
+    serverOffsetMs = estimatedServerMs - endWall;
+
+    serverSynced = true;
+
+    applySync(estimatedServerMs);
+
+    setSyncStatus(
+
+      true,
+
+      "Đã đồng bộ timeapi.world · RTT " + Math.round(rtt) + "ms"
+
+    );
+
+    updateEndTimeDisplay();
+
+    return true;
+
+  }catch(error){
+
+    console.error("Lỗi đồng bộ timeapi.world:", error);
+
+    if(serverSynced){
+
+      // Nếu lần đồng bộ mới lỗi, giữ độ lệch đã biết gần nhất.
+
+      // Không nhảy về giờ máy vì có thể làm đồng hồ đột ngột lệch.
+
+      setSyncStatus(false, "Lỗi kết nối API · giữ đồng bộ gần nhất");
+
+    }else{
+
+      // Chỉ dùng giờ máy khi chưa từng đồng bộ thành công.
+
+      serverOffsetMs = 0;
+
+      applySync(Date.now());
+
+      setSyncStatus(false, "Không kết nối được API · tạm dùng giờ máy");
+
+    }
+
+    updateEndTimeDisplay();
+
+    return false;
+
+  }finally{
+
+    syncInProgress = false;
+
+  }
+
+}
+
+// =====================================================
+
+// LƯU MÀU VÀ CÁC CHỨC NĂNG CŨ
+
+// =====================================================
+
+var OFFSET_KEY = "tnam_countdown_offset";
+
+function loadOffset(){
+
+  try{
+
     var v = parseFloat(localStorage.getItem(OFFSET_KEY));
+
     return Number.isFinite(v) ? Math.round(v * 100) / 100 : 0;
+
   }catch(e){ return 0; }
+
 }
+
 function saveOffset(){
-  try{ localStorage.setItem(OFFSET_KEY, String(offsetSec)); }catch(e){}
+
+  try{
+
+    localStorage.setItem(OFFSET_KEY, String(offsetSec));
+
+  }catch(e){}
+
 }
+
 var offsetSec = loadOffset();
 
 var finished = false;
+
 var tickTimer = null;
-function nowMs(){
-  return Date.now() + serverOffsetMs;
-}
-function setSyncStatus(ok, msg){
-  syncStatusEl.textContent = msg;
-  syncStatusEl.className = "sync-status " + (ok ? "ok" : "fail");
-}
-function parseEndTime(endStr, serverMs){
-  if(!endStr) return null;
-  var mFull = endStr.match(/^(\d{1,2}):(\d{2}):(\d{2})\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if(mFull){
-    var h = +mFull[1], mi = +mFull[2], s = +mFull[3];
-    var day = +mFull[4], month = +mFull[5], year = +mFull[6];
-    if(h > 23 || mi > 59 || s > 59 || day < 1 || day > 31 || month < 1 || month > 12) return null;
-    return vnDateToUTC(year, month, day, h, mi, s);
-  }
-  var m = endStr.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
-  if(!m) return null;
-  var h = +m[1], mi = +m[2], s = +m[3];
-  if(h > 23 || mi > 59 || s > 59) return null;
-  var nowParts = getVNParts(new Date(serverMs));
-  var endUTC = vnDateToUTC(nowParts.year, nowParts.month, nowParts.day, h, mi, s);
-  return endUTC;
-}
-function applySync(serverMs){
-  expireDate = parseEndTime(endStr, serverMs);
-  if(!expireDate){
-    remainingAtSync = null;
-    return;
-  }
-  var target = expireDate.getTime() + offsetSec * 1000;
-  remainingAtSync = target - serverMs;
-  basePerf = performance.now();
-}
-function getRemainingMs(){
-  if(remainingAtSync === null) return null;
-  return remainingAtSync - (performance.now() - basePerf);
-}
-function syncServerTime(){
-  // Nhiều nguồn giờ + chọn nguồn RTT thấp nhất
-  var sources = [
-    {
-      name: "utctime",
-      url: "https://utctime.app/api/now/Asia/Ho_Chi_Minh",
-      parse: function(data, rtt){
-        var ms = data.unix_ms || (data.unix * 1000);
-        return ms + rtt / 2;
-      }
-    },
-    {
-      name: "timezone.io",
-      url: "https://worldtime.timezone.io/api/timezone/Asia/Ho_Chi_Minh",
-      parse: function(data, rtt){
-        return (data.unixtime * 1000) + rtt / 2;
-      }
-    },
-    {
-      name: "worldtimeapi",
-      url: "https://worldtimeapi.org/api/timezone/Asia/Ho_Chi_Minh",
-      parse: function(data, rtt){
-        return (data.unixtime * 1000) + rtt / 2;
-      }
-    }
-  ];
 
-  function trySource(src){
-    var t0 = Date.now();
-    return fetch(src.url, { cache: "no-store", mode: "cors" })
-      .then(function(r){
-        if(!r.ok) throw new Error("HTTP " + r.status);
-        return r.json().then(function(data){
-          var t1 = Date.now();
-          var rtt = t1 - t0;
-          var serverMs = src.parse(data, rtt);
-          return { ok: true, serverMs: serverMs, rtt: rtt, name: src.name, t1: t1 };
-        });
-      })
-      .catch(function(){ return { ok: false, name: src.name }; });
-  }
-
-  return Promise.all(sources.map(trySource)).then(function(results){
-    var good = results.filter(function(r){ return r.ok; });
-    if(!good.length){
-      serverSynced = false;
-      serverOffsetMs = 0;
-      applySync(Date.now());
-      setSyncStatus(false, "Không đồng bộ được · dùng giờ máy");
-      updateEndTimeDisplay();
-      return false;
-    }
-    // Chọn nguồn có RTT thấp nhất
-    good.sort(function(a,b){ return a.rtt - b.rtt; });
-    var best = good[0];
-    serverOffsetMs = best.serverMs - best.t1;
-    serverSynced = true;
-    applySync(best.serverMs);
-    setSyncStatus(true, "Đã đồng bộ (" + best.name + " ±" + Math.round(best.rtt/2) + "ms)");
-    updateEndTimeDisplay();
-    return true;
-  });
-}
 var STORAGE_KEY = "tnam_countdown_colors";
+
 function getColorTimes(){
+
   try{
+
     var raw = localStorage.getItem(STORAGE_KEY);
+
     return raw ? JSON.parse(raw) : [];
+
   }catch(e){ return []; }
+
 }
+
 function setColorTimes(list){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }catch(e){}
+
+  try{
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+
+  }catch(e){}
+
 }
+
 function findColor(sec){
+
   var list = getColorTimes();
+
   for(var i = 0; i < list.length; i++){
+
     var ct = list[i];
-    if(sec <= ct.start && sec >= ct.end) return ct.color;
+
+    if(sec <= ct.start && sec >= ct.end){
+
+      return ct.color;
+
+    }
+
   }
+
   return null;
+
 }
+
 function renderColorList(){
+
   var list = getColorTimes();
+
   var el = document.getElementById("colorList");
+
   el.innerHTML = "";
+
   if(!list.length){
-    el.innerHTML = '<div style="color:#666;font-size:12px;text-align:center;padding:8px">Chưa có khoảng màu nào</div>';
+
+    el.innerHTML =
+
+      '<div style="color:#666;font-size:12px;text-align:center;padding:8px">' +
+
+      'Chưa có khoảng màu nào</div>';
+
     return;
+
   }
+
   list.forEach(function(item){
+
     var div = document.createElement("div");
+
     div.className = "color-item";
-    div.innerHTML =
-      '<span class="swatch" style="background:' + item.color + '"></span>' +
-      '<span>' + item.start + 's → ' + item.end + 's</span>' +
-      '<button type="button" class="del" data-id="' + item.id + '">✕</button>';
-    el.appendChild(div);
-  });
-  el.querySelectorAll(".del").forEach(function(btn){
-    btn.onclick = function(){
-      setColorTimes(getColorTimes().filter(function(x){ return x.id !== +btn.dataset.id; }));
+
+    var swatch = document.createElement("span");
+
+    swatch.className = "swatch";
+
+    swatch.style.background = item.color;
+
+    var label = document.createElement("span");
+
+    label.textContent = item.start + "s → " + item.end + "s";
+
+    var del = document.createElement("button");
+
+    del.type = "button";
+
+    del.className = "del";
+
+    del.textContent = "✕";
+
+    del.onclick = function(){
+
+      setColorTimes(
+
+        getColorTimes().filter(function(x){
+
+          return x.id !== item.id;
+
+        })
+
+      );
+
       renderColorList();
+
     };
+
+    div.appendChild(swatch);
+
+    div.appendChild(label);
+
+    div.appendChild(del);
+
+    el.appendChild(div);
+
   });
+
 }
+
 document.getElementById("btnOpenColor").onclick = function(){
+
   document.getElementById("colorModal").classList.add("show");
+
   renderColorList();
+
 };
+
 document.getElementById("btnCloseColor").onclick = function(){
+
   document.getElementById("colorModal").classList.remove("show");
+
 };
+
 document.getElementById("btnAddColor").onclick = function(){
+
   var s = parseFloat(document.getElementById("colorStart").value);
+
   var e = parseFloat(document.getElementById("colorEnd").value);
+
   var c = document.getElementById("colorPick").value;
+
   if(!Number.isFinite(s) || !Number.isFinite(e)) return;
-  var start = Math.max(s, e), end = Math.min(s, e);
+
+  var start = Math.max(s, e);
+
+  var end = Math.min(s, e);
+
   var list = getColorTimes();
-  list.push({ id: Date.now(), start: start, end: end, color: c });
+
+  list.push({
+
+    id: Date.now(),
+
+    start: start,
+
+    end: end,
+
+    color: c
+
+  });
+
   setColorTimes(list);
+
   renderColorList();
+
   document.getElementById("colorStart").value = "";
+
   document.getElementById("colorEnd").value = "";
+
 };
+
 document.getElementById("btnClearColor").onclick = function(){
+
   setColorTimes([]);
+
   renderColorList();
+
 };
+
 function updateEndTimeDisplay(){
+
   if(!expireDate){
+
     endEl.textContent = "Không nhận được thời gian";
+
     return;
+
   }
-  var adjusted = new Date(expireDate.getTime() + offsetSec * 1000);
+
+  var adjusted = new Date(
+
+    expireDate.getTime() + offsetSec * 1000
+
+  );
+
   var p = getVNParts(adjusted);
+
   endEl.innerHTML =
-    "Hết lúc: <strong>" + pad(p.hour) + ":" + pad(p.minute) + ":" + pad(p.second) + "</strong>" +
-    " &nbsp;•&nbsp; <strong>" + pad(p.day) + "/" + pad(p.month) + "/" + p.year + "</strong>";
+
+    "Hết lúc: <strong>" +
+
+    pad(p.hour) + ":" + pad(p.minute) + ":" + pad(p.second) +
+
+    "</strong> &nbsp;•&nbsp; <strong>" +
+
+    pad(p.day) + "/" + pad(p.month) + "/" + p.year +
+
+    "</strong>";
+
 }
+
 function updateOffsetLabel(){
+
   saveOffset();
+
   var sign = offsetSec > 0 ? "+" : "";
+
   offsetVal.textContent = sign + offsetSec.toFixed(2) + "s";
+
   if(remainingAtSync !== null && expireDate){
+
     var serverNowApprox = nowMs();
+
     var target = expireDate.getTime() + offsetSec * 1000;
+
     remainingAtSync = target - serverNowApprox;
+
     basePerf = performance.now();
+
   }
+
   updateEndTimeDisplay();
+
 }
+
 function onTimeUp(){
+
   if(finished) return;
+
   finished = true;
-  if(tickTimer){ clearInterval(tickTimer); tickTimer = null; }
+
+  if(tickTimer){
+
+    clearInterval(tickTimer);
+
+    tickTimer = null;
+
+  }
+
   timerEl.textContent = "✕";
+
   timerEl.className = "timer done";
+
   timerEl.style.color = "";
+
   infoEl.className = "info done";
+
   if(adjBox) adjBox.classList.add("hidden");
+
   if(adjLabel) adjLabel.classList.add("hidden");
+
   if(offsetHint) offsetHint.classList.add("hidden");
+
   if(syncStatusEl) syncStatusEl.classList.add("hidden");
+
   var colorBtn = document.getElementById("btnOpenColor");
+
   if(colorBtn) colorBtn.classList.add("hidden");
+
   var left = 5;
+
   infoEl.textContent = "Đã hết thời gian · đóng sau " + left + "s";
+
   var closeTimer = setInterval(function(){
+
     left -= 1;
+
     if(left > 0){
+
       infoEl.textContent = "Đã hết thời gian · đóng sau " + left + "s";
+
       return;
+
     }
+
     clearInterval(closeTimer);
+
     infoEl.textContent = "Đang đóng...";
+
     try{ window.close(); }catch(e){}
+
     setTimeout(function(){
-      try{ window.location.replace("about:blank"); }
-      catch(e2){
-        try{ document.body.innerHTML = ""; document.title = ""; }catch(e3){}
+
+      try{
+
+        window.location.replace("about:blank");
+
+      }catch(e2){
+
+        try{
+
+          document.body.innerHTML = "";
+
+          document.title = "";
+
+        }catch(e3){}
+
       }
+
     }, 300);
+
   }, 1000);
+
 }
+
 function tick(){
+
   if(finished) return;
+
   var leftMs = getRemainingMs();
+
   if(leftMs === null){
+
     timerEl.textContent = "--.-";
+
     return;
+
   }
+
   if(leftMs <= 0){
+
     onTimeUp();
+
     return;
+
   }
+
   var totalSec = leftMs / 1000;
+
   var shown = totalSec.toFixed(1);
-  timerEl.innerHTML = shown.replace(".", "<span class='dot'>.</span>");
+
+  timerEl.innerHTML = shown.replace(
+
+    ".", "<span class='dot'>.</span>"
+
+  );
+
   var custom = findColor(totalSec);
+
   if(custom){
+
     timerEl.style.color = custom;
-    timerEl.className = "timer" + (totalSec <= 5 ? " blink" : "");
+
+    timerEl.className = "timer" +
+
+      (totalSec <= 5 ? " blink" : "");
+
   }else{
+
     timerEl.className = "timer";
+
     if(totalSec <= 5){
+
       timerEl.style.color = "#ff0040";
+
       timerEl.className = "timer blink";
+
     }else{
+
       timerEl.style.color = "#25f4ee";
+
     }
+
   }
-  var label = type && box ? (type + " • " + box) : (name || "Rương/Túi");
+
+  var label = type && box
+
+    ? (type + " • " + box)
+
+    : (name || "Rương/Túi");
+
   infoEl.textContent = label;
+
 }
+
 document.querySelectorAll("#adjBox button[data-v]").forEach(function(btn){
+
   btn.onclick = function(){
+
     if(finished) return;
+
     offsetSec += parseFloat(btn.dataset.v);
+
     offsetSec = Math.round(offsetSec * 100) / 100;
+
     updateOffsetLabel();
+
     tick();
+
   };
+
 });
+
 document.getElementById("btnReset").onclick = function(){
+
   if(finished) return;
+
   offsetSec = 0;
+
   updateOffsetLabel();
+
   tick();
+
 };
+
 function startCountdown(){
+
   if(!endStr){
+
     endEl.textContent = "Không nhận được thời gian";
+
     infoEl.textContent = "Thiếu dữ liệu đếm ngược";
+
   }
+
   updateOffsetLabel();
+
   tick();
+
   if(tickTimer) clearInterval(tickTimer);
+
   tickTimer = setInterval(tick, 50);
+
 }
-syncServerTime().then(function(){
+
+// =====================================================
+
+// KHỞI ĐỘNG VÀ ĐỒNG BỘ ĐỊNH KỲ
+
+// =====================================================
+
+var fastSyncTimer = null;
+
+var regularSyncTimer = null;
+
+async function initialize(){
+
+  await syncServerTime();
+
   startCountdown();
-  // Đồng bộ nhanh hơn trong 60s đầu (mỗi 8s), sau đó mỗi 15s
+
+  // Đồng bộ nhanh lúc đầu, giữ lịch đồng bộ như code cũ.
+
   var syncCount = 0;
-  var fastSync = setInterval(function(){
-    if(finished){ clearInterval(fastSync); return; }
-    syncServerTime();
-    syncCount++;
-    if(syncCount >= 8){ // ~64s
-      clearInterval(fastSync);
-      setInterval(function(){
-        if(!finished) syncServerTime();
-      }, SYNC_INTERVAL);
+
+  fastSyncTimer = setInterval(function(){
+
+    if(finished){
+
+      clearInterval(fastSyncTimer);
+
+      return;
+
     }
+
+    syncServerTime();
+
+    syncCount++;
+
+    if(syncCount >= 8){
+
+      clearInterval(fastSyncTimer);
+
+      fastSyncTimer = null;
+
+      if(regularSyncTimer){
+
+        clearInterval(regularSyncTimer);
+
+      }
+
+      regularSyncTimer = setInterval(function(){
+
+        if(!finished){
+
+          syncServerTime();
+
+        }
+
+      }, SYNC_INTERVAL);
+
+    }
+
   }, 8000);
-});
+
+}
+
+initialize();
+
 </script>
+
 </body>
+
 </html>
