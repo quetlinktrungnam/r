@@ -167,7 +167,6 @@
       color: #f87171;
     }
 
-    /* Màn hình thành công / hết hạn */
     #successView {
       display: none;
       padding: 12px 0 4px;
@@ -816,7 +815,11 @@
 
 
   /* =========================
-     LẤY MÃ CK
+     LẤY MÃ CK (HỖ TRỢ 2 PREFIX)
+     =========================
+     Hỗ trợ:
+       - quetlinktrungnam + số
+       - thuethietbi + số
   ========================== */
 
   function ckFromColF(content) {
@@ -827,30 +830,41 @@
         .toLowerCase();
 
 
+    // Bỏ khoảng trắng để dễ match
+    const noSpace = s.replace(/\s+/g, "");
+
+
+    // 1. Thử lấy từ đầu chuỗi
     const first =
       (s.split(/\s+/)[0] || "");
 
 
     if (
-      /^quetlinktrungnam\d{7}$/
-        .test(first)
+      /^quetlinktrungnam\d{5,12}$/.test(first) ||
+      /^thuethietbi\d{5,12}$/.test(first)
     ) {
-
       return first;
-
     }
 
 
-    const m =
-      s.replace(/\s+/g, "")
-       .match(
-         /quetlinktrungnam\d{7}/
-       );
+    // 2. Tìm trong toàn bộ nội dung
+    let m =
+      noSpace.match(
+        /quetlinktrungnam\d{5,12}/
+      );
+
+    if (m) return m[0];
 
 
-    return m
-      ? m[0]
-      : "";
+    m =
+      noSpace.match(
+        /thuethietbi\d{5,12}/
+      );
+
+    if (m) return m[0];
+
+
+    return "";
 
   }
 
