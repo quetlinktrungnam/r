@@ -3,59 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Quét Link Trung Nam</title>
+<title> Trung Nhịn</title>
 <link rel="dns-prefetch" href="https://docs.google.com">
 <link rel="dns-prefetch" href="https://utctime.app">
 <link rel="dns-prefetch" href="https://worldtime.timezone.io">
 <link rel="preconnect" href="https://docs.google.com" crossorigin>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;width:100%;min-height:100%;background:#050505;color:#fff;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
-body{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
-.container{width:100%;max-width:430px}
-.card{
-background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));
-border:1px solid rgba(255,255,255,.10);border-radius:24px;padding:28px 22px;
-box-shadow:0 20px 70px rgba(0,0,0,.65),inset 0 1px rgba(255,255,255,.05);
-backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)
+:root{
+  color-scheme:dark;
+  --bg:#07090d;
+  --line:rgba(220,190,120,.22);
+  --gold:#d9bd78;
+  --gold-light:#f4e4b3;
+  --muted:#8c96a5;
 }
-.logo{text-align:center;font-size:34px;font-weight:900;letter-spacing:4px;margin-bottom:7px;
-background:linear-gradient(90deg,#25f4ee,#fff,#ff2c55);
--webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.sub{text-align:center;color:#888;font-size:13px;margin-bottom:28px}
-.status{padding:15px;border-radius:15px;background:rgba(255,255,255,.045);
-border:1px solid rgba(255,255,255,.07);text-align:center;margin-bottom:18px;font-size:14px}
-.status.loading{color:#aaa}
-.status.success{color:#25f4ee;border-color:rgba(37,244,238,.25)}
-.status.error{color:#ff667f;border-color:rgba(255,44,85,.25)}
-.status.warning{color:#ffb347;border-color:rgba(255,179,71,.25)}
-.device-title{font-size:12px;color:#888;margin-bottom:8px}
-.device-box{display:flex;align-items:center;gap:8px;background:#090909;
-border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:5px}
-.device-code{flex:1;min-width:0;padding:10px;font-family:monospace;font-size:11px;
-color:#ccc;word-break:break-all;line-height:1.4}
-.device-code-short{flex:1;min-width:0;padding:14px 10px;font-family:monospace;
-font-size:28px;font-weight:800;color:#25f4ee;text-align:center;letter-spacing:2px;line-height:1.2}
-.copy-btn,.open-btn{border:0;cursor:pointer;color:#fff;font-weight:800;border-radius:11px;
-padding:11px 14px;white-space:nowrap}
-.copy-btn{background:linear-gradient(135deg,#ff2c55,#ff0050)}
-.open-btn{width:100%;margin-top:15px;padding:15px;font-size:15px;
-background:linear-gradient(135deg,#25f4ee,#1677ff)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{
+  margin:0;padding:0;width:100%;min-height:100%;
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(174,133,55,.13),transparent 42%),
+    radial-gradient(ellipse at 100% 100%,rgba(24,93,106,.10),transparent 38%),
+    var(--bg);
+  color:#f5f3ed;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+}
+body{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:22px}
+.container{width:100%;max-width:460px}
+.card{
+  position:relative;overflow:hidden;
+  padding:34px 25px 26px;
+  border:1px solid var(--line);border-radius:28px;
+  background:linear-gradient(155deg,rgba(24,30,40,.97),rgba(10,13,19,.98) 70%);
+  box-shadow:0 28px 90px rgba(0,0,0,.58),inset 0 1px rgba(255,255,255,.055);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  text-align:center;
+}
+.card:before{
+  content:"";position:absolute;inset:0 18% auto;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.8;
+}
+.logo{
+  margin-bottom:8px;font-size:23px;font-weight:900;letter-spacing:2.5px;text-transform:uppercase;
+  background:linear-gradient(100deg,#fff2c8 0%,#d9bd78 48%,#fff8df 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.sub{color:#87909d;font-size:10px;letter-spacing:4px;font-weight:700;margin-bottom:24px}
+.status{
+  padding:14px;border-radius:14px;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);text-align:center;margin-bottom:18px;font-size:14px;
+}
+.status.loading{color:#a8b0bb}
+.status.success{color:#83c9a3;border-color:rgba(120,200,160,.25);background:rgba(72,143,112,.10)}
+.status.error{color:#e58b8d;border-color:rgba(239,110,114,.25);background:rgba(181,75,78,.10)}
+.status.warning{color:var(--gold-light);border-color:rgba(217,189,120,.32);background:rgba(217,189,120,.08)}
+.device-title{font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:.4px;text-align:left}
+.device-box{
+  display:flex;align-items:center;gap:8px;background:#0b0f15;
+  border:1px solid rgba(217,189,120,.18);border-radius:14px;padding:5px;
+}
+.device-code{
+  flex:1;min-width:0;padding:10px;font-family:monospace;font-size:11px;
+  color:#cfd5dd;word-break:break-all;line-height:1.4;text-align:left;
+}
+.device-code-short{
+  flex:1;min-width:0;padding:14px 10px;font-family:monospace;font-size:28px;font-weight:800;
+  color:#e4c77f;text-align:center;letter-spacing:2px;line-height:1.2;
+  text-shadow:0 0 34px rgba(217,189,120,.12);
+}
+.copy-btn,.open-btn{
+  border:1px solid rgba(217,189,120,.34);cursor:pointer;font-weight:800;border-radius:11px;
+  padding:11px 14px;white-space:nowrap;letter-spacing:.15px;color:#17140c;
+  background:linear-gradient(135deg,#b99a55,#e1c783 55%,#b99a55);
+  box-shadow:0 8px 24px rgba(185,154,85,.12);
+}
+.open-btn{width:100%;margin-top:18px;padding:14px;font-size:14px;border-radius:13px}
 .copy-btn:active,.open-btn:active{transform:scale(.97)}
-.note{margin-top:15px;color:#777;text-align:center;font-size:12px;line-height:1.5}
-.expiry{margin-top:10px;text-align:center;font-size:12px;color:#aaa}
-.expiry strong{color:#fff}
+.note{margin-top:16px;color:#7f8998;text-align:center;font-size:12px;line-height:1.6}
+.note a{color:var(--gold-light);text-decoration:none}
+.expiry{
+  margin-top:14px;padding:11px 12px;text-align:center;font-size:12px;color:#7f8998;
+  border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.025);
+}
+.expiry strong{color:#d6dbe2}
 .hidden{display:none !important}
-.spinner{width:20px;height:20px;margin:0 auto 10px;border:2px solid rgba(255,255,255,.15);
-border-top-color:#25f4ee;border-radius:50%;animation:spin .7s linear infinite}
+.spinner{
+  width:20px;height:20px;margin:0 auto 10px;border:2px solid rgba(255,255,255,.15);
+  border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;
+}
 @keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:380px){
+  body{padding:13px}
+  .card{padding:28px 17px 22px;border-radius:23px}
+  .logo{font-size:20px;letter-spacing:2px}
+}
 </style>
 </head>
 <body>
 <div class="container">
 <div class="card">
-<div class="logo">Quét Link Trung Nam</div>
+<div class="logo">Trung Nhịn</div>
 <div class="sub">XÁC MINH THIẾT BỊ</div>
 <div id="loadingBox" class="status loading">
 <div class="spinner"></div>
@@ -69,11 +116,11 @@ border-top-color:#25f4ee;border-radius:50%;animation:spin .7s linear infinite}
 <button id="copyBtn" class="copy-btn">COPY</button>
 </div>
 <div class="note">
-Vui lòng copy mã gửi về cho chủ bot:
-<a href="https://t.me/dithai21" style="color:#25f4ee;text-decoration:none;">
-https://t.me/dithai21
+Vui lòng copy mã gửi về cho bot:
+<a href="https://t.me/Trungnhin1853">
+https://t.me/Trungnhin1853
 </a> để được duyệt mã.<br>
-Admin: @dithai21
+Admin: @Trungnhin1853
 </div>
 </div>
 <div id="approvedBox" class="hidden">
@@ -97,12 +144,12 @@ Admin: @dithai21
 <div id="expiredDate" class="expiry"></div>
 <div class="note">
 Vui lòng copy mã gửi về cho bot:
-<a href="https://t.me/thuebotquetlinktrungnam1_bot" style="color:#25f4ee;text-decoration:none;">
-https://t.me/dithai21
+<a href="https://t.me/Trungnhin1853">
+https://t.me/thuebotquetlinktrungnam1_bot
 </a> để được duyệt mã.<br>
-Admin: @dithai21<br><br>
+Admin: @Trungnhin1853<br><br>
 Thiết bị của bạn đã hết thời gian sử dụng.<br>
-Vui lòng liên hệ admin @dithai21 để gia hạn.
+Vui lòng liên hệ admin @Trungnhin1853 để gia hạn.
 </div>
 </div>
 <div id="errorBox" class="hidden">
@@ -113,11 +160,34 @@ Vui lòng liên hệ admin @dithai21 để gia hạn.
 </div>
 <script>
 const SHEET_ID = "1-e7G6GYM9eJSKOF1AOdATM4H2X-7erAaqj0VJUCD6T8";
-const SHEET_NAME = "sheet2";   // <-- đã đổi từ Sheet1 sang key1
+const SHEET_NAME = "key1";
 const CACHE_KEY = "tnam_auth_cache_v3";
 const CACHE_TTL_MS = 3000;
 const SHOW_APPROVED_MS = 400;
 const RECHECK_DELAY_MS = 250;
+
+// ===== AES KEY (giống bot) =====
+const AES_KEY_HEX = "a8f3c91e7b2d4f6a9c0e1b3d5f7a8c9e0b1d2f3a4c5e6b7d8f9a0c1e2b3d4f5a";
+const AES_IV_HEX  = "1a2b3c4d5e6f708192a3b4c5d6e7f809";
+const AES_KEY = CryptoJS.enc.Hex.parse(AES_KEY_HEX);
+const AES_IV  = CryptoJS.enc.Hex.parse(AES_IV_HEX);
+
+function aesDecrypt(encrypted) {
+    if (!encrypted) return "";
+    try {
+        let b64 = String(encrypted).replace(/-/g, "+").replace(/_/g, "/");
+        while (b64.length % 4) b64 += "=";
+        const decrypted = CryptoJS.AES.decrypt(b64, AES_KEY, {
+            iv: AES_IV,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+        return decrypted.toString(CryptoJS.enc.Utf8);
+    } catch (e) {
+        console.error("AES decrypt error:", e);
+        return "";
+    }
+}
 
 function generateDeviceId(){
     const uuid = crypto.randomUUID();
@@ -134,12 +204,6 @@ function getDeviceId(){
     }
     return id;
 }
-function decodeRoomParam(r){
-    if(!r) return "";
-    let s = String(r).replace(/-/g, "+").replace(/_/g, "/");
-    while(s.length % 4) s += "=";
-    try{ return atob(s); }catch(e){ return ""; }
-}
 function getTikTokUrl(){
     const params = new URLSearchParams(window.location.search);
     return params.get("url") || params.get("u") || "";
@@ -155,8 +219,8 @@ function getRoomId(){
     const params = new URLSearchParams(window.location.search);
     const r = params.get("r");
     if(r){
-        const decoded = decodeRoomParam(r);
-        if(decoded && /^\d+$/.test(decoded)) return decoded;
+        const decoded = aesDecrypt(r);
+        if(decoded && /^\d{10,}$/.test(decoded)) return decoded;
     }
     return getRoomIdFromUrl(getTikTokUrl());
 }
