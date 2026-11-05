@@ -1,9 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <title>Trung Nhịn • Đếm ngược</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
@@ -25,6 +25,8 @@
     --tn-gold-light:#f4e4b3;
     --tn-muted:#8c96a5;
     --tn-active-glow:rgba(217,189,120,.08);
+    --tn-page-color:#07090d;
+    --tn-page-glow:rgba(217,189,120,.08);
 }
 
 html,body{
@@ -39,10 +41,14 @@ html,body{
 
 body{
     min-height:100vh;
+    min-height:100dvh;
     display:flex;
     justify-content:center;
     align-items:center;
     padding:22px;
+    position:relative;
+    isolation:isolate;
+    overflow-x:hidden;
     background:
         radial-gradient(
             ellipse at 50% 0%,
@@ -58,9 +64,43 @@ body{
     transition:background .5s ease;
 }
 
+/* LỚP MÀU PHỦ TOÀN BỘ MÀN HÌNH */
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    pointer-events:none;
+    opacity:0;
+    background:
+        radial-gradient(
+            ellipse at center,
+            var(--tn-page-glow),
+            transparent 85%
+        ),
+        var(--tn-page-color);
+    transition:opacity .4s ease;
+}
+
+body.tn-color-active::before{
+    opacity:1;
+    animation:tnBackgroundPulse 2.2s ease-in-out infinite alternate;
+}
+
+@keyframes tnBackgroundPulse{
+    from{
+        filter:brightness(.82);
+    }
+    to{
+        filter:brightness(1.15);
+    }
+}
+
 .container{
     width:100%;
     max-width:460px;
+    position:relative;
+    z-index:1;
 }
 
 .card{
@@ -70,25 +110,19 @@ body{
     padding:34px 25px 26px;
     border:1px solid var(--tn-line);
     border-radius:28px;
-
     background:
         linear-gradient(
             155deg,
             rgba(24,30,40,.97),
             rgba(10,13,19,.98) 70%
         );
-
     box-shadow:
         0 28px 90px rgba(0,0,0,.58),
         inset 0 1px rgba(255,255,255,.055);
-
     backdrop-filter:blur(24px);
     -webkit-backdrop-filter:blur(24px);
-
     text-align:center;
-
     transition:
-        background .5s ease,
         border-color .5s ease,
         box-shadow .5s ease,
         transform .3s ease;
@@ -111,20 +145,18 @@ body{
     z-index:2;
 }
 
-/* Ánh sáng chuyển động */
+/* Ánh sáng chuyển động trong thẻ */
 .card:after{
     content:"";
     position:absolute;
     inset:-50%;
     pointer-events:none;
     z-index:0;
-
     background:radial-gradient(
         circle at 50% 40%,
         var(--tn-active-glow),
         transparent 55%
     );
-
     animation:tnGlow 8s ease-in-out infinite alternate;
 }
 
@@ -147,14 +179,12 @@ body{
     font-size:25px;
     font-weight:900;
     letter-spacing:3px;
-
     background:linear-gradient(
         100deg,
         #fff2c8 0%,
         #d9bd78 48%,
         #fff8df 100%
     );
-
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
 }
@@ -172,21 +202,14 @@ body{
     margin-bottom:6px;
     padding:9px 19px;
     border-radius:999px;
-
     color:var(--tn-gold-light);
-
     background:rgba(217,189,120,.08);
     border:1px solid rgba(217,189,120,.32);
-
     box-shadow:inset 0 1px rgba(255,255,255,.04);
-
     font-size:15px;
     font-weight:800;
     letter-spacing:.4px;
-
-    transition:
-        background .4s ease,
-        border-color .4s ease;
+    transition:background .4s ease,border-color .4s ease;
 }
 
 .box-value{
@@ -209,16 +232,10 @@ body{
     font-weight:750;
     letter-spacing:-2px;
     line-height:1.08;
-
     font-variant-numeric:tabular-nums;
-
     color:#e4c77f;
-
     text-shadow:0 0 34px rgba(217,189,120,.12);
-
-    transition:
-        color .3s ease,
-        text-shadow .3s ease;
+    transition:color .3s ease,text-shadow .3s ease;
 }
 
 .timer .dot{
@@ -228,24 +245,14 @@ body{
 .timer.done{
     color:#ef6e72;
     font-size:90px;
-
     text-shadow:0 0 28px rgba(239,110,114,.18);
-
     animation:popX .35s ease-out;
 }
 
 @keyframes popX{
-    0%{
-        transform:scale(.3);
-        opacity:0;
-    }
-    70%{
-        transform:scale(1.15);
-    }
-    100%{
-        transform:scale(1);
-        opacity:1;
-    }
+    0%{transform:scale(.3);opacity:0}
+    70%{transform:scale(1.15)}
+    100%{transform:scale(1);opacity:1}
 }
 
 @keyframes blink{
@@ -274,12 +281,9 @@ body{
 .end-time{
     margin-top:18px;
     padding:11px 12px;
-
     border:1px solid rgba(255,255,255,.07);
     border-radius:12px;
-
     background:rgba(255,255,255,.025);
-
     color:#7f8998;
     font-size:12px;
     line-height:1.5;
@@ -303,15 +307,10 @@ body{
     border:1px solid rgba(255,255,255,.08);
     border-radius:9px;
     padding:9px 11px;
-
     font-size:12px;
     font-weight:700;
     cursor:pointer;
-
-    transition:
-        transform .1s,
-        filter .1s,
-        background .2s;
+    transition:transform .1s,filter .1s,background .2s;
 }
 
 .adj button:active{
@@ -361,38 +360,27 @@ body{
     margin-top:9px;
 }
 
-.sync-status.ok{
-    color:#83c9a3;
-}
-
-.sync-status.fail{
-    color:#e58b8d;
-}
+.sync-status.ok{color:#83c9a3}
+.sync-status.fail{color:#e58b8d}
 
 .color-btn{
     margin-top:20px;
     width:100%;
     padding:13px 15px;
-
     border:1px solid rgba(217,189,120,.34);
     border-radius:13px;
-
     background:linear-gradient(
         135deg,
         #b99a55,
         #e1c783 55%,
         #b99a55
     );
-
     color:#17140c;
     font-size:13px;
     font-weight:800;
     letter-spacing:.15px;
-
     box-shadow:0 8px 24px rgba(185,154,85,.12);
-
     cursor:pointer;
-
     transition:all .25s ease;
 }
 
@@ -401,9 +389,7 @@ body{
     box-shadow:0 0 25px rgba(217,189,120,.2);
 }
 
-.color-btn:active{
-    transform:scale(.985);
-}
+.color-btn:active{transform:scale(.985)}
 
 .note{
     margin-top:16px;
@@ -413,9 +399,7 @@ body{
     line-height:1.5;
 }
 
-.hidden{
-    display:none !important;
-}
+.hidden{display:none !important}
 
 /* Modal */
 .modal-overlay{
@@ -423,33 +407,21 @@ body{
     position:fixed;
     inset:0;
     z-index:9999;
-
     background:rgba(1,3,7,.78);
-
     backdrop-filter:blur(8px);
     -webkit-backdrop-filter:blur(8px);
-
     align-items:center;
     justify-content:center;
     padding:16px;
 }
 
-.modal-overlay.show{
-    display:flex;
-}
+.modal-overlay.show{display:flex}
 
 .modal{
     border:1px solid rgba(217,189,120,.24);
     border-radius:20px;
-
-    background:linear-gradient(
-        155deg,
-        #171c25,
-        #0c1017
-    );
-
+    background:linear-gradient(155deg,#171c25,#0c1017);
     box-shadow:0 24px 80px rgba(0,0,0,.55);
-
     padding:20px;
     width:100%;
     max-width:360px;
@@ -485,10 +457,8 @@ body{
     padding:9px 10px;
     border-radius:8px;
     border:1px solid rgba(255,255,255,.12);
-
     background:#0b0f15;
     color:#fff;
-
     font-size:14px;
     outline:none;
 }
@@ -523,35 +493,20 @@ body{
     cursor:pointer;
 }
 
-.btn-add{
-    background:#477f65;
-    color:#fff;
-}
+.btn-add{background:#477f65;color:#fff}
+.btn-clear{background:#8c4146;color:#fff}
+.btn-close{background:rgba(255,255,255,.09);color:#ddd}
 
-.btn-clear{
-    background:#8c4146;
-    color:#fff;
-}
-
-.btn-close{
-    background:rgba(255,255,255,.09);
-    color:#ddd;
-}
-
-.color-list{
-    margin-top:14px;
-}
+.color-list{margin-top:14px}
 
 .color-item{
     display:flex;
     align-items:center;
     gap:10px;
     padding:8px 10px;
-
     background:rgba(255,255,255,.045);
     border:1px solid rgba(255,255,255,.04);
     border-radius:10px;
-
     margin-bottom:6px;
     font-size:13px;
 }
@@ -582,37 +537,25 @@ body{
 }
 
 @media(max-width:380px){
-    body{
-        padding:13px;
-    }
-
+    body{padding:13px}
     .card{
         padding:28px 17px 22px;
         border-radius:23px;
     }
-
     .logo{
         font-size:22px;
         letter-spacing:2.4px;
     }
-
-    .timer{
-        font-size:64px;
-    }
-
-    .adj button{
-        padding:8px 9px;
-    }
+    .timer{font-size:64px}
+    .adj button{padding:8px 9px}
 }
 
 @media(prefers-reduced-motion:reduce){
-    .card:after{
+    .card:after,
+    body.tn-color-active::before{
         animation:none;
     }
-
-    *{
-        transition-duration:0s !important;
-    }
+    *{transition-duration:0s !important}
 }
 </style>
 </head>
@@ -626,15 +569,11 @@ body{
         <div class="sub">ĐẾM NGƯỢC</div>
 
         <div id="typeBox" class="type-box" style="display:none;"></div>
-
         <div id="boxValue" class="box-value" style="display:none;"></div>
-
         <div id="ratioLine" class="ratio-line" style="display:none;"></div>
 
         <div id="timer" class="timer">--.-</div>
-
         <div id="info" class="info">Đang tải...</div>
-
         <div id="endTime" class="end-time"></div>
 
         <div class="adj" id="adjBox">
@@ -677,57 +616,33 @@ body{
         <h3>Màu nền theo thời gian còn lại</h3>
 
         <div class="row">
-
             <div style="flex:1">
                 <label>Từ (giây)</label>
-                <input
-                    type="number"
-                    id="colorStart"
-                    placeholder="vd: 60"
-                    step="any"
-                >
+                <input type="number" id="colorStart" placeholder="vd: 60" step="any">
             </div>
 
             <div style="flex:1">
                 <label>Đến (giây)</label>
-                <input
-                    type="number"
-                    id="colorEnd"
-                    placeholder="vd: 30"
-                    step="any"
-                >
+                <input type="number" id="colorEnd" placeholder="vd: 30" step="any">
             </div>
 
             <div>
                 <label>Màu</label>
-                <input
-                    type="color"
-                    id="colorPick"
-                    value="#2563eb"
-                >
+                <input type="color" id="colorPick" value="#2563eb">
             </div>
-
         </div>
 
         <div class="actions">
-            <button type="button" class="btn-add" id="btnAddColor">
-                + Thêm
-            </button>
-
-            <button type="button" class="btn-clear" id="btnClearColor">
-                Xóa tất cả
-            </button>
-
-            <button type="button" class="btn-close" id="btnCloseColor">
-                Đóng
-            </button>
+            <button type="button" class="btn-add" id="btnAddColor">+ Thêm</button>
+            <button type="button" class="btn-clear" id="btnClearColor">Xóa tất cả</button>
+            <button type="button" class="btn-close" id="btnCloseColor">Đóng</button>
         </div>
 
         <div class="color-list" id="colorList"></div>
 
         <div class="modal-hint">
             Ví dụ: Từ 60 → Đến 30 = khi còn 30–60 giây,
-            nền thẻ sẽ dùng màu đã chọn.<br>
+            toàn bộ nền trang sẽ dùng màu đã chọn.<br>
             Màu số đếm vẫn giữ màu vàng premium.<br>
             Không có khoảng màu → nền đen vàng mặc định.
         </div>
@@ -804,15 +719,11 @@ function aesDecrypt(encrypted){
 // ======================================================
 
 function loadParams(){
-
     var params = new URLSearchParams(window.location.search);
-
     var c = (params.get("c") || "").trim();
 
     if(c){
-
         var raw = aesDecrypt(c);
-
         var parts = raw.split("|");
 
         return {
@@ -861,8 +772,6 @@ var offsetHint = document.getElementById("offsetHint");
 
 var syncStatusEl = document.getElementById("syncStatus");
 
-var cardEl = document.querySelector(".card");
-
 if(type){
     typeEl.style.display = "inline-block";
     typeEl.textContent = type;
@@ -887,7 +796,6 @@ function pad(n,len){
 }
 
 function getVNParts(date){
-
     date = date || new Date();
 
     var fmt = new Intl.DateTimeFormat("en-CA",{
@@ -920,7 +828,6 @@ function getVNParts(date){
 }
 
 function vnDateToUTC(y,m,d,h,mi,s){
-
     return new Date(
         Date.UTC(y,m-1,d,h-7,mi,s,0)
     );
@@ -932,14 +839,10 @@ function vnDateToUTC(y,m,d,h,mi,s){
 
 var serverOffsetMs = 0;
 var serverSynced = false;
-
 var SYNC_INTERVAL = 15000;
-
 var remainingAtSync = null;
 var basePerf = 0;
-
 var expireDate = null;
-
 var finished = false;
 var tickTimer = null;
 
@@ -954,26 +857,20 @@ function nowMs(){
 var OFFSET_KEY = "tnam_countdown_offset";
 
 function loadOffset(){
-
     try{
         var v = parseFloat(localStorage.getItem(OFFSET_KEY));
 
         return Number.isFinite(v)
             ? Math.round(v*100)/100
             : 0;
-
     }catch(e){
         return 0;
     }
 }
 
 function saveOffset(){
-
     try{
-        localStorage.setItem(
-            OFFSET_KEY,
-            String(offsetSec)
-        );
+        localStorage.setItem(OFFSET_KEY,String(offsetSec));
     }catch(e){}
 }
 
@@ -984,11 +881,8 @@ var offsetSec = loadOffset();
 // ======================================================
 
 function setSyncStatus(ok,msg){
-
     syncStatusEl.textContent = msg;
-
-    syncStatusEl.className =
-        "sync-status " + (ok ? "ok" : "fail");
+    syncStatusEl.className = "sync-status " + (ok ? "ok" : "fail");
 }
 
 // ======================================================
@@ -996,7 +890,6 @@ function setSyncStatus(ok,msg){
 // ======================================================
 
 function parseEndTime(endStr,serverMs){
-
     if(!endStr) return null;
 
     var mFull = endStr.match(
@@ -1004,40 +897,25 @@ function parseEndTime(endStr,serverMs){
     );
 
     if(mFull){
-
         var h = +mFull[1];
         var mi = +mFull[2];
         var s = +mFull[3];
-
         var day = +mFull[4];
         var month = +mFull[5];
         var year = +mFull[6];
 
         if(
-            h > 23 ||
-            mi > 59 ||
-            s > 59 ||
-            day < 1 ||
-            day > 31 ||
-            month < 1 ||
-            month > 12
+            h > 23 || mi > 59 || s > 59 ||
+            day < 1 || day > 31 ||
+            month < 1 || month > 12
         ){
             return null;
         }
 
-        return vnDateToUTC(
-            year,
-            month,
-            day,
-            h,
-            mi,
-            s
-        );
+        return vnDateToUTC(year,month,day,h,mi,s);
     }
 
-    var m = endStr.match(
-        /^(\d{1,2}):(\d{2}):(\d{2})$/
-    );
+    var m = endStr.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
 
     if(!m) return null;
 
@@ -1049,11 +927,9 @@ function parseEndTime(endStr,serverMs){
         return null;
     }
 
-    var nowParts = getVNParts(
-        new Date(serverMs)
-    );
+    var nowParts = getVNParts(new Date(serverMs));
 
-    var endUTC = vnDateToUTC(
+    return vnDateToUTC(
         nowParts.year,
         nowParts.month,
         nowParts.day,
@@ -1061,8 +937,6 @@ function parseEndTime(endStr,serverMs){
         mi,
         s
     );
-
-    return endUTC;
 }
 
 // ======================================================
@@ -1070,37 +944,25 @@ function parseEndTime(endStr,serverMs){
 // ======================================================
 
 function applySync(serverMs){
-
-    expireDate = parseEndTime(
-        endStr,
-        serverMs
-    );
+    expireDate = parseEndTime(endStr,serverMs);
 
     if(!expireDate){
-
         remainingAtSync = null;
-
         return;
     }
 
-    var target =
-        expireDate.getTime() +
-        offsetSec*1000;
+    var target = expireDate.getTime() + offsetSec*1000;
 
-    remainingAtSync =
-        target - serverMs;
-
+    remainingAtSync = target-serverMs;
     basePerf = performance.now();
 }
 
 function getRemainingMs(){
-
     if(remainingAtSync === null){
         return null;
     }
 
-    return remainingAtSync -
-        (performance.now()-basePerf);
+    return remainingAtSync-(performance.now()-basePerf);
 }
 
 // ======================================================
@@ -1108,80 +970,47 @@ function getRemainingMs(){
 // ======================================================
 
 function syncServerTime(){
-
     var sources = [
-
         {
             name:"utctime",
-
             url:"https://utctime.app/api/now/Asia/Ho_Chi_Minh",
-
             parse:function(data,rtt){
-
-                var ms =
-                    data.unix_ms ||
-                    (data.unix*1000);
-
+                var ms = data.unix_ms || (data.unix*1000);
                 return ms+rtt/2;
             }
         },
-
         {
             name:"timezone.io",
-
             url:"https://worldtime.timezone.io/api/timezone/Asia/Ho_Chi_Minh",
-
             parse:function(data,rtt){
-
-                return (
-                    data.unixtime*1000
-                )+rtt/2;
+                return (data.unixtime*1000)+rtt/2;
             }
         },
-
         {
             name:"worldtimeapi",
-
             url:"https://worldtimeapi.org/api/timezone/Asia/Ho_Chi_Minh",
-
             parse:function(data,rtt){
-
-                return (
-                    data.unixtime*1000
-                )+rtt/2;
+                return (data.unixtime*1000)+rtt/2;
             }
         }
     ];
 
     function trySource(src){
-
         var t0 = Date.now();
 
-        return fetch(
-            src.url,
-            {
-                cache:"no-store",
-                mode:"cors"
-            }
-        )
+        return fetch(src.url,{
+            cache:"no-store",
+            mode:"cors"
+        })
         .then(function(r){
-
             if(!r.ok){
-                throw new Error(
-                    "HTTP "+r.status
-                );
+                throw new Error("HTTP "+r.status);
             }
 
             return r.json().then(function(data){
-
                 var t1 = Date.now();
-
                 var rtt = t1-t0;
-
-                var serverMs = src.parse(
-                    data,
-                    rtt
-                );
+                var serverMs = src.parse(data,rtt);
 
                 return {
                     ok:true,
@@ -1193,35 +1022,21 @@ function syncServerTime(){
             });
         })
         .catch(function(){
-
-            return {
-                ok:false,
-                name:src.name
-            };
+            return {ok:false,name:src.name};
         });
     }
 
-    return Promise.all(
-        sources.map(trySource)
-    ).then(function(results){
-
+    return Promise.all(sources.map(trySource)).then(function(results){
         var good = results.filter(function(r){
-            return r.ok;
+            return r.ok && Number.isFinite(r.serverMs);
         });
 
         if(!good.length){
-
             serverSynced = false;
-
             serverOffsetMs = 0;
-
             applySync(Date.now());
 
-            setSyncStatus(
-                false,
-                "Không đồng bộ được · dùng giờ máy"
-            );
-
+            setSyncStatus(false,"Không đồng bộ được · dùng giờ máy");
             updateEndTimeDisplay();
 
             return false;
@@ -1233,20 +1048,14 @@ function syncServerTime(){
 
         var best = good[0];
 
-        serverOffsetMs =
-            best.serverMs-best.t1;
-
+        serverOffsetMs = best.serverMs-best.t1;
         serverSynced = true;
 
         applySync(best.serverMs);
 
         setSyncStatus(
             true,
-            "Đã đồng bộ ("+
-            best.name+
-            " ±"+
-            Math.round(best.rtt/2)+
-            "ms)"
+            "Đã đồng bộ ("+best.name+" ±"+Math.round(best.rtt/2)+"ms)"
         );
 
         updateEndTimeDisplay();
@@ -1262,30 +1071,19 @@ function syncServerTime(){
 var STORAGE_KEY = "tnam_countdown_colors";
 
 function getColorTimes(){
-
     try{
+        var raw = localStorage.getItem(STORAGE_KEY);
+        var list = raw ? JSON.parse(raw) : [];
 
-        var raw = localStorage.getItem(
-            STORAGE_KEY
-        );
-
-        return raw ? JSON.parse(raw) : [];
-
+        return Array.isArray(list) ? list : [];
     }catch(e){
-
         return [];
     }
 }
 
 function setColorTimes(list){
-
     try{
-
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(list)
-        );
-
+        localStorage.setItem(STORAGE_KEY,JSON.stringify(list));
     }catch(e){}
 }
 
@@ -1294,26 +1092,16 @@ function setColorTimes(list){
 // ======================================================
 
 function findColor(sec){
-
     var list = getColorTimes();
 
-    /*
-      Ưu tiên khoảng màu được thêm sau.
-      Nếu có nhiều khoảng trùng nhau,
-      khoảng mới nhất sẽ được sử dụng.
-    */
-
-    for(
-        var i=list.length-1;
-        i>=0;
-        i--
-    ){
-
+    for(var i=list.length-1;i>=0;i--){
         var ct = list[i];
 
         if(
-            sec <= ct.start &&
-            sec >= ct.end
+            Number.isFinite(Number(ct.start)) &&
+            Number.isFinite(Number(ct.end)) &&
+            sec <= Number(ct.start) &&
+            sec >= Number(ct.end)
         ){
             return ct.color;
         }
@@ -1327,107 +1115,57 @@ function findColor(sec){
 // ======================================================
 
 function hexToRGBA(hex,alpha){
-
     var h = String(hex).replace("#","");
 
-    if(h.length !== 6){
-
-        return "rgba(217,189,120,"+
-            alpha+")";
+    if(!/^[0-9a-fA-F]{6}$/.test(h)){
+        return "rgba(217,189,120,"+alpha+")";
     }
 
-    var r = parseInt(
-        h.substring(0,2),
-        16
-    );
+    var r = parseInt(h.substring(0,2),16);
+    var g = parseInt(h.substring(2,4),16);
+    var b = parseInt(h.substring(4,6),16);
 
-    var g = parseInt(
-        h.substring(2,4),
-        16
-    );
-
-    var b = parseInt(
-        h.substring(4,6),
-        16
-    );
-
-    return "rgba("+
-        r+","+
-        g+","+
-        b+","+
-        alpha+")";
+    return "rgba("+r+","+g+","+b+","+alpha+")";
 }
 
 // ======================================================
-// ĐỔI MÀU NỀN CARD
+// ĐỔI MÀU TOÀN BỘ NỀN TRANG
 // ======================================================
 
 function applyBackgroundColor(sec){
-
     var color = findColor(sec);
-
-    if(!cardEl) return;
+    var body = document.body;
 
     if(color){
+        body.classList.add("tn-color-active");
 
-        var glow = hexToRGBA(
-            color,
-            .20
-        );
+        body.style.setProperty("--tn-page-color",color);
+        body.style.setProperty("--tn-page-glow",hexToRGBA(color,.72));
 
-        var border = hexToRGBA(
-            color,
-            .55
-        );
+        body.style.setProperty("--tn-active-glow",hexToRGBA(color,.20));
 
-        var shadow = hexToRGBA(
-            color,
-            .13
-        );
+        var border = hexToRGBA(color,.55);
+        var shadow = hexToRGBA(color,.22);
 
-        cardEl.style.background =
-            "radial-gradient("+
-            "ellipse at 50% 0%,"+
-            glow+
-            ",transparent 75%),"+
-            "linear-gradient("+
-            "155deg,"+
-            "#171c25,"+
-            "#0c1017"+
-            ")";
-
-        cardEl.style.borderColor =
-            border;
+        cardEl.style.borderColor = border;
 
         cardEl.style.boxShadow =
             "0 28px 90px rgba(0,0,0,.58),"+
-            "0 0 35px "+shadow;
-
-        document.body.style.setProperty(
-            "--tn-active-glow",
-            hexToRGBA(color,.16)
-        );
+            "0 0 35px "+shadow+
+            ",inset 0 1px rgba(255,255,255,.055)";
 
     }else{
+        body.classList.remove("tn-color-active");
 
-        cardEl.style.background =
-            "linear-gradient("+
-            "155deg,"+
-            "rgba(24,30,40,.97),"+
-            "rgba(10,13,19,.98) 70%"+
-            ")";
+        body.style.removeProperty("--tn-page-color");
+        body.style.removeProperty("--tn-page-glow");
+        body.style.setProperty("--tn-active-glow","rgba(217,189,120,.08)");
 
-        cardEl.style.borderColor =
-            "rgba(220,190,120,.22)";
+        cardEl.style.borderColor = "rgba(220,190,120,.22)";
 
         cardEl.style.boxShadow =
             "0 28px 90px rgba(0,0,0,.58),"+
             "inset 0 1px rgba(255,255,255,.055)";
-
-        document.body.style.setProperty(
-            "--tn-active-glow",
-            "rgba(217,189,120,.08)"
-        );
     }
 }
 
@@ -1436,76 +1174,44 @@ function applyBackgroundColor(sec){
 // ======================================================
 
 function renderColorList(){
-
     var list = getColorTimes();
-
-    var el = document.getElementById(
-        "colorList"
-    );
+    var el = document.getElementById("colorList");
 
     el.innerHTML = "";
 
     if(!list.length){
-
         el.innerHTML =
-            '<div style="'+
-            'color:#666;'+
-            'font-size:12px;'+
-            'text-align:center;'+
-            'padding:8px'+
-            '">Chưa có khoảng màu nào</div>';
-
+            '<div style="color:#666;font-size:12px;text-align:center;padding:8px">Chưa có khoảng màu nào</div>';
         return;
     }
 
     list.forEach(function(item){
-
-        var div = document.createElement(
-            "div"
-        );
-
+        var div = document.createElement("div");
         div.className = "color-item";
 
-        var swatch = document.createElement(
-            "span"
-        );
-
+        var swatch = document.createElement("span");
         swatch.className = "swatch";
+        swatch.style.background = item.color;
 
-        swatch.style.background =
-            item.color;
+        var label = document.createElement("span");
+        label.textContent = item.start+"s → "+item.end+"s";
 
-        var label = document.createElement(
-            "span"
-        );
-
-        label.textContent =
-            item.start+
-            "s → "+
-            item.end+
-            "s";
-
-        var del = document.createElement(
-            "button"
-        );
-
+        var del = document.createElement("button");
         del.type = "button";
-
         del.className = "del";
-
         del.textContent = "✕";
 
         del.onclick = function(){
-
             setColorTimes(
-                getColorTimes().filter(
-                    function(x){
-                        return x.id !== item.id;
-                    }
-                )
+                getColorTimes().filter(function(x){
+                    return x.id !== item.id;
+                })
             );
 
             renderColorList();
+
+            var left = getRemainingMs();
+            applyBackgroundColor(left === null ? -1 : left/1000);
         };
 
         div.appendChild(swatch);
@@ -1520,119 +1226,72 @@ function renderColorList(){
 // MODAL MÀU
 // ======================================================
 
-document.getElementById(
-    "btnOpenColor"
-).onclick = function(){
-
-    document.getElementById(
-        "colorModal"
-    ).classList.add("show");
-
+document.getElementById("btnOpenColor").onclick = function(){
+    document.getElementById("colorModal").classList.add("show");
     renderColorList();
 };
 
-document.getElementById(
-    "btnCloseColor"
-).onclick = function(){
-
-    document.getElementById(
-        "colorModal"
-    ).classList.remove("show");
+document.getElementById("btnCloseColor").onclick = function(){
+    document.getElementById("colorModal").classList.remove("show");
 };
 
-document.getElementById(
-    "colorModal"
-).addEventListener(
-    "click",
-    function(e){
-
-        if(e.target === this){
-
-            this.classList.remove("show");
-        }
+document.getElementById("colorModal").addEventListener("click",function(e){
+    if(e.target === this){
+        this.classList.remove("show");
     }
-);
+});
 
 // ======================================================
 // THÊM MÀU
 // ======================================================
 
-document.getElementById(
-    "btnAddColor"
-).onclick = function(){
+document.getElementById("btnAddColor").onclick = function(){
+    var s = parseFloat(document.getElementById("colorStart").value);
+    var e = parseFloat(document.getElementById("colorEnd").value);
+    var c = document.getElementById("colorPick").value;
 
-    var s = parseFloat(
-        document.getElementById(
-            "colorStart"
-        ).value
-    );
-
-    var e = parseFloat(
-        document.getElementById(
-            "colorEnd"
-        ).value
-    );
-
-    var c = document.getElementById(
-        "colorPick"
-    ).value;
-
-    if(
-        !Number.isFinite(s) ||
-        !Number.isFinite(e)
-    ){
+    if(!Number.isFinite(s) || !Number.isFinite(e)){
+        alert("Vui lòng nhập thời gian hợp lệ.");
         return;
     }
 
     if(s < 0 || e < 0){
+        alert("Thời gian không được âm.");
         return;
     }
 
     var start = Math.max(s,e);
-
     var end = Math.min(s,e);
 
     var list = getColorTimes();
 
     list.push({
-
-        id:Date.now(),
-
+        id:Date.now()+Math.random(),
         start:start,
-
         end:end,
-
         color:c
     });
 
     setColorTimes(list);
-
     renderColorList();
 
-    document.getElementById(
-        "colorStart"
-    ).value = "";
+    document.getElementById("colorStart").value = "";
+    document.getElementById("colorEnd").value = "";
 
-    document.getElementById(
-        "colorEnd"
-    ).value = "";
+    var left = getRemainingMs();
+    applyBackgroundColor(left === null ? -1 : left/1000);
 };
 
 // ======================================================
 // XÓA TOÀN BỘ MÀU
 // ======================================================
 
-document.getElementById(
-    "btnClearColor"
-).onclick = function(){
-
+document.getElementById("btnClearColor").onclick = function(){
     setColorTimes([]);
-
     renderColorList();
 
-    applyBackgroundColor(
-        getRemainingMs() / 1000
-    );
+    var left = getRemainingMs();
+    applyBackgroundColor(left === null ? -1 : left/1000);
 };
 
 // ======================================================
@@ -1640,18 +1299,13 @@ document.getElementById(
 // ======================================================
 
 function updateEndTimeDisplay(){
-
     if(!expireDate){
-
-        endEl.textContent =
-            "Không nhận được thời gian";
-
+        endEl.textContent = "Không nhận được thời gian";
         return;
     }
 
     var adjusted = new Date(
-        expireDate.getTime()+
-        offsetSec*1000
+        expireDate.getTime()+offsetSec*1000
     );
 
     var p = getVNParts(adjusted);
@@ -1674,33 +1328,18 @@ function updateEndTimeDisplay(){
 // ======================================================
 
 function updateOffsetLabel(){
-
     saveOffset();
 
-    var sign =
-        offsetSec > 0
-        ? "+"
-        : "";
+    var sign = offsetSec > 0 ? "+" : "";
 
     offsetVal.textContent =
-        sign+
-        offsetSec.toFixed(2)+
-        "s";
+        sign+offsetSec.toFixed(2)+"s";
 
-    if(
-        remainingAtSync !== null &&
-        expireDate
-    ){
-
+    if(remainingAtSync !== null && expireDate){
         var serverNowApprox = nowMs();
+        var target = expireDate.getTime()+offsetSec*1000;
 
-        var target =
-            expireDate.getTime()+
-            offsetSec*1000;
-
-        remainingAtSync =
-            target-serverNowApprox;
-
+        remainingAtSync = target-serverNowApprox;
         basePerf = performance.now();
     }
 
@@ -1712,105 +1351,60 @@ function updateOffsetLabel(){
 // ======================================================
 
 function onTimeUp(){
-
     if(finished) return;
 
     finished = true;
 
     if(tickTimer){
-
         clearInterval(tickTimer);
-
         tickTimer = null;
     }
 
     timerEl.textContent = "✕";
-
     timerEl.className = "timer done";
-
     timerEl.style.color = "";
 
     infoEl.className = "info done";
 
-    if(adjBox){
-        adjBox.classList.add("hidden");
-    }
+    if(adjBox) adjBox.classList.add("hidden");
+    if(adjLabel) adjLabel.classList.add("hidden");
+    if(offsetHint) offsetHint.classList.add("hidden");
+    if(syncStatusEl) syncStatusEl.classList.add("hidden");
 
-    if(adjLabel){
-        adjLabel.classList.add("hidden");
-    }
-
-    if(offsetHint){
-        offsetHint.classList.add("hidden");
-    }
-
-    if(syncStatusEl){
-        syncStatusEl.classList.add("hidden");
-    }
-
-    var colorBtn = document.getElementById(
-        "btnOpenColor"
-    );
-
-    if(colorBtn){
-        colorBtn.classList.add("hidden");
-    }
+    var colorBtn = document.getElementById("btnOpenColor");
+    if(colorBtn) colorBtn.classList.add("hidden");
 
     var left = 5;
 
-    infoEl.textContent =
-        "Đã hết thời gian · đóng sau "+
-        left+
-        "s";
+    infoEl.textContent = "Đã hết thời gian · đóng sau "+left+"s";
 
-    var closeTimer = setInterval(
-        function(){
+    var closeTimer = setInterval(function(){
+        left--;
 
-            left -= 1;
+        if(left > 0){
+            infoEl.textContent = "Đã hết thời gian · đóng sau "+left+"s";
+            return;
+        }
 
-            if(left > 0){
+        clearInterval(closeTimer);
+        infoEl.textContent = "Đang đóng...";
 
-                infoEl.textContent =
-                    "Đã hết thời gian · đóng sau "+
-                    left+
-                    "s";
+        try{
+            window.close();
+        }catch(e){}
 
-                return;
-            }
-
-            clearInterval(closeTimer);
-
-            infoEl.textContent =
-                "Đang đóng...";
-
+        setTimeout(function(){
             try{
-                window.close();
-            }catch(e){}
-
-            setTimeout(function(){
-
+                window.location.replace("about:blank");
+            }catch(e2){
                 try{
+                    document.body.innerHTML = "";
+                    document.title = "";
+                }catch(e3){}
+            }
+        },300);
 
-                    window.location.replace(
-                        "about:blank"
-                    );
-
-                }catch(e2){
-
-                    try{
-
-                        document.body.innerHTML = "";
-
-                        document.title = "";
-
-                    }catch(e3){}
-                }
-
-            },300);
-
-        },
-        1000
-    );
+    },1000);
 }
 
 // ======================================================
@@ -1818,67 +1412,47 @@ function onTimeUp(){
 // ======================================================
 
 function tick(){
-
     if(finished) return;
 
     var leftMs = getRemainingMs();
 
     if(leftMs === null){
-
         timerEl.textContent = "--.-";
-
+        applyBackgroundColor(-1);
         return;
     }
 
     if(leftMs <= 0){
-
         onTimeUp();
-
         return;
     }
 
     var totalSec = leftMs/1000;
-
     var shown = totalSec.toFixed(1);
 
-    timerEl.innerHTML =
-        shown.replace(
-            ".",
-            "<span class='dot'>.</span>"
-        );
+    timerEl.innerHTML = shown.replace(
+        ".",
+        "<span class='dot'>.</span>"
+    );
 
     /*
-      MÀU TÙY CHỈNH CHỈ ĐỔI NỀN CARD.
+      MÀU TÙY CHỈNH CHỈ ĐỔI NỀN TOÀN BỘ TRANG.
       KHÔNG ĐỔI MÀU SỐ ĐẾM.
     */
 
     applyBackgroundColor(totalSec);
 
     if(totalSec <= 5){
-
-        timerEl.style.color =
-            "#ef6e72";
-
-        timerEl.className =
-            "timer blink";
-
-        timerEl.style.textShadow =
-            "0 0 30px rgba(239,110,114,.35)";
-
+        timerEl.style.color = "#ef6e72";
+        timerEl.className = "timer blink";
+        timerEl.style.textShadow = "0 0 30px rgba(239,110,114,.35)";
     }else{
-
-        timerEl.style.color =
-            "#e4c77f";
-
-        timerEl.className =
-            "timer";
-
-        timerEl.style.textShadow =
-            "0 0 34px rgba(217,189,120,.12)";
+        timerEl.style.color = "#e4c77f";
+        timerEl.className = "timer";
+        timerEl.style.textShadow = "0 0 34px rgba(217,189,120,.12)";
     }
 
-    var label =
-        type && box
+    var label = type && box
         ? (type+" • "+box)
         : (name || "Rương/Túi");
 
@@ -1889,23 +1463,14 @@ function tick(){
 // NÚT CHỈNH LỆCH
 // ======================================================
 
-document.querySelectorAll(
-    "#adjBox button[data-v]"
-).forEach(function(btn){
-
+document.querySelectorAll("#adjBox button[data-v]").forEach(function(btn){
     btn.onclick = function(){
-
         if(finished) return;
 
-        offsetSec += parseFloat(
-            btn.dataset.v
-        );
-
-        offsetSec =
-            Math.round(offsetSec*100)/100;
+        offsetSec += parseFloat(btn.dataset.v);
+        offsetSec = Math.round(offsetSec*100)/100;
 
         updateOffsetLabel();
-
         tick();
     };
 });
@@ -1914,16 +1479,11 @@ document.querySelectorAll(
 // RESET ĐỘ LỆCH
 // ======================================================
 
-document.getElementById(
-    "btnReset"
-).onclick = function(){
-
+document.getElementById("btnReset").onclick = function(){
     if(finished) return;
 
     offsetSec = 0;
-
     updateOffsetLabel();
-
     tick();
 };
 
@@ -1932,29 +1492,19 @@ document.getElementById(
 // ======================================================
 
 function startCountdown(){
-
     if(!endStr){
-
-        endEl.textContent =
-            "Không nhận được thời gian";
-
-        infoEl.textContent =
-            "Thiếu dữ liệu đếm ngược";
+        endEl.textContent = "Không nhận được thời gian";
+        infoEl.textContent = "Thiếu dữ liệu đếm ngược";
     }
 
     updateOffsetLabel();
-
     tick();
 
     if(tickTimer){
-
         clearInterval(tickTimer);
     }
 
-    tickTimer = setInterval(
-        tick,
-        50
-    );
+    tickTimer = setInterval(tick,50);
 }
 
 // ======================================================
@@ -1962,45 +1512,29 @@ function startCountdown(){
 // ======================================================
 
 syncServerTime().then(function(){
-
     startCountdown();
 
     var syncCount = 0;
 
-    var fastSync = setInterval(
-        function(){
+    var fastSync = setInterval(function(){
+        if(finished){
+            clearInterval(fastSync);
+            return;
+        }
 
-            if(finished){
+        syncServerTime();
+        syncCount++;
 
-                clearInterval(fastSync);
+        if(syncCount >= 8){
+            clearInterval(fastSync);
 
-                return;
-            }
-
-            syncServerTime();
-
-            syncCount++;
-
-            if(syncCount >= 8){
-
-                clearInterval(fastSync);
-
-                setInterval(
-                    function(){
-
-                        if(!finished){
-
-                            syncServerTime();
-                        }
-
-                    },
-                    SYNC_INTERVAL
-                );
-            }
-
-        },
-        8000
-    );
+            setInterval(function(){
+                if(!finished){
+                    syncServerTime();
+                }
+            },SYNC_INTERVAL);
+        }
+    },8000);
 });
 </script>
 
