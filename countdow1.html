@@ -3,764 +3,2006 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
 <title>Trung Nhịn • Đếm ngược</title>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
 <style>
 *{
     box-sizing:border-box;
     -webkit-tap-highlight-color:transparent;
     -webkit-user-select:none;
-    -moz-user-select:none;
-    -ms-user-select:none;
     user-select:none;
 }
+
+:root{
+    color-scheme:dark;
+    --tn-bg:#07090d;
+    --tn-panel:#10151d;
+    --tn-line:rgba(220,190,120,.22);
+    --tn-gold:#d9bd78;
+    --tn-gold-light:#f4e4b3;
+    --tn-muted:#8c96a5;
+    --tn-active-glow:rgba(217,189,120,.08);
+}
+
 html,body{
-    margin:0;padding:0;width:100%;min-height:100%;
-    background:#050505;color:#fff;
+    margin:0;
+    padding:0;
+    width:100%;
+    min-height:100%;
+    background:#07090d;
+    color:#f5f3ed;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
 }
+
 body{
-    min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:22px;
+    background:
+        radial-gradient(
+            ellipse at 50% 0%,
+            var(--tn-active-glow),
+            transparent 48%
+        ),
+        radial-gradient(
+            ellipse at 100% 100%,
+            rgba(24,93,106,.10),
+            transparent 38%
+        ),
+        #07090d;
+    transition:background .5s ease;
 }
-.container{width:100%;max-width:430px;}
+
+.container{
+    width:100%;
+    max-width:460px;
+}
+
 .card{
-    background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));
-    border:1px solid rgba(255,255,255,.10);
-    border-radius:24px;padding:28px 22px;
-    box-shadow:0 20px 70px rgba(0,0,0,.65),inset 0 1px rgba(255,255,255,.05);
-    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+    padding:34px 25px 26px;
+    border:1px solid var(--tn-line);
+    border-radius:28px;
+
+    background:
+        linear-gradient(
+            155deg,
+            rgba(24,30,40,.97),
+            rgba(10,13,19,.98) 70%
+        );
+
+    box-shadow:
+        0 28px 90px rgba(0,0,0,.58),
+        inset 0 1px rgba(255,255,255,.055);
+
+    backdrop-filter:blur(24px);
+    -webkit-backdrop-filter:blur(24px);
+
     text-align:center;
+
+    transition:
+        background .5s ease,
+        border-color .5s ease,
+        box-shadow .5s ease,
+        transform .3s ease;
 }
+
+/* Viền ánh sáng */
+.card:before{
+    content:"";
+    position:absolute;
+    inset:0 18% auto;
+    height:1px;
+    background:linear-gradient(
+        90deg,
+        transparent,
+        var(--tn-gold),
+        transparent
+    );
+    opacity:.8;
+    pointer-events:none;
+    z-index:2;
+}
+
+/* Ánh sáng chuyển động */
+.card:after{
+    content:"";
+    position:absolute;
+    inset:-50%;
+    pointer-events:none;
+    z-index:0;
+
+    background:radial-gradient(
+        circle at 50% 40%,
+        var(--tn-active-glow),
+        transparent 55%
+    );
+
+    animation:tnGlow 8s ease-in-out infinite alternate;
+}
+
+.card > *{
+    position:relative;
+    z-index:1;
+}
+
+@keyframes tnGlow{
+    from{
+        transform:translate(-4%,-3%) scale(.95);
+    }
+    to{
+        transform:translate(4%,3%) scale(1.08);
+    }
+}
+
 .logo{
-    font-size:26px;font-weight:900;letter-spacing:1px;margin-bottom:4px;
-    background:linear-gradient(90deg,#25f4ee,#fff,#ff2c55);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:8px;
+    font-size:25px;
+    font-weight:900;
+    letter-spacing:3px;
+
+    background:linear-gradient(
+        100deg,
+        #fff2c8 0%,
+        #d9bd78 48%,
+        #fff8df 100%
+    );
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
 }
-.sub{color:#888;font-size:13px;margin-bottom:18px;}
+
+.sub{
+    color:#87909d;
+    font-size:10px;
+    letter-spacing:4px;
+    font-weight:700;
+    margin-bottom:24px;
+}
+
 .type-box{
-    display:inline-block;margin-bottom:6px;padding:8px 18px;border-radius:999px;
-    background:rgba(37,244,238,.12);border:1px solid rgba(37,244,238,.28);
-    font-size:15px;font-weight:800;color:#25f4ee;
+    display:inline-block;
+    margin-bottom:6px;
+    padding:9px 19px;
+    border-radius:999px;
+
+    color:var(--tn-gold-light);
+
+    background:rgba(217,189,120,.08);
+    border:1px solid rgba(217,189,120,.32);
+
+    box-shadow:inset 0 1px rgba(255,255,255,.04);
+
+    font-size:15px;
+    font-weight:800;
+    letter-spacing:.4px;
+
+    transition:
+        background .4s ease,
+        border-color .4s ease;
 }
-.box-value{font-size:26px;font-weight:900;color:#fff;margin:6px 0 2px;letter-spacing:1px;}
-.ratio-line{font-size:13px;color:#aaa;margin-bottom:12px;}
+
+.box-value{
+    margin:10px 0 4px;
+    font-size:27px;
+    font-weight:900;
+    letter-spacing:.5px;
+    color:#f7f4eb;
+}
+
+.ratio-line{
+    color:#9da6b2;
+    font-size:13px;
+    margin-bottom:14px;
+}
+
 .timer{
-    font-size:72px;font-weight:700;letter-spacing:-0.02em;
-    font-variant-numeric:tabular-nums;margin:18px 0 6px;
-    color:#25f4ee;transition:color .15s ease;line-height:1;
+    margin:28px 0 12px;
+    font-size:clamp(64px,17vw,82px);
+    font-weight:750;
+    letter-spacing:-2px;
+    line-height:1.08;
+
+    font-variant-numeric:tabular-nums;
+
+    color:#e4c77f;
+
+    text-shadow:0 0 34px rgba(217,189,120,.12);
+
+    transition:
+        color .3s ease,
+        text-shadow .3s ease;
 }
-.timer .dot{letter-spacing:0.08em;}
+
+.timer .dot{
+    letter-spacing:.08em;
+}
+
 .timer.done{
-    color:#ff2c55;font-size:90px;
+    color:#ef6e72;
+    font-size:90px;
+
+    text-shadow:0 0 28px rgba(239,110,114,.18);
+
     animation:popX .35s ease-out;
 }
+
 @keyframes popX{
-    0%{transform:scale(.3);opacity:0}
-    70%{transform:scale(1.15)}
-    100%{transform:scale(1);opacity:1}
+    0%{
+        transform:scale(.3);
+        opacity:0;
+    }
+    70%{
+        transform:scale(1.15);
+    }
+    100%{
+        transform:scale(1);
+        opacity:1;
+    }
 }
+
 @keyframes blink{
     0%,100%{opacity:1}
     50%{opacity:.5}
 }
-.timer.blink{animation:blink .45s ease-in-out infinite}
-.info{font-size:14px;color:#aaa;line-height:1.45;margin-top:6px}
-.info.done{color:#ff2c55;font-weight:700;font-size:16px}
-.end-time{margin-top:14px;font-size:12px;color:#777;line-height:1.5}
-.end-time strong{color:#ccc;font-weight:600}
+
+.timer.blink{
+    animation:blink .45s ease-in-out infinite;
+}
+
+.info{
+    color:#a8b0bb;
+    font-size:13px;
+    letter-spacing:.15px;
+    line-height:1.45;
+    margin-top:10px;
+}
+
+.info.done{
+    color:#f08a8d;
+    font-weight:700;
+    font-size:16px;
+}
+
+.end-time{
+    margin-top:18px;
+    padding:11px 12px;
+
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:12px;
+
+    background:rgba(255,255,255,.025);
+
+    color:#7f8998;
+    font-size:12px;
+    line-height:1.5;
+}
+
+.end-time strong{
+    color:#d6dbe2;
+    font-weight:600;
+}
+
 .adj{
-    display:flex;justify-content:center;align-items:center;
-    gap:6px;margin-top:20px;flex-wrap:wrap;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:7px;
+    margin-top:20px;
+    flex-wrap:wrap;
 }
+
 .adj button{
-    border:0;border-radius:8px;padding:8px 10px;
-    font-size:13px;font-weight:700;cursor:pointer;
-    transition:transform .1s, filter .1s;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:9px;
+    padding:9px 11px;
+
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+
+    transition:
+        transform .1s,
+        filter .1s,
+        background .2s;
 }
-.adj button:active{transform:scale(.93);filter:brightness(1.15)}
-.adj .btn-minus{background:#ef4444;color:#fff}
-.adj .btn-plus{background:#22c55e;color:#fff}
-.adj .btn-reset{background:rgba(255,255,255,.12);color:#ddd;min-width:52px}
-.offset-label{font-size:12px;margin-top:10px;color:#888}
-.offset-label .val{color:#25f4ee;font-weight:700}
-.offset-hint{font-size:11px;color:#555;margin-top:4px;line-height:1.4}
-.sync-status{font-size:11px;color:#555;margin-top:6px}
-.sync-status.ok{color:#22c55e}
-.sync-status.fail{color:#f87171}
+
+.adj button:active{
+    transform:scale(.93);
+    filter:brightness(1.15);
+}
+
+.adj .btn-minus{
+    background:rgba(181,75,78,.16);
+    color:#ef9b9d;
+    border-color:rgba(239,110,114,.22);
+}
+
+.adj .btn-plus{
+    background:rgba(72,143,112,.16);
+    color:#9bd8b7;
+    border-color:rgba(120,200,160,.20);
+}
+
+.adj .btn-reset{
+    background:rgba(255,255,255,.07);
+    color:#d8dce2;
+    min-width:52px;
+}
+
+.offset-label{
+    font-size:12px;
+    margin-top:13px;
+    color:#8b95a3;
+}
+
+.offset-label .val{
+    color:var(--tn-gold-light);
+    font-weight:700;
+}
+
+.offset-hint{
+    font-size:11px;
+    color:#626c7a;
+    margin-top:4px;
+    line-height:1.4;
+}
+
+.sync-status{
+    font-size:11px;
+    color:#737d8a;
+    margin-top:9px;
+}
+
+.sync-status.ok{
+    color:#83c9a3;
+}
+
+.sync-status.fail{
+    color:#e58b8d;
+}
+
 .color-btn{
-    margin-top:16px;width:100%;padding:11px;border:0;border-radius:12px;
-    background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;
-    font-size:14px;font-weight:700;cursor:pointer;
+    margin-top:20px;
+    width:100%;
+    padding:13px 15px;
+
+    border:1px solid rgba(217,189,120,.34);
+    border-radius:13px;
+
+    background:linear-gradient(
+        135deg,
+        #b99a55,
+        #e1c783 55%,
+        #b99a55
+    );
+
+    color:#17140c;
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.15px;
+
+    box-shadow:0 8px 24px rgba(185,154,85,.12);
+
+    cursor:pointer;
+
+    transition:all .25s ease;
 }
-.color-btn:active{transform:scale(.97)}
-.note{margin-top:14px;color:#444;font-size:11px;line-height:1.5}
-.hidden{display:none !important}
+
+.color-btn:hover{
+    filter:brightness(1.12);
+    box-shadow:0 0 25px rgba(217,189,120,.2);
+}
+
+.color-btn:active{
+    transform:scale(.985);
+}
+
+.note{
+    margin-top:16px;
+    color:#596372;
+    font-size:10px;
+    letter-spacing:.1px;
+    line-height:1.5;
+}
+
+.hidden{
+    display:none !important;
+}
+
+/* Modal */
 .modal-overlay{
-    display:none;position:fixed;inset:0;z-index:9999;
-    background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:16px;
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:9999;
+
+    background:rgba(1,3,7,.78);
+
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+
+    align-items:center;
+    justify-content:center;
+    padding:16px;
 }
-.modal-overlay.show{display:flex}
+
+.modal-overlay.show{
+    display:flex;
+}
+
 .modal{
-    background:#111;border:1px solid rgba(255,255,255,.12);
-    border-radius:18px;padding:20px;width:100%;max-width:360px;
-    max-height:90vh;overflow-y:auto;text-align:left;
+    border:1px solid rgba(217,189,120,.24);
+    border-radius:20px;
+
+    background:linear-gradient(
+        155deg,
+        #171c25,
+        #0c1017
+    );
+
+    box-shadow:0 24px 80px rgba(0,0,0,.55);
+
+    padding:20px;
+    width:100%;
+    max-width:360px;
+    max-height:90vh;
+    overflow-y:auto;
+    text-align:left;
 }
-.modal h3{margin:0 0 14px;font-size:16px;text-align:center;color:#fff}
-.modal label{display:block;font-size:12px;color:#aaa;margin-bottom:4px}
-.modal .row{display:flex;gap:8px;margin-bottom:10px;align-items:flex-end}
+
+.modal h3{
+    margin:0 0 14px;
+    font-size:16px;
+    text-align:center;
+    color:var(--tn-gold-light);
+    letter-spacing:.2px;
+}
+
+.modal label{
+    display:block;
+    font-size:12px;
+    color:#a0a9b6;
+    margin-bottom:4px;
+}
+
+.modal .row{
+    display:flex;
+    gap:8px;
+    margin-bottom:10px;
+    align-items:flex-end;
+}
+
 .modal input[type="number"]{
-    width:100%;padding:9px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);
-    background:#1a1a1a;color:#fff;font-size:14px;outline:none;
+    width:100%;
+    padding:9px 10px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,.12);
+
+    background:#0b0f15;
+    color:#fff;
+
+    font-size:14px;
+    outline:none;
 }
+
+.modal input[type="number"]:focus{
+    border-color:rgba(217,189,120,.5);
+}
+
 .modal input[type="color"]{
-    width:48px;height:38px;border:0;border-radius:8px;padding:0;cursor:pointer;background:none;
+    width:48px;
+    height:38px;
+    border:0;
+    border-radius:8px;
+    padding:0;
+    cursor:pointer;
+    background:none;
 }
-.modal .actions{display:flex;gap:8px;margin-top:12px}
+
+.modal .actions{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+}
+
 .modal .actions button{
-    flex:1;padding:10px;border:0;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;
+    flex:1;
+    padding:10px;
+    border:0;
+    border-radius:10px;
+    font-weight:700;
+    font-size:13px;
+    cursor:pointer;
 }
-.btn-add{background:#22c55e;color:#fff}
-.btn-clear{background:#ef4444;color:#fff}
-.btn-close{background:rgba(255,255,255,.12);color:#ddd}
-.color-list{margin-top:14px}
+
+.btn-add{
+    background:#477f65;
+    color:#fff;
+}
+
+.btn-clear{
+    background:#8c4146;
+    color:#fff;
+}
+
+.btn-close{
+    background:rgba(255,255,255,.09);
+    color:#ddd;
+}
+
+.color-list{
+    margin-top:14px;
+}
+
 .color-item{
-    display:flex;align-items:center;gap:10px;padding:8px 10px;
-    background:rgba(255,255,255,.05);border-radius:10px;margin-bottom:6px;font-size:13px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 10px;
+
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.04);
+    border-radius:10px;
+
+    margin-bottom:6px;
+    font-size:13px;
 }
+
 .color-item .swatch{
-    width:22px;height:22px;border-radius:6px;flex-shrink:0;
+    width:22px;
+    height:22px;
+    border-radius:6px;
+    flex-shrink:0;
     border:1px solid rgba(255,255,255,.2);
 }
+
 .color-item .del{
-    margin-left:auto;background:transparent;border:0;color:#f87171;
-    font-size:16px;cursor:pointer;padding:4px 8px;
+    margin-left:auto;
+    background:transparent;
+    border:0;
+    color:#f87171;
+    font-size:16px;
+    cursor:pointer;
+    padding:4px 8px;
 }
-.modal-hint{font-size:11px;color:#666;margin-top:8px;line-height:1.4}
-</style>
 
-<style id="trung-nhin-premium-theme">
-:root{
-  color-scheme:dark;
-  --tn-bg:#07090d;
-  --tn-panel:#10151d;
-  --tn-line:rgba(220,190,120,.22);
-  --tn-gold:#d9bd78;
-  --tn-gold-light:#f4e4b3;
-  --tn-muted:#8c96a5;
+.modal-hint{
+    font-size:11px;
+    color:#788291;
+    margin-top:8px;
+    line-height:1.5;
 }
-html,body{
-  background:
-    radial-gradient(ellipse at 50% 0%,rgba(174,133,55,.13),transparent 42%),
-    radial-gradient(ellipse at 100% 100%,rgba(24,93,106,.10),transparent 38%),
-    var(--tn-bg);
-  color:#f5f3ed;
-}
-body{padding:22px;align-items:center}
-.container{max-width:460px}
-.card{
-  position:relative;
-  overflow:hidden;
-  padding:34px 25px 26px;
-  border:1px solid var(--tn-line);
-  border-radius:28px;
-  background:linear-gradient(155deg,rgba(24,30,40,.97),rgba(10,13,19,.98) 70%);
-  box-shadow:0 28px 90px rgba(0,0,0,.58),inset 0 1px rgba(255,255,255,.055);
-  backdrop-filter:blur(24px);
-}
-.card:before{
-  content:"";
-  position:absolute;inset:0 18% auto;height:1px;
-  background:linear-gradient(90deg,transparent,var(--tn-gold),transparent);
-  opacity:.8;
-}
-.logo{
-  margin-bottom:8px;
-  font-size:25px;
-  font-weight:900;
-  letter-spacing:3px;
-  background:linear-gradient(100deg,#fff2c8 0%,#d9bd78 48%,#fff8df 100%);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
-.sub{
-  color:#87909d;
-  font-size:10px;
-  letter-spacing:4px;
-  font-weight:700;
-  margin-bottom:24px;
-}
-.type-box{
-  padding:9px 19px;
-  color:var(--tn-gold-light);
-  background:rgba(217,189,120,.08);
-  border:1px solid rgba(217,189,120,.32);
-  box-shadow:inset 0 1px rgba(255,255,255,.04);
-  letter-spacing:.4px;
-}
-.box-value{
-  margin:10px 0 4px;
-  font-size:27px;
-  letter-spacing:.5px;
-  color:#f7f4eb;
-}
-.ratio-line{color:#9da6b2;margin-bottom:14px}
-.timer{
-  margin:28px 0 12px;
-  font-size:clamp(64px,17vw,82px);
-  font-weight:750;
-  letter-spacing:-2px;
-  line-height:1.08;
-  color:#e4c77f;
-  text-shadow:0 0 34px rgba(217,189,120,.12);
-}
-.timer.done{
-  color:#ef6e72;
-  font-size:90px;
-  text-shadow:0 0 28px rgba(239,110,114,.18);
-}
-.info{
-  color:#a8b0bb;
-  font-size:13px;
-  letter-spacing:.15px;
-  margin-top:10px;
-}
-.info.done{color:#f08a8d}
-.end-time{
-  margin-top:18px;
-  padding:11px 12px;
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:12px;
-  background:rgba(255,255,255,.025);
-  color:#7f8998;
-}
-.end-time strong{color:#d6dbe2}
-.adj{gap:7px;margin-top:20px}
-.adj button{
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:9px;
-  padding:9px 11px;
-  font-size:12px;
-}
-.adj .btn-minus{background:rgba(181,75,78,.16);color:#ef9b9d;border-color:rgba(239,110,114,.22)}
-.adj .btn-plus{background:rgba(72,143,112,.16);color:#9bd8b7;border-color:rgba(120,200,160,.20)}
-.adj .btn-reset{background:rgba(255,255,255,.07);color:#d8dce2}
-.offset-label{color:#8b95a3;margin-top:13px}
-.offset-label .val{color:var(--tn-gold-light)}
-.offset-hint{color:#626c7a}
-.sync-status{margin-top:9px;color:#737d8a}
-.sync-status.ok{color:#83c9a3}
-.sync-status.fail{color:#e58b8d}
-.color-btn{
-  margin-top:20px;
-  padding:13px 15px;
-  border:1px solid rgba(217,189,120,.34);
-  border-radius:13px;
-  background:linear-gradient(135deg,#b99a55,#e1c783 55%,#b99a55);
-  color:#17140c;
-  font-size:13px;
-  font-weight:800;
-  letter-spacing:.15px;
-  box-shadow:0 8px 24px rgba(185,154,85,.12);
-}
-.color-btn:active{transform:scale(.985)}
-.note{margin-top:16px;color:#596372;font-size:10px;letter-spacing:.1px}
-.modal-overlay{background:rgba(1,3,7,.78);backdrop-filter:blur(8px)}
-.modal{
-  border:1px solid rgba(217,189,120,.24);
-  border-radius:20px;
-  background:linear-gradient(155deg,#171c25,#0c1017);
-  box-shadow:0 24px 80px rgba(0,0,0,.55);
-}
-.modal h3{color:var(--tn-gold-light);letter-spacing:.2px}
-.modal label{color:#a0a9b6}
-.modal input[type="number"]{
-  border-color:rgba(255,255,255,.12);
-  background:#0b0f15;
-}
-.modal .actions button{border-radius:10px}
-.btn-add{background:#477f65}
-.btn-clear{background:#8c4146}
-.btn-close{background:rgba(255,255,255,.09)}
-.color-item{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.04)}
-.modal-hint{color:#788291}
+
 @media(max-width:380px){
-  body{padding:13px}
-  .card{padding:28px 17px 22px;border-radius:23px}
-  .logo{font-size:22px;letter-spacing:2.4px}
-  .timer{font-size:64px}
-  .adj button{padding:8px 9px}
+    body{
+        padding:13px;
+    }
+
+    .card{
+        padding:28px 17px 22px;
+        border-radius:23px;
+    }
+
+    .logo{
+        font-size:22px;
+        letter-spacing:2.4px;
+    }
+
+    .timer{
+        font-size:64px;
+    }
+
+    .adj button{
+        padding:8px 9px;
+    }
+}
+
+@media(prefers-reduced-motion:reduce){
+    .card:after{
+        animation:none;
+    }
+
+    *{
+        transition-duration:0s !important;
+    }
 }
 </style>
-
 </head>
+
 <body>
+
 <div class="container">
-  <div class="card">
-    <div class="logo">TRUNG NHỊN</div>
-    <div class="sub">ĐẾM NGƯỢC</div>
-    <div id="typeBox" class="type-box" style="display:none;"></div>
-    <div id="boxValue" class="box-value" style="display:none;"></div>
-    <div id="ratioLine" class="ratio-line" style="display:none;"></div>
-    <div id="timer" class="timer">--.-</div>
-    <div id="info" class="info">Đang tải...</div>
-    <div id="endTime" class="end-time"></div>
-    <div class="adj" id="adjBox">
-      <button type="button" class="btn-minus" data-v="-0.05">-0.05s</button>
-      <button type="button" class="btn-minus" data-v="-0.01">-0.01s</button>
-      <button type="button" class="btn-reset" id="btnReset">0.00s</button>
-      <button type="button" class="btn-plus" data-v="0.01">+0.01s</button>
-      <button type="button" class="btn-plus" data-v="0.05">+0.05s</button>
+    <div class="card">
+
+        <div class="logo">TRUNG NHỊN</div>
+        <div class="sub">ĐẾM NGƯỢC</div>
+
+        <div id="typeBox" class="type-box" style="display:none;"></div>
+
+        <div id="boxValue" class="box-value" style="display:none;"></div>
+
+        <div id="ratioLine" class="ratio-line" style="display:none;"></div>
+
+        <div id="timer" class="timer">--.-</div>
+
+        <div id="info" class="info">Đang tải...</div>
+
+        <div id="endTime" class="end-time"></div>
+
+        <div class="adj" id="adjBox">
+            <button type="button" class="btn-minus" data-v="-0.05">-0.05s</button>
+            <button type="button" class="btn-minus" data-v="-0.01">-0.01s</button>
+            <button type="button" class="btn-reset" id="btnReset">0.00s</button>
+            <button type="button" class="btn-plus" data-v="0.01">+0.01s</button>
+            <button type="button" class="btn-plus" data-v="0.05">+0.05s</button>
+        </div>
+
+        <div class="offset-label" id="adjLabel">
+            Lệch: <span class="val" id="offsetVal">0.00s</span>
+        </div>
+
+        <div class="offset-hint" id="offsetHint">
+            + làm chậm · − làm nhanh<br>
+            (chỉnh cho khớp lúc rương mở thật)
+        </div>
+
+        <div id="syncStatus" class="sync-status">
+            Đang đồng bộ giờ server...
+        </div>
+
+        <button type="button" class="color-btn" id="btnOpenColor">
+            Thêm màu sắc theo thời gian
+        </button>
+
+        <div class="note">
+            Thời gian theo giờ Việt Nam
+            (đồng bộ server · kháng chỉnh giờ máy)
+        </div>
+
     </div>
-    <div class="offset-label" id="adjLabel">
-      Lệch: <span class="val" id="offsetVal">0.00s</span>
-    </div>
-    <div class="offset-hint" id="offsetHint">
-      + làm chậm · − làm nhanh<br>
-      (chỉnh cho khớp lúc rương mở thật)
-    </div>
-    <div id="syncStatus" class="sync-status">Đang đồng bộ giờ server...</div>
-    <button type="button" class="color-btn" id="btnOpenColor">Thêm màu sắc theo thời gian</button>
-    <div class="note">Thời gian theo giờ Việt Nam (đồng bộ server · kháng chỉnh giờ máy)</div>
-  </div>
 </div>
+
+<!-- Modal màu sắc -->
 <div class="modal-overlay" id="colorModal">
-  <div class="modal">
-    <h3>Màu theo thời gian còn lại</h3>
-    <div class="row">
-      <div style="flex:1">
-        <label>Từ (giây)</label>
-        <input type="number" id="colorStart" placeholder="vd: 60" step="any">
-      </div>
-      <div style="flex:1">
-        <label>Đến (giây)</label>
-        <input type="number" id="colorEnd" placeholder="vd: 30" step="any">
-      </div>
-      <div>
-        <label>Màu</label>
-        <input type="color" id="colorPick" value="#ef4444">
-      </div>
+    <div class="modal">
+
+        <h3>Màu nền theo thời gian còn lại</h3>
+
+        <div class="row">
+
+            <div style="flex:1">
+                <label>Từ (giây)</label>
+                <input
+                    type="number"
+                    id="colorStart"
+                    placeholder="vd: 60"
+                    step="any"
+                >
+            </div>
+
+            <div style="flex:1">
+                <label>Đến (giây)</label>
+                <input
+                    type="number"
+                    id="colorEnd"
+                    placeholder="vd: 30"
+                    step="any"
+                >
+            </div>
+
+            <div>
+                <label>Màu</label>
+                <input
+                    type="color"
+                    id="colorPick"
+                    value="#2563eb"
+                >
+            </div>
+
+        </div>
+
+        <div class="actions">
+            <button type="button" class="btn-add" id="btnAddColor">
+                + Thêm
+            </button>
+
+            <button type="button" class="btn-clear" id="btnClearColor">
+                Xóa tất cả
+            </button>
+
+            <button type="button" class="btn-close" id="btnCloseColor">
+                Đóng
+            </button>
+        </div>
+
+        <div class="color-list" id="colorList"></div>
+
+        <div class="modal-hint">
+            Ví dụ: Từ 60 → Đến 30 = khi còn 30–60 giây,
+            nền thẻ sẽ dùng màu đã chọn.<br>
+            Màu số đếm vẫn giữ màu vàng premium.<br>
+            Không có khoảng màu → nền đen vàng mặc định.
+        </div>
+
     </div>
-    <div class="actions">
-      <button type="button" class="btn-add" id="btnAddColor">+ Thêm</button>
-      <button type="button" class="btn-clear" id="btnClearColor">Xóa tất cả</button>
-      <button type="button" class="btn-close" id="btnCloseColor">Đóng</button>
-    </div>
-    <div class="color-list" id="colorList"></div>
-    <div class="modal-hint">
-      Ví dụ: Từ 60 → Đến 30 = khi còn 30–60 giây dùng màu đó.<br>
-      Không có khoảng → màu cyan mặc định.
-    </div>
-  </div>
 </div>
+
 <script>
-document.addEventListener("contextmenu", function(e){ e.preventDefault(); });
-document.addEventListener("selectstart", function(e){ e.preventDefault(); });
-document.addEventListener("copy", function(e){ e.preventDefault(); });
-document.addEventListener("cut", function(e){ e.preventDefault(); });
-document.addEventListener("dragstart", function(e){ e.preventDefault(); });
+document.addEventListener("contextmenu",function(e){
+    e.preventDefault();
+});
 
-// ===== AES KEY (giống bot) =====
-const AES_KEY_HEX = "a8f3c91e7b2d4f6a9c0e1b3d5f7a8c9e0b1d2f3a4c5e6b7d8f9a0c1e2b3d4f5a";
-const AES_IV_HEX  = "1a2b3c4d5e6f708192a3b4c5d6e7f809";
+document.addEventListener("selectstart",function(e){
+    e.preventDefault();
+});
+
+document.addEventListener("copy",function(e){
+    e.preventDefault();
+});
+
+document.addEventListener("cut",function(e){
+    e.preventDefault();
+});
+
+document.addEventListener("dragstart",function(e){
+    e.preventDefault();
+});
+
+// ======================================================
+// AES KEY
+// ======================================================
+
+const AES_KEY_HEX =
+"a8f3c91e7b2d4f6a9c0e1b3d5f7a8c9e0b1d2f3a4c5e6b7d8f9a0c1e2b3d4f5a";
+
+const AES_IV_HEX =
+"1a2b3c4d5e6f708192a3b4c5d6e7f809";
+
 const AES_KEY = CryptoJS.enc.Hex.parse(AES_KEY_HEX);
-const AES_IV  = CryptoJS.enc.Hex.parse(AES_IV_HEX);
+const AES_IV = CryptoJS.enc.Hex.parse(AES_IV_HEX);
 
-function aesDecrypt(encrypted) {
-    if (!encrypted) return "";
-    try {
-        let b64 = String(encrypted).replace(/-/g, "+").replace(/_/g, "/");
-        while (b64.length % 4) b64 += "=";
-        const decrypted = CryptoJS.AES.decrypt(b64, AES_KEY, {
-            iv: AES_IV,
-            mode: CryptoJS.mode.CBC,
-            padding: CryptoJS.pad.Pkcs7
-        });
+function aesDecrypt(encrypted){
+    if(!encrypted) return "";
+
+    try{
+        let b64 = String(encrypted)
+            .replace(/-/g,"+")
+            .replace(/_/g,"/");
+
+        while(b64.length % 4){
+            b64 += "=";
+        }
+
+        const decrypted = CryptoJS.AES.decrypt(
+            b64,
+            AES_KEY,
+            {
+                iv:AES_IV,
+                mode:CryptoJS.mode.CBC,
+                padding:CryptoJS.pad.Pkcs7
+            }
+        );
+
         return decrypted.toString(CryptoJS.enc.Utf8);
-    } catch (e) {
-        console.error("AES decrypt error:", e);
+
+    }catch(e){
+        console.error("AES decrypt error:",e);
         return "";
     }
 }
 
+// ======================================================
+// ĐỌC THAM SỐ URL
+// ======================================================
+
 function loadParams(){
-  var params = new URLSearchParams(window.location.search);
-  var c = (params.get("c") || "").trim();
-  if(c){
-    var raw = aesDecrypt(c);
-    var parts = raw.split("|");
+
+    var params = new URLSearchParams(window.location.search);
+
+    var c = (params.get("c") || "").trim();
+
+    if(c){
+
+        var raw = aesDecrypt(c);
+
+        var parts = raw.split("|");
+
+        return {
+            end:(parts[0] || "").trim(),
+            type:(parts[1] || "").trim(),
+            box:(parts[2] || "").trim(),
+            ratio:(parts[3] || "").trim(),
+            name:""
+        };
+    }
+
     return {
-      end: (parts[0] || "").trim(),
-      type: (parts[1] || "").trim(),
-      box: (parts[2] || "").trim(),
-      ratio: (parts[3] || "").trim(),
-      name: ""
+        end:(params.get("end") || "").trim(),
+        type:(params.get("type") || "").trim(),
+        box:(params.get("box") || "").trim(),
+        ratio:(params.get("ratio") || "").trim(),
+        name:(params.get("name") || "").trim()
     };
-  }
-  return {
-    end: (params.get("end") || "").trim(),
-    type: (params.get("type") || "").trim(),
-    box: (params.get("box") || "").trim(),
-    ratio: (params.get("ratio") || "").trim(),
-    name: (params.get("name") || "").trim()
-  };
 }
+
 var P = loadParams();
+
 var endStr = P.end;
 var type = P.type;
 var box = P.box;
 var ratio = P.ratio;
 var name = P.name;
+
+// ======================================================
+// DOM
+// ======================================================
+
 var timerEl = document.getElementById("timer");
 var infoEl = document.getElementById("info");
 var endEl = document.getElementById("endTime");
+
 var typeEl = document.getElementById("typeBox");
 var boxEl = document.getElementById("boxValue");
 var ratioEl = document.getElementById("ratioLine");
+
 var adjBox = document.getElementById("adjBox");
 var adjLabel = document.getElementById("adjLabel");
+
 var offsetVal = document.getElementById("offsetVal");
 var offsetHint = document.getElementById("offsetHint");
+
 var syncStatusEl = document.getElementById("syncStatus");
-if(type){ typeEl.style.display = "inline-block"; typeEl.textContent = type; }
-if(box){ boxEl.style.display = "block"; boxEl.textContent = box; }
-if(ratio){ ratioEl.style.display = "block"; ratioEl.textContent = "Ratio: " + ratio; }
-function pad(n, len){ return String(n).padStart(len || 2, "0"); }
+
+var cardEl = document.querySelector(".card");
+
+if(type){
+    typeEl.style.display = "inline-block";
+    typeEl.textContent = type;
+}
+
+if(box){
+    boxEl.style.display = "block";
+    boxEl.textContent = box;
+}
+
+if(ratio){
+    ratioEl.style.display = "block";
+    ratioEl.textContent = "Ratio: " + ratio;
+}
+
+// ======================================================
+// GIỜ VIỆT NAM
+// ======================================================
+
+function pad(n,len){
+    return String(n).padStart(len || 2,"0");
+}
+
 function getVNParts(date){
-  date = date || new Date();
-  var fmt = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Ho_Chi_Minh",
-    year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", second: "2-digit",
-    hour12: false
-  });
-  var parts = {};
-  fmt.formatToParts(date).forEach(function(p){
-    if(p.type !== "literal") parts[p.type] = p.value;
-  });
-  return {
-    year:+parts.year, month:+parts.month, day:+parts.day,
-    hour:+parts.hour, minute:+parts.minute, second:+parts.second
-  };
+
+    date = date || new Date();
+
+    var fmt = new Intl.DateTimeFormat("en-CA",{
+        timeZone:"Asia/Ho_Chi_Minh",
+        year:"numeric",
+        month:"2-digit",
+        day:"2-digit",
+        hour:"2-digit",
+        minute:"2-digit",
+        second:"2-digit",
+        hour12:false
+    });
+
+    var parts = {};
+
+    fmt.formatToParts(date).forEach(function(p){
+        if(p.type !== "literal"){
+            parts[p.type] = p.value;
+        }
+    });
+
+    return {
+        year:+parts.year,
+        month:+parts.month,
+        day:+parts.day,
+        hour:+parts.hour,
+        minute:+parts.minute,
+        second:+parts.second
+    };
 }
-function vnDateToUTC(y, m, d, h, mi, s){
-  return new Date(Date.UTC(y, m - 1, d, h - 7, mi, s, 0));
+
+function vnDateToUTC(y,m,d,h,mi,s){
+
+    return new Date(
+        Date.UTC(y,m-1,d,h-7,mi,s,0)
+    );
 }
+
+// ======================================================
+// ĐỒNG BỘ GIỜ SERVER
+// ======================================================
+
 var serverOffsetMs = 0;
 var serverSynced = false;
-var SYNC_INTERVAL = 15000; // đồng bộ thường xuyên hơn
+
+var SYNC_INTERVAL = 15000;
+
 var remainingAtSync = null;
 var basePerf = 0;
-var expireDate = null;
 
-// ===== ĐỘ LỆCH GIÂY (lưu localStorage, dùng chung mọi link) =====
-var OFFSET_KEY = "tnam_countdown_offset";
-function loadOffset(){
-  try{
-    var v = parseFloat(localStorage.getItem(OFFSET_KEY));
-    return Number.isFinite(v) ? Math.round(v * 100) / 100 : 0;
-  }catch(e){ return 0; }
-}
-function saveOffset(){
-  try{ localStorage.setItem(OFFSET_KEY, String(offsetSec)); }catch(e){}
-}
-var offsetSec = loadOffset();
+var expireDate = null;
 
 var finished = false;
 var tickTimer = null;
+
 function nowMs(){
-  return Date.now() + serverOffsetMs;
+    return Date.now() + serverOffsetMs;
 }
-function setSyncStatus(ok, msg){
-  syncStatusEl.textContent = msg;
-  syncStatusEl.className = "sync-status " + (ok ? "ok" : "fail");
+
+// ======================================================
+// ĐỘ LỆCH GIÂY
+// ======================================================
+
+var OFFSET_KEY = "tnam_countdown_offset";
+
+function loadOffset(){
+
+    try{
+        var v = parseFloat(localStorage.getItem(OFFSET_KEY));
+
+        return Number.isFinite(v)
+            ? Math.round(v*100)/100
+            : 0;
+
+    }catch(e){
+        return 0;
+    }
 }
-function parseEndTime(endStr, serverMs){
-  if(!endStr) return null;
-  var mFull = endStr.match(/^(\d{1,2}):(\d{2}):(\d{2})\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if(mFull){
-    var h = +mFull[1], mi = +mFull[2], s = +mFull[3];
-    var day = +mFull[4], month = +mFull[5], year = +mFull[6];
-    if(h > 23 || mi > 59 || s > 59 || day < 1 || day > 31 || month < 1 || month > 12) return null;
-    return vnDateToUTC(year, month, day, h, mi, s);
-  }
-  var m = endStr.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
-  if(!m) return null;
-  var h = +m[1], mi = +m[2], s = +m[3];
-  if(h > 23 || mi > 59 || s > 59) return null;
-  var nowParts = getVNParts(new Date(serverMs));
-  var endUTC = vnDateToUTC(nowParts.year, nowParts.month, nowParts.day, h, mi, s);
-  return endUTC;
+
+function saveOffset(){
+
+    try{
+        localStorage.setItem(
+            OFFSET_KEY,
+            String(offsetSec)
+        );
+    }catch(e){}
 }
+
+var offsetSec = loadOffset();
+
+// ======================================================
+// TRẠNG THÁI ĐỒNG BỘ
+// ======================================================
+
+function setSyncStatus(ok,msg){
+
+    syncStatusEl.textContent = msg;
+
+    syncStatusEl.className =
+        "sync-status " + (ok ? "ok" : "fail");
+}
+
+// ======================================================
+// PHÂN TÍCH THỜI GIAN KẾT THÚC
+// ======================================================
+
+function parseEndTime(endStr,serverMs){
+
+    if(!endStr) return null;
+
+    var mFull = endStr.match(
+        /^(\d{1,2}):(\d{2}):(\d{2})\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+    );
+
+    if(mFull){
+
+        var h = +mFull[1];
+        var mi = +mFull[2];
+        var s = +mFull[3];
+
+        var day = +mFull[4];
+        var month = +mFull[5];
+        var year = +mFull[6];
+
+        if(
+            h > 23 ||
+            mi > 59 ||
+            s > 59 ||
+            day < 1 ||
+            day > 31 ||
+            month < 1 ||
+            month > 12
+        ){
+            return null;
+        }
+
+        return vnDateToUTC(
+            year,
+            month,
+            day,
+            h,
+            mi,
+            s
+        );
+    }
+
+    var m = endStr.match(
+        /^(\d{1,2}):(\d{2}):(\d{2})$/
+    );
+
+    if(!m) return null;
+
+    var h = +m[1];
+    var mi = +m[2];
+    var s = +m[3];
+
+    if(h > 23 || mi > 59 || s > 59){
+        return null;
+    }
+
+    var nowParts = getVNParts(
+        new Date(serverMs)
+    );
+
+    var endUTC = vnDateToUTC(
+        nowParts.year,
+        nowParts.month,
+        nowParts.day,
+        h,
+        mi,
+        s
+    );
+
+    return endUTC;
+}
+
+// ======================================================
+// ÁP DỤNG ĐỒNG BỘ
+// ======================================================
+
 function applySync(serverMs){
-  expireDate = parseEndTime(endStr, serverMs);
-  if(!expireDate){
-    remainingAtSync = null;
-    return;
-  }
-  var target = expireDate.getTime() + offsetSec * 1000;
-  remainingAtSync = target - serverMs;
-  basePerf = performance.now();
-}
-function getRemainingMs(){
-  if(remainingAtSync === null) return null;
-  return remainingAtSync - (performance.now() - basePerf);
-}
-function syncServerTime(){
-  // Nhiều nguồn giờ + chọn nguồn RTT thấp nhất
-  var sources = [
-    {
-      name: "utctime",
-      url: "https://utctime.app/api/now/Asia/Ho_Chi_Minh",
-      parse: function(data, rtt){
-        var ms = data.unix_ms || (data.unix * 1000);
-        return ms + rtt / 2;
-      }
-    },
-    {
-      name: "timezone.io",
-      url: "https://worldtime.timezone.io/api/timezone/Asia/Ho_Chi_Minh",
-      parse: function(data, rtt){
-        return (data.unixtime * 1000) + rtt / 2;
-      }
-    },
-    {
-      name: "worldtimeapi",
-      url: "https://worldtimeapi.org/api/timezone/Asia/Ho_Chi_Minh",
-      parse: function(data, rtt){
-        return (data.unixtime * 1000) + rtt / 2;
-      }
-    }
-  ];
 
-  function trySource(src){
-    var t0 = Date.now();
-    return fetch(src.url, { cache: "no-store", mode: "cors" })
-      .then(function(r){
-        if(!r.ok) throw new Error("HTTP " + r.status);
-        return r.json().then(function(data){
-          var t1 = Date.now();
-          var rtt = t1 - t0;
-          var serverMs = src.parse(data, rtt);
-          return { ok: true, serverMs: serverMs, rtt: rtt, name: src.name, t1: t1 };
-        });
-      })
-      .catch(function(){ return { ok: false, name: src.name }; });
-  }
+    expireDate = parseEndTime(
+        endStr,
+        serverMs
+    );
 
-  return Promise.all(sources.map(trySource)).then(function(results){
-    var good = results.filter(function(r){ return r.ok; });
-    if(!good.length){
-      serverSynced = false;
-      serverOffsetMs = 0;
-      applySync(Date.now());
-      setSyncStatus(false, "Không đồng bộ được · dùng giờ máy");
-      updateEndTimeDisplay();
-      return false;
+    if(!expireDate){
+
+        remainingAtSync = null;
+
+        return;
     }
-    // Chọn nguồn có RTT thấp nhất
-    good.sort(function(a,b){ return a.rtt - b.rtt; });
-    var best = good[0];
-    serverOffsetMs = best.serverMs - best.t1;
-    serverSynced = true;
-    applySync(best.serverMs);
-    setSyncStatus(true, "Đã đồng bộ (" + best.name + " ±" + Math.round(best.rtt/2) + "ms)");
-    updateEndTimeDisplay();
-    return true;
-  });
-}
-var STORAGE_KEY = "tnam_countdown_colors";
-function getColorTimes(){
-  try{
-    var raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  }catch(e){ return []; }
-}
-function setColorTimes(list){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }catch(e){}
-}
-function findColor(sec){
-  var list = getColorTimes();
-  for(var i = 0; i < list.length; i++){
-    var ct = list[i];
-    if(sec <= ct.start && sec >= ct.end) return ct.color;
-  }
-  return null;
-}
-function renderColorList(){
-  var list = getColorTimes();
-  var el = document.getElementById("colorList");
-  el.innerHTML = "";
-  if(!list.length){
-    el.innerHTML = '<div style="color:#666;font-size:12px;text-align:center;padding:8px">Chưa có khoảng màu nào</div>';
-    return;
-  }
-  list.forEach(function(item){
-    var div = document.createElement("div");
-    div.className = "color-item";
-    div.innerHTML =
-      '<span class="swatch" style="background:' + item.color + '"></span>' +
-      '<span>' + item.start + 's → ' + item.end + 's</span>' +
-      '<button type="button" class="del" data-id="' + item.id + '">✕</button>';
-    el.appendChild(div);
-  });
-  el.querySelectorAll(".del").forEach(function(btn){
-    btn.onclick = function(){
-      setColorTimes(getColorTimes().filter(function(x){ return x.id !== +btn.dataset.id; }));
-      renderColorList();
-    };
-  });
-}
-document.getElementById("btnOpenColor").onclick = function(){
-  document.getElementById("colorModal").classList.add("show");
-  renderColorList();
-};
-document.getElementById("btnCloseColor").onclick = function(){
-  document.getElementById("colorModal").classList.remove("show");
-};
-document.getElementById("btnAddColor").onclick = function(){
-  var s = parseFloat(document.getElementById("colorStart").value);
-  var e = parseFloat(document.getElementById("colorEnd").value);
-  var c = document.getElementById("colorPick").value;
-  if(!Number.isFinite(s) || !Number.isFinite(e)) return;
-  var start = Math.max(s, e), end = Math.min(s, e);
-  var list = getColorTimes();
-  list.push({ id: Date.now(), start: start, end: end, color: c });
-  setColorTimes(list);
-  renderColorList();
-  document.getElementById("colorStart").value = "";
-  document.getElementById("colorEnd").value = "";
-};
-document.getElementById("btnClearColor").onclick = function(){
-  setColorTimes([]);
-  renderColorList();
-};
-function updateEndTimeDisplay(){
-  if(!expireDate){
-    endEl.textContent = "Không nhận được thời gian";
-    return;
-  }
-  var adjusted = new Date(expireDate.getTime() + offsetSec * 1000);
-  var p = getVNParts(adjusted);
-  endEl.innerHTML =
-    "Hết lúc: <strong>" + pad(p.hour) + ":" + pad(p.minute) + ":" + pad(p.second) + "</strong>" +
-    " &nbsp;•&nbsp; <strong>" + pad(p.day) + "/" + pad(p.month) + "/" + p.year + "</strong>";
-}
-function updateOffsetLabel(){
-  saveOffset();
-  var sign = offsetSec > 0 ? "+" : "";
-  offsetVal.textContent = sign + offsetSec.toFixed(2) + "s";
-  if(remainingAtSync !== null && expireDate){
-    var serverNowApprox = nowMs();
-    var target = expireDate.getTime() + offsetSec * 1000;
-    remainingAtSync = target - serverNowApprox;
+
+    var target =
+        expireDate.getTime() +
+        offsetSec*1000;
+
+    remainingAtSync =
+        target - serverMs;
+
     basePerf = performance.now();
-  }
-  updateEndTimeDisplay();
 }
-function onTimeUp(){
-  if(finished) return;
-  finished = true;
-  if(tickTimer){ clearInterval(tickTimer); tickTimer = null; }
-  timerEl.textContent = "✕";
-  timerEl.className = "timer done";
-  timerEl.style.color = "";
-  infoEl.className = "info done";
-  if(adjBox) adjBox.classList.add("hidden");
-  if(adjLabel) adjLabel.classList.add("hidden");
-  if(offsetHint) offsetHint.classList.add("hidden");
-  if(syncStatusEl) syncStatusEl.classList.add("hidden");
-  var colorBtn = document.getElementById("btnOpenColor");
-  if(colorBtn) colorBtn.classList.add("hidden");
-  var left = 5;
-  infoEl.textContent = "Đã hết thời gian · đóng sau " + left + "s";
-  var closeTimer = setInterval(function(){
-    left -= 1;
-    if(left > 0){
-      infoEl.textContent = "Đã hết thời gian · đóng sau " + left + "s";
-      return;
+
+function getRemainingMs(){
+
+    if(remainingAtSync === null){
+        return null;
     }
-    clearInterval(closeTimer);
-    infoEl.textContent = "Đang đóng...";
-    try{ window.close(); }catch(e){}
-    setTimeout(function(){
-      try{ window.location.replace("about:blank"); }
-      catch(e2){
-        try{ document.body.innerHTML = ""; document.title = ""; }catch(e3){}
-      }
-    }, 300);
-  }, 1000);
+
+    return remainingAtSync -
+        (performance.now()-basePerf);
 }
-function tick(){
-  if(finished) return;
-  var leftMs = getRemainingMs();
-  if(leftMs === null){
-    timerEl.textContent = "--.-";
-    return;
-  }
-  if(leftMs <= 0){
-    onTimeUp();
-    return;
-  }
-  var totalSec = leftMs / 1000;
-  var shown = totalSec.toFixed(1);
-  timerEl.innerHTML = shown.replace(".", "<span class='dot'>.</span>");
-  var custom = findColor(totalSec);
-  if(custom){
-    timerEl.style.color = custom;
-    timerEl.className = "timer" + (totalSec <= 5 ? " blink" : "");
-  }else{
-    timerEl.className = "timer";
-    if(totalSec <= 5){
-      timerEl.style.color = "#ff0040";
-      timerEl.className = "timer blink";
+
+// ======================================================
+// API GIỜ SERVER
+// ======================================================
+
+function syncServerTime(){
+
+    var sources = [
+
+        {
+            name:"utctime",
+
+            url:"https://utctime.app/api/now/Asia/Ho_Chi_Minh",
+
+            parse:function(data,rtt){
+
+                var ms =
+                    data.unix_ms ||
+                    (data.unix*1000);
+
+                return ms+rtt/2;
+            }
+        },
+
+        {
+            name:"timezone.io",
+
+            url:"https://worldtime.timezone.io/api/timezone/Asia/Ho_Chi_Minh",
+
+            parse:function(data,rtt){
+
+                return (
+                    data.unixtime*1000
+                )+rtt/2;
+            }
+        },
+
+        {
+            name:"worldtimeapi",
+
+            url:"https://worldtimeapi.org/api/timezone/Asia/Ho_Chi_Minh",
+
+            parse:function(data,rtt){
+
+                return (
+                    data.unixtime*1000
+                )+rtt/2;
+            }
+        }
+    ];
+
+    function trySource(src){
+
+        var t0 = Date.now();
+
+        return fetch(
+            src.url,
+            {
+                cache:"no-store",
+                mode:"cors"
+            }
+        )
+        .then(function(r){
+
+            if(!r.ok){
+                throw new Error(
+                    "HTTP "+r.status
+                );
+            }
+
+            return r.json().then(function(data){
+
+                var t1 = Date.now();
+
+                var rtt = t1-t0;
+
+                var serverMs = src.parse(
+                    data,
+                    rtt
+                );
+
+                return {
+                    ok:true,
+                    serverMs:serverMs,
+                    rtt:rtt,
+                    name:src.name,
+                    t1:t1
+                };
+            });
+        })
+        .catch(function(){
+
+            return {
+                ok:false,
+                name:src.name
+            };
+        });
+    }
+
+    return Promise.all(
+        sources.map(trySource)
+    ).then(function(results){
+
+        var good = results.filter(function(r){
+            return r.ok;
+        });
+
+        if(!good.length){
+
+            serverSynced = false;
+
+            serverOffsetMs = 0;
+
+            applySync(Date.now());
+
+            setSyncStatus(
+                false,
+                "Không đồng bộ được · dùng giờ máy"
+            );
+
+            updateEndTimeDisplay();
+
+            return false;
+        }
+
+        good.sort(function(a,b){
+            return a.rtt-b.rtt;
+        });
+
+        var best = good[0];
+
+        serverOffsetMs =
+            best.serverMs-best.t1;
+
+        serverSynced = true;
+
+        applySync(best.serverMs);
+
+        setSyncStatus(
+            true,
+            "Đã đồng bộ ("+
+            best.name+
+            " ±"+
+            Math.round(best.rtt/2)+
+            "ms)"
+        );
+
+        updateEndTimeDisplay();
+
+        return true;
+    });
+}
+
+// ======================================================
+// LƯU MÀU TÙY CHỈNH
+// ======================================================
+
+var STORAGE_KEY = "tnam_countdown_colors";
+
+function getColorTimes(){
+
+    try{
+
+        var raw = localStorage.getItem(
+            STORAGE_KEY
+        );
+
+        return raw ? JSON.parse(raw) : [];
+
+    }catch(e){
+
+        return [];
+    }
+}
+
+function setColorTimes(list){
+
+    try{
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(list)
+        );
+
+    }catch(e){}
+}
+
+// ======================================================
+// TÌM MÀU THEO THỜI GIAN
+// ======================================================
+
+function findColor(sec){
+
+    var list = getColorTimes();
+
+    /*
+      Ưu tiên khoảng màu được thêm sau.
+      Nếu có nhiều khoảng trùng nhau,
+      khoảng mới nhất sẽ được sử dụng.
+    */
+
+    for(
+        var i=list.length-1;
+        i>=0;
+        i--
+    ){
+
+        var ct = list[i];
+
+        if(
+            sec <= ct.start &&
+            sec >= ct.end
+        ){
+            return ct.color;
+        }
+    }
+
+    return null;
+}
+
+// ======================================================
+// HEX SANG RGBA
+// ======================================================
+
+function hexToRGBA(hex,alpha){
+
+    var h = String(hex).replace("#","");
+
+    if(h.length !== 6){
+
+        return "rgba(217,189,120,"+
+            alpha+")";
+    }
+
+    var r = parseInt(
+        h.substring(0,2),
+        16
+    );
+
+    var g = parseInt(
+        h.substring(2,4),
+        16
+    );
+
+    var b = parseInt(
+        h.substring(4,6),
+        16
+    );
+
+    return "rgba("+
+        r+","+
+        g+","+
+        b+","+
+        alpha+")";
+}
+
+// ======================================================
+// ĐỔI MÀU NỀN CARD
+// ======================================================
+
+function applyBackgroundColor(sec){
+
+    var color = findColor(sec);
+
+    if(!cardEl) return;
+
+    if(color){
+
+        var glow = hexToRGBA(
+            color,
+            .20
+        );
+
+        var border = hexToRGBA(
+            color,
+            .55
+        );
+
+        var shadow = hexToRGBA(
+            color,
+            .13
+        );
+
+        cardEl.style.background =
+            "radial-gradient("+
+            "ellipse at 50% 0%,"+
+            glow+
+            ",transparent 75%),"+
+            "linear-gradient("+
+            "155deg,"+
+            "#171c25,"+
+            "#0c1017"+
+            ")";
+
+        cardEl.style.borderColor =
+            border;
+
+        cardEl.style.boxShadow =
+            "0 28px 90px rgba(0,0,0,.58),"+
+            "0 0 35px "+shadow;
+
+        document.body.style.setProperty(
+            "--tn-active-glow",
+            hexToRGBA(color,.16)
+        );
+
     }else{
-      timerEl.style.color = "#25f4ee";
+
+        cardEl.style.background =
+            "linear-gradient("+
+            "155deg,"+
+            "rgba(24,30,40,.97),"+
+            "rgba(10,13,19,.98) 70%"+
+            ")";
+
+        cardEl.style.borderColor =
+            "rgba(220,190,120,.22)";
+
+        cardEl.style.boxShadow =
+            "0 28px 90px rgba(0,0,0,.58),"+
+            "inset 0 1px rgba(255,255,255,.055)";
+
+        document.body.style.setProperty(
+            "--tn-active-glow",
+            "rgba(217,189,120,.08)"
+        );
     }
-  }
-  var label = type && box ? (type + " • " + box) : (name || "Rương/Túi");
-  infoEl.textContent = label;
 }
-document.querySelectorAll("#adjBox button[data-v]").forEach(function(btn){
-  btn.onclick = function(){
-    if(finished) return;
-    offsetSec += parseFloat(btn.dataset.v);
-    offsetSec = Math.round(offsetSec * 100) / 100;
-    updateOffsetLabel();
-    tick();
-  };
-});
-document.getElementById("btnReset").onclick = function(){
-  if(finished) return;
-  offsetSec = 0;
-  updateOffsetLabel();
-  tick();
+
+// ======================================================
+// RENDER DANH SÁCH MÀU
+// ======================================================
+
+function renderColorList(){
+
+    var list = getColorTimes();
+
+    var el = document.getElementById(
+        "colorList"
+    );
+
+    el.innerHTML = "";
+
+    if(!list.length){
+
+        el.innerHTML =
+            '<div style="'+
+            'color:#666;'+
+            'font-size:12px;'+
+            'text-align:center;'+
+            'padding:8px'+
+            '">Chưa có khoảng màu nào</div>';
+
+        return;
+    }
+
+    list.forEach(function(item){
+
+        var div = document.createElement(
+            "div"
+        );
+
+        div.className = "color-item";
+
+        var swatch = document.createElement(
+            "span"
+        );
+
+        swatch.className = "swatch";
+
+        swatch.style.background =
+            item.color;
+
+        var label = document.createElement(
+            "span"
+        );
+
+        label.textContent =
+            item.start+
+            "s → "+
+            item.end+
+            "s";
+
+        var del = document.createElement(
+            "button"
+        );
+
+        del.type = "button";
+
+        del.className = "del";
+
+        del.textContent = "✕";
+
+        del.onclick = function(){
+
+            setColorTimes(
+                getColorTimes().filter(
+                    function(x){
+                        return x.id !== item.id;
+                    }
+                )
+            );
+
+            renderColorList();
+        };
+
+        div.appendChild(swatch);
+        div.appendChild(label);
+        div.appendChild(del);
+
+        el.appendChild(div);
+    });
+}
+
+// ======================================================
+// MODAL MÀU
+// ======================================================
+
+document.getElementById(
+    "btnOpenColor"
+).onclick = function(){
+
+    document.getElementById(
+        "colorModal"
+    ).classList.add("show");
+
+    renderColorList();
 };
-function startCountdown(){
-  if(!endStr){
-    endEl.textContent = "Không nhận được thời gian";
-    infoEl.textContent = "Thiếu dữ liệu đếm ngược";
-  }
-  updateOffsetLabel();
-  tick();
-  if(tickTimer) clearInterval(tickTimer);
-  tickTimer = setInterval(tick, 50);
-}
-syncServerTime().then(function(){
-  startCountdown();
-  // Đồng bộ nhanh hơn trong 60s đầu (mỗi 8s), sau đó mỗi 15s
-  var syncCount = 0;
-  var fastSync = setInterval(function(){
-    if(finished){ clearInterval(fastSync); return; }
-    syncServerTime();
-    syncCount++;
-    if(syncCount >= 8){ // ~64s
-      clearInterval(fastSync);
-      setInterval(function(){
-        if(!finished) syncServerTime();
-      }, SYNC_INTERVAL);
+
+document.getElementById(
+    "btnCloseColor"
+).onclick = function(){
+
+    document.getElementById(
+        "colorModal"
+    ).classList.remove("show");
+};
+
+document.getElementById(
+    "colorModal"
+).addEventListener(
+    "click",
+    function(e){
+
+        if(e.target === this){
+
+            this.classList.remove("show");
+        }
     }
-  }, 8000);
+);
+
+// ======================================================
+// THÊM MÀU
+// ======================================================
+
+document.getElementById(
+    "btnAddColor"
+).onclick = function(){
+
+    var s = parseFloat(
+        document.getElementById(
+            "colorStart"
+        ).value
+    );
+
+    var e = parseFloat(
+        document.getElementById(
+            "colorEnd"
+        ).value
+    );
+
+    var c = document.getElementById(
+        "colorPick"
+    ).value;
+
+    if(
+        !Number.isFinite(s) ||
+        !Number.isFinite(e)
+    ){
+        return;
+    }
+
+    if(s < 0 || e < 0){
+        return;
+    }
+
+    var start = Math.max(s,e);
+
+    var end = Math.min(s,e);
+
+    var list = getColorTimes();
+
+    list.push({
+
+        id:Date.now(),
+
+        start:start,
+
+        end:end,
+
+        color:c
+    });
+
+    setColorTimes(list);
+
+    renderColorList();
+
+    document.getElementById(
+        "colorStart"
+    ).value = "";
+
+    document.getElementById(
+        "colorEnd"
+    ).value = "";
+};
+
+// ======================================================
+// XÓA TOÀN BỘ MÀU
+// ======================================================
+
+document.getElementById(
+    "btnClearColor"
+).onclick = function(){
+
+    setColorTimes([]);
+
+    renderColorList();
+
+    applyBackgroundColor(
+        getRemainingMs() / 1000
+    );
+};
+
+// ======================================================
+// HIỂN THỊ THỜI GIAN KẾT THÚC
+// ======================================================
+
+function updateEndTimeDisplay(){
+
+    if(!expireDate){
+
+        endEl.textContent =
+            "Không nhận được thời gian";
+
+        return;
+    }
+
+    var adjusted = new Date(
+        expireDate.getTime()+
+        offsetSec*1000
+    );
+
+    var p = getVNParts(adjusted);
+
+    endEl.innerHTML =
+        "Hết lúc: <strong>"+
+        pad(p.hour)+":"+
+        pad(p.minute)+":"+
+        pad(p.second)+
+        "</strong>"+
+        " &nbsp;•&nbsp; <strong>"+
+        pad(p.day)+"/"+
+        pad(p.month)+"/"+
+        p.year+
+        "</strong>";
+}
+
+// ======================================================
+// CẬP NHẬT ĐỘ LỆCH
+// ======================================================
+
+function updateOffsetLabel(){
+
+    saveOffset();
+
+    var sign =
+        offsetSec > 0
+        ? "+"
+        : "";
+
+    offsetVal.textContent =
+        sign+
+        offsetSec.toFixed(2)+
+        "s";
+
+    if(
+        remainingAtSync !== null &&
+        expireDate
+    ){
+
+        var serverNowApprox = nowMs();
+
+        var target =
+            expireDate.getTime()+
+            offsetSec*1000;
+
+        remainingAtSync =
+            target-serverNowApprox;
+
+        basePerf = performance.now();
+    }
+
+    updateEndTimeDisplay();
+}
+
+// ======================================================
+// HẾT THỜI GIAN
+// ======================================================
+
+function onTimeUp(){
+
+    if(finished) return;
+
+    finished = true;
+
+    if(tickTimer){
+
+        clearInterval(tickTimer);
+
+        tickTimer = null;
+    }
+
+    timerEl.textContent = "✕";
+
+    timerEl.className = "timer done";
+
+    timerEl.style.color = "";
+
+    infoEl.className = "info done";
+
+    if(adjBox){
+        adjBox.classList.add("hidden");
+    }
+
+    if(adjLabel){
+        adjLabel.classList.add("hidden");
+    }
+
+    if(offsetHint){
+        offsetHint.classList.add("hidden");
+    }
+
+    if(syncStatusEl){
+        syncStatusEl.classList.add("hidden");
+    }
+
+    var colorBtn = document.getElementById(
+        "btnOpenColor"
+    );
+
+    if(colorBtn){
+        colorBtn.classList.add("hidden");
+    }
+
+    var left = 5;
+
+    infoEl.textContent =
+        "Đã hết thời gian · đóng sau "+
+        left+
+        "s";
+
+    var closeTimer = setInterval(
+        function(){
+
+            left -= 1;
+
+            if(left > 0){
+
+                infoEl.textContent =
+                    "Đã hết thời gian · đóng sau "+
+                    left+
+                    "s";
+
+                return;
+            }
+
+            clearInterval(closeTimer);
+
+            infoEl.textContent =
+                "Đang đóng...";
+
+            try{
+                window.close();
+            }catch(e){}
+
+            setTimeout(function(){
+
+                try{
+
+                    window.location.replace(
+                        "about:blank"
+                    );
+
+                }catch(e2){
+
+                    try{
+
+                        document.body.innerHTML = "";
+
+                        document.title = "";
+
+                    }catch(e3){}
+                }
+
+            },300);
+
+        },
+        1000
+    );
+}
+
+// ======================================================
+// CẬP NHẬT ĐẾM NGƯỢC
+// ======================================================
+
+function tick(){
+
+    if(finished) return;
+
+    var leftMs = getRemainingMs();
+
+    if(leftMs === null){
+
+        timerEl.textContent = "--.-";
+
+        return;
+    }
+
+    if(leftMs <= 0){
+
+        onTimeUp();
+
+        return;
+    }
+
+    var totalSec = leftMs/1000;
+
+    var shown = totalSec.toFixed(1);
+
+    timerEl.innerHTML =
+        shown.replace(
+            ".",
+            "<span class='dot'>.</span>"
+        );
+
+    /*
+      MÀU TÙY CHỈNH CHỈ ĐỔI NỀN CARD.
+      KHÔNG ĐỔI MÀU SỐ ĐẾM.
+    */
+
+    applyBackgroundColor(totalSec);
+
+    if(totalSec <= 5){
+
+        timerEl.style.color =
+            "#ef6e72";
+
+        timerEl.className =
+            "timer blink";
+
+        timerEl.style.textShadow =
+            "0 0 30px rgba(239,110,114,.35)";
+
+    }else{
+
+        timerEl.style.color =
+            "#e4c77f";
+
+        timerEl.className =
+            "timer";
+
+        timerEl.style.textShadow =
+            "0 0 34px rgba(217,189,120,.12)";
+    }
+
+    var label =
+        type && box
+        ? (type+" • "+box)
+        : (name || "Rương/Túi");
+
+    infoEl.textContent = label;
+}
+
+// ======================================================
+// NÚT CHỈNH LỆCH
+// ======================================================
+
+document.querySelectorAll(
+    "#adjBox button[data-v]"
+).forEach(function(btn){
+
+    btn.onclick = function(){
+
+        if(finished) return;
+
+        offsetSec += parseFloat(
+            btn.dataset.v
+        );
+
+        offsetSec =
+            Math.round(offsetSec*100)/100;
+
+        updateOffsetLabel();
+
+        tick();
+    };
+});
+
+// ======================================================
+// RESET ĐỘ LỆCH
+// ======================================================
+
+document.getElementById(
+    "btnReset"
+).onclick = function(){
+
+    if(finished) return;
+
+    offsetSec = 0;
+
+    updateOffsetLabel();
+
+    tick();
+};
+
+// ======================================================
+// BẮT ĐẦU ĐẾM NGƯỢC
+// ======================================================
+
+function startCountdown(){
+
+    if(!endStr){
+
+        endEl.textContent =
+            "Không nhận được thời gian";
+
+        infoEl.textContent =
+            "Thiếu dữ liệu đếm ngược";
+    }
+
+    updateOffsetLabel();
+
+    tick();
+
+    if(tickTimer){
+
+        clearInterval(tickTimer);
+    }
+
+    tickTimer = setInterval(
+        tick,
+        50
+    );
+}
+
+// ======================================================
+// KHỞI ĐỘNG ĐỒNG BỘ
+// ======================================================
+
+syncServerTime().then(function(){
+
+    startCountdown();
+
+    var syncCount = 0;
+
+    var fastSync = setInterval(
+        function(){
+
+            if(finished){
+
+                clearInterval(fastSync);
+
+                return;
+            }
+
+            syncServerTime();
+
+            syncCount++;
+
+            if(syncCount >= 8){
+
+                clearInterval(fastSync);
+
+                setInterval(
+                    function(){
+
+                        if(!finished){
+
+                            syncServerTime();
+                        }
+
+                    },
+                    SYNC_INTERVAL
+                );
+            }
+
+        },
+        8000
+    );
 });
 </script>
+
 </body>
 </html>
