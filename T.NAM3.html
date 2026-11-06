@@ -1,235 +1,148 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <title>Quét Link Trung Nam</title>
 
 <style>
-* {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
 }
-
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100%;
-    background: #050505;
-    color: #fff;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+html,body{
+    margin:0;
+    width:100%;
+    min-height:100%;
+    background:#050505;
+    color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
 }
-
-body {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+body{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
 }
-
-.container {
-    width: 100%;
-    max-width: 430px;
+.card{
+    width:100%;
+    max-width:430px;
+    padding:28px 22px;
+    text-align:center;
+    background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:24px;
+    box-shadow:0 20px 70px rgba(0,0,0,.65);
 }
-
-.card {
-    background: linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
-    border: 1px solid rgba(255,255,255,.10);
-    border-radius: 24px;
-    padding: 28px 22px;
-    box-shadow: 0 20px 70px rgba(0,0,0,.65);
-    backdrop-filter: blur(20px);
+.logo{
+    font-size:28px;
+    font-weight:900;
+    letter-spacing:2px;
+    background:linear-gradient(90deg,#25f4ee,#fff,#ff2c55);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
 }
-
-.logo {
-    text-align: center;
-    font-size: 30px;
-    font-weight: 900;
-    letter-spacing: 3px;
-    margin-bottom: 7px;
-    background: linear-gradient(90deg,#25f4ee,#fff,#ff2c55);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.sub{
+    color:#888;
+    font-size:13px;
+    margin-top:8px;
 }
-
-.sub {
-    text-align: center;
-    color: #888;
-    font-size: 13px;
-    margin-bottom: 28px;
+.status{
+    margin-top:25px;
+    padding:16px;
+    border-radius:15px;
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.08);
+    color:#25f4ee;
+    font-size:14px;
 }
-
-.status {
-    padding: 17px;
-    border-radius: 15px;
-    background: rgba(255,255,255,.045);
-    border: 1px solid rgba(255,255,255,.07);
-    text-align: center;
-    font-size: 14px;
+.spinner{
+    width:22px;
+    height:22px;
+    margin:0 auto 12px;
+    border:2px solid rgba(255,255,255,.15);
+    border-top-color:#25f4ee;
+    border-radius:50%;
+    animation:spin .7s linear infinite;
 }
-
-.status.success {
-    color: #25f4ee;
-    border-color: rgba(37,244,238,.25);
-}
-
-.status.error {
-    color: #ff667f;
-    border-color: rgba(255,44,85,.25);
-}
-
-.room {
-    margin-top: 18px;
-    padding: 14px;
-    background: #090909;
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 14px;
-    text-align: center;
-}
-
-.room-title {
-    font-size: 12px;
-    color: #888;
-    margin-bottom: 8px;
-}
-
-.room-id {
-    font-family: monospace;
-    font-size: 17px;
-    font-weight: 800;
-    color: #25f4ee;
-    word-break: break-all;
-}
-
-.open-btn {
-    width: 100%;
-    margin-top: 18px;
-    padding: 15px;
-    border: 0;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 800;
-    color: #000;
-    background: linear-gradient(135deg,#25f4ee,#1677ff);
-    cursor: pointer;
-}
-
-.open-btn:active {
-    transform: scale(.97);
-}
-
-.note {
-    margin-top: 15px;
-    color: #777;
-    text-align: center;
-    font-size: 12px;
-    line-height: 1.5;
-}
-
-.hidden {
-    display: none !important;
+@keyframes spin{
+    to{transform:rotate(360deg)}
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-    <div class="card">
+<div class="card">
+    <div class="logo">Quét Link Trung Nam</div>
+    <div class="sub">ĐANG KẾT NỐI TIKTOK LIVE</div>
 
-        <div class="logo">Quét Link Trung Nam</div>
-        <div class="sub">HỆ THỐNG MỞ TIKTOK LIVE</div>
-
-        <div id="statusBox" class="status">
-            Đang xử lý liên kết...
-        </div>
-
-        <div id="roomBox" class="room hidden">
-            <div class="room-title">ROOM ID</div>
-            <div id="roomId" class="room-id"></div>
-        </div>
-
-        <button id="openBtn" class="open-btn hidden">
-            MỞ TIKTOK
-        </button>
-
-        <div class="note">
-            Quét Link Trung Nam
-        </div>
-
+    <div class="status">
+        <div class="spinner"></div>
+        Đang chuyển đến phòng LIVE...
     </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
 <script>
-
-// ===== AES KEY =====
+// ===== AES KEY (GIỮ NGUYÊN) =====
 const AES_KEY_HEX = "a8f3c91e7b2d4f6a9c0e1b3d5f7a8c9e0b1d2f3a4c5e6b7d8f9a0c1e2b3d4f5a";
 const AES_IV_HEX  = "1a2b3c4d5e6f708192a3b4c5d6e7f809";
 
 const AES_KEY = CryptoJS.enc.Hex.parse(AES_KEY_HEX);
 const AES_IV = CryptoJS.enc.Hex.parse(AES_IV_HEX);
 
-// ===== GIẢI MÃ AES =====
-function aesDecrypt(encrypted) {
-    if (!encrypted) return "";
+function aesDecrypt(encrypted){
+    if(!encrypted) return "";
 
-    try {
+    try{
         let b64 = String(encrypted)
-            .replace(/-/g, "+")
-            .replace(/_/g, "/");
+            .replace(/-/g,"+")
+            .replace(/_/g,"/");
 
-        while (b64.length % 4) b64 += "=";
+        while(b64.length % 4) b64 += "=";
 
-        const decrypted = CryptoJS.AES.decrypt(b64, AES_KEY, {
-            iv: AES_IV,
-            mode: CryptoJS.mode.CBC,
-            padding: CryptoJS.pad.Pkcs7
+        const decrypted = CryptoJS.AES.decrypt(b64,AES_KEY,{
+            iv:AES_IV,
+            mode:CryptoJS.mode.CBC,
+            padding:CryptoJS.pad.Pkcs7
         });
 
         return decrypted.toString(CryptoJS.enc.Utf8);
-
-    } catch (e) {
-        console.error(e);
+    }catch(e){
         return "";
     }
 }
 
-// ===== LẤY TIKTOK URL =====
-function getTikTokUrl() {
-    const params = new URLSearchParams(window.location.search);
-
+// ===== LẤY LINK TIKTOK =====
+function getTikTokUrl(){
+    const params = new URLSearchParams(location.search);
     return params.get("url") || params.get("u") || "";
 }
 
 // ===== LẤY ROOM ID TỪ URL =====
-function getRoomIdFromUrl(url) {
-    if (!url) return "";
+function getRoomIdFromUrl(url){
+    if(!url) return "";
 
     let m = url.match(/room_id=(\d+)/i);
-
-    if (m) return m[1];
+    if(m) return m[1];
 
     m = url.match(/\/live\/(\d+)/i);
-
     return m ? m[1] : "";
 }
 
 // ===== LẤY ROOM ID =====
-function getRoomId() {
-
-    const params = new URLSearchParams(window.location.search);
-
+function getRoomId(){
+    const params = new URLSearchParams(location.search);
     const r = params.get("r");
 
-    if (r) {
+    if(r){
         const decoded = aesDecrypt(r);
 
-        if (decoded && /^\d{10,}$/.test(decoded)) {
+        if(decoded && /^\d{10,}$/.test(decoded)){
             return decoded;
         }
     }
@@ -237,56 +150,25 @@ function getRoomId() {
     return getRoomIdFromUrl(getTikTokUrl());
 }
 
-// ===== MỞ TIKTOK =====
-function openTikTok() {
-
+// ===== MỞ TIKTOK LIVE =====
+function openTikTok(){
     const roomId = getRoomId();
 
-    if (!roomId) {
-        showError("Không tìm thấy Room ID!");
+    if(!roomId){
+        document.querySelector(".status").innerHTML =
+            "Không tìm thấy Room ID!";
         return;
     }
 
-    window.location.href =
-        "snssdk1180://live?room_id=" + encodeURIComponent(roomId);
+    location.href =
+        "snssdk1180://live?room_id=" +
+        encodeURIComponent(roomId);
 }
 
-// ===== HIỂN THỊ LỖI =====
-function showError(message) {
-
-    const status = document.getElementById("statusBox");
-
-    status.className = "status error";
-    status.textContent = message;
-
-    document.getElementById("roomBox").classList.add("hidden");
-    document.getElementById("openBtn").classList.add("hidden");
-}
-
-// ===== KHỞI CHẠY =====
-function init() {
-
-    const roomId = getRoomId();
-
-    if (!roomId) {
-        showError("Không tìm thấy Room ID!");
-        return;
-    }
-
-    document.getElementById("statusBox").className = "status success";
-    document.getElementById("statusBox").textContent =
-        "✓ Đã lấy Room ID thành công";
-
-    document.getElementById("roomId").textContent = roomId;
-
-    document.getElementById("roomBox").classList.remove("hidden");
-    document.getElementById("openBtn").classList.remove("hidden");
-}
-
-document.getElementById("openBtn").addEventListener("click", openTikTok);
-
-init();
-
+// ===== TỰ ĐỘNG MỞ =====
+window.addEventListener("load",function(){
+    setTimeout(openTikTok,250);
+});
 </script>
 
 </body>
