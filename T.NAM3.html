@@ -3,502 +3,291 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title> Trung Nhịn</title>
-<link rel="dns-prefetch" href="https://docs.google.com">
-<link rel="dns-prefetch" href="https://utctime.app">
-<link rel="dns-prefetch" href="https://worldtime.timezone.io">
-<link rel="preconnect" href="https://docs.google.com" crossorigin>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+<title>Quét Link Trung Nam</title>
+
 <style>
-:root{
-  color-scheme:dark;
-  --bg:#07090d;
-  --line:rgba(220,190,120,.22);
-  --gold:#d9bd78;
-  --gold-light:#f4e4b3;
-  --muted:#8c96a5;
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{
-  margin:0;padding:0;width:100%;min-height:100%;
-  background:
-    radial-gradient(ellipse at 50% 0%,rgba(174,133,55,.13),transparent 42%),
-    radial-gradient(ellipse at 100% 100%,rgba(24,93,106,.10),transparent 38%),
-    var(--bg);
-  color:#f5f3ed;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    background: #050505;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
 }
-body{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:22px}
-.container{width:100%;max-width:460px}
-.card{
-  position:relative;overflow:hidden;
-  padding:34px 25px 26px;
-  border:1px solid var(--line);border-radius:28px;
-  background:linear-gradient(155deg,rgba(24,30,40,.97),rgba(10,13,19,.98) 70%);
-  box-shadow:0 28px 90px rgba(0,0,0,.58),inset 0 1px rgba(255,255,255,.055);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  text-align:center;
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
 }
-.card:before{
-  content:"";position:absolute;inset:0 18% auto;height:1px;
-  background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.8;
+
+.container {
+    width: 100%;
+    max-width: 430px;
 }
-.logo{
-  margin-bottom:8px;font-size:23px;font-weight:900;letter-spacing:2.5px;text-transform:uppercase;
-  background:linear-gradient(100deg,#fff2c8 0%,#d9bd78 48%,#fff8df 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+
+.card {
+    background: linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 24px;
+    padding: 28px 22px;
+    box-shadow: 0 20px 70px rgba(0,0,0,.65);
+    backdrop-filter: blur(20px);
 }
-.sub{color:#87909d;font-size:10px;letter-spacing:4px;font-weight:700;margin-bottom:24px}
-.status{
-  padding:14px;border-radius:14px;background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.07);text-align:center;margin-bottom:18px;font-size:14px;
+
+.logo {
+    text-align: center;
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    margin-bottom: 7px;
+    background: linear-gradient(90deg,#25f4ee,#fff,#ff2c55);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
-.status.loading{color:#a8b0bb}
-.status.success{color:#83c9a3;border-color:rgba(120,200,160,.25);background:rgba(72,143,112,.10)}
-.status.error{color:#e58b8d;border-color:rgba(239,110,114,.25);background:rgba(181,75,78,.10)}
-.status.warning{color:var(--gold-light);border-color:rgba(217,189,120,.32);background:rgba(217,189,120,.08)}
-.device-title{font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:.4px;text-align:left}
-.device-box{
-  display:flex;align-items:center;gap:8px;background:#0b0f15;
-  border:1px solid rgba(217,189,120,.18);border-radius:14px;padding:5px;
+
+.sub {
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 28px;
 }
-.device-code{
-  flex:1;min-width:0;padding:10px;font-family:monospace;font-size:11px;
-  color:#cfd5dd;word-break:break-all;line-height:1.4;text-align:left;
+
+.status {
+    padding: 17px;
+    border-radius: 15px;
+    background: rgba(255,255,255,.045);
+    border: 1px solid rgba(255,255,255,.07);
+    text-align: center;
+    font-size: 14px;
 }
-.device-code-short{
-  flex:1;min-width:0;padding:14px 10px;font-family:monospace;font-size:28px;font-weight:800;
-  color:#e4c77f;text-align:center;letter-spacing:2px;line-height:1.2;
-  text-shadow:0 0 34px rgba(217,189,120,.12);
+
+.status.success {
+    color: #25f4ee;
+    border-color: rgba(37,244,238,.25);
 }
-.copy-btn,.open-btn{
-  border:1px solid rgba(217,189,120,.34);cursor:pointer;font-weight:800;border-radius:11px;
-  padding:11px 14px;white-space:nowrap;letter-spacing:.15px;color:#17140c;
-  background:linear-gradient(135deg,#b99a55,#e1c783 55%,#b99a55);
-  box-shadow:0 8px 24px rgba(185,154,85,.12);
+
+.status.error {
+    color: #ff667f;
+    border-color: rgba(255,44,85,.25);
 }
-.open-btn{width:100%;margin-top:18px;padding:14px;font-size:14px;border-radius:13px}
-.copy-btn:active,.open-btn:active{transform:scale(.97)}
-.note{margin-top:16px;color:#7f8998;text-align:center;font-size:12px;line-height:1.6}
-.note a{color:var(--gold-light);text-decoration:none}
-.expiry{
-  margin-top:14px;padding:11px 12px;text-align:center;font-size:12px;color:#7f8998;
-  border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.025);
+
+.room {
+    margin-top: 18px;
+    padding: 14px;
+    background: #090909;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+    text-align: center;
 }
-.expiry strong{color:#d6dbe2}
-.hidden{display:none !important}
-.spinner{
-  width:20px;height:20px;margin:0 auto 10px;border:2px solid rgba(255,255,255,.15);
-  border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;
+
+.room-title {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 8px;
 }
-@keyframes spin{to{transform:rotate(360deg)}}
-@media(max-width:380px){
-  body{padding:13px}
-  .card{padding:28px 17px 22px;border-radius:23px}
-  .logo{font-size:20px;letter-spacing:2px}
+
+.room-id {
+    font-family: monospace;
+    font-size: 17px;
+    font-weight: 800;
+    color: #25f4ee;
+    word-break: break-all;
+}
+
+.open-btn {
+    width: 100%;
+    margin-top: 18px;
+    padding: 15px;
+    border: 0;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 800;
+    color: #000;
+    background: linear-gradient(135deg,#25f4ee,#1677ff);
+    cursor: pointer;
+}
+
+.open-btn:active {
+    transform: scale(.97);
+}
+
+.note {
+    margin-top: 15px;
+    color: #777;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.hidden {
+    display: none !important;
 }
 </style>
 </head>
-<body>
-<div class="container">
-<div class="card">
-<div class="logo">Trung Nhịn</div>
-<div class="sub">XÁC MINH THIẾT BỊ</div>
-<div id="loadingBox" class="status loading">
-<div class="spinner"></div>
-Đang kiểm tra thiết bị...
-</div>
-<div id="deniedBox" class="hidden">
-<div class="status error">Thiết bị chưa được cấp phép</div>
-<div class="device-title">Mã thiết bị của bạn</div>
-<div class="device-box">
-<div id="deviceCode" class="device-code"></div>
-<button id="copyBtn" class="copy-btn">COPY</button>
-</div>
-<div class="note">
-Vui lòng copy mã gửi về cho bot:
-<a href="https://t.me/Trungnhin1853">
-https://t.me/Trungnhin1853
-</a> để được duyệt mã.<br>
-Admin: @Trungnhin1853
-</div>
-</div>
-<div id="approvedBox" class="hidden">
-<div class="status success">✓ Thiết bị đã được cấp phép</div>
-<div class="device-title">Mã thiết bị (4 ký tự đầu)</div>
-<div class="device-box">
-<div id="deviceCodeApproved" class="device-code-short"></div>
-</div>
-<div id="approvedNote" class="note"></div>
-<div id="expiryBox" class="expiry"></div>
-<button id="openBtn" class="open-btn">MỞ TIKTOK</button>
-</div>
-<div id="expiredBox" class="hidden">
-<div class="status warning">⚠ Thiết bị đã hết hạn</div>
-<div class="device-title">Mã thiết bị của bạn</div>
-<div class="device-box">
-<div id="deviceCodeExpired" class="device-code"></div>
-<button id="copyBtnExpired" class="copy-btn">COPY</button>
-</div>
-<div id="expiredNote" class="note"></div>
-<div id="expiredDate" class="expiry"></div>
-<div class="note">
-Vui lòng copy mã gửi về cho bot:
-<a href="https://t.me/Trungnhin1853">
-https://t.me/thuebotquetlinktrungnam1_bot
-</a> để được duyệt mã.<br>
-Admin: @Trungnhin1853<br><br>
-Thiết bị của bạn đã hết thời gian sử dụng.<br>
-Vui lòng liên hệ admin @Trungnhin1853 để gia hạn.
-</div>
-</div>
-<div id="errorBox" class="hidden">
-<div class="status error">Không thể kiểm tra thiết bị</div>
-<div class="note">Vui lòng kiểm tra kết nối mạng hoặc quyền truy cập.</div>
-</div>
-</div>
-</div>
-<script>
-const SHEET_ID = "1-e7G6GYM9eJSKOF1AOdATM4H2X-7erAaqj0VJUCD6T8";
-const SHEET_NAME = "key1";
-const CACHE_KEY = "tnam_auth_cache_v3";
-const CACHE_TTL_MS = 3000;
-const SHOW_APPROVED_MS = 400;
-const RECHECK_DELAY_MS = 250;
 
-// ===== AES KEY (giống bot) =====
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <div class="logo">Quét Link Trung Nam</div>
+        <div class="sub">HỆ THỐNG MỞ TIKTOK LIVE</div>
+
+        <div id="statusBox" class="status">
+            Đang xử lý liên kết...
+        </div>
+
+        <div id="roomBox" class="room hidden">
+            <div class="room-title">ROOM ID</div>
+            <div id="roomId" class="room-id"></div>
+        </div>
+
+        <button id="openBtn" class="open-btn hidden">
+            MỞ TIKTOK
+        </button>
+
+        <div class="note">
+            Quét Link Trung Nam
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+<script>
+
+// ===== AES KEY =====
 const AES_KEY_HEX = "a8f3c91e7b2d4f6a9c0e1b3d5f7a8c9e0b1d2f3a4c5e6b7d8f9a0c1e2b3d4f5a";
 const AES_IV_HEX  = "1a2b3c4d5e6f708192a3b4c5d6e7f809";
-const AES_KEY = CryptoJS.enc.Hex.parse(AES_KEY_HEX);
-const AES_IV  = CryptoJS.enc.Hex.parse(AES_IV_HEX);
 
+const AES_KEY = CryptoJS.enc.Hex.parse(AES_KEY_HEX);
+const AES_IV = CryptoJS.enc.Hex.parse(AES_IV_HEX);
+
+// ===== GIẢI MÃ AES =====
 function aesDecrypt(encrypted) {
     if (!encrypted) return "";
+
     try {
-        let b64 = String(encrypted).replace(/-/g, "+").replace(/_/g, "/");
+        let b64 = String(encrypted)
+            .replace(/-/g, "+")
+            .replace(/_/g, "/");
+
         while (b64.length % 4) b64 += "=";
+
         const decrypted = CryptoJS.AES.decrypt(b64, AES_KEY, {
             iv: AES_IV,
             mode: CryptoJS.mode.CBC,
             padding: CryptoJS.pad.Pkcs7
         });
+
         return decrypted.toString(CryptoJS.enc.Utf8);
+
     } catch (e) {
-        console.error("AES decrypt error:", e);
+        console.error(e);
         return "";
     }
 }
 
-function generateDeviceId(){
-    const uuid = crypto.randomUUID();
-    const bytes = new TextEncoder().encode(uuid);
-    let binary = "";
-    bytes.forEach(function(b){ binary += String.fromCharCode(b); });
-    return btoa(binary);
-}
-function getDeviceId(){
-    let id = localStorage.getItem("tnam_device_id");
-    if(!id){
-        id = generateDeviceId();
-        localStorage.setItem("tnam_device_id", id);
-    }
-    return id;
-}
-function getTikTokUrl(){
+// ===== LẤY TIKTOK URL =====
+function getTikTokUrl() {
     const params = new URLSearchParams(window.location.search);
+
     return params.get("url") || params.get("u") || "";
 }
-function getRoomIdFromUrl(url){
-    if(!url) return "";
+
+// ===== LẤY ROOM ID TỪ URL =====
+function getRoomIdFromUrl(url) {
+    if (!url) return "";
+
     let m = url.match(/room_id=(\d+)/i);
-    if(m) return m[1];
+
+    if (m) return m[1];
+
     m = url.match(/\/live\/(\d+)/i);
+
     return m ? m[1] : "";
 }
-function getRoomId(){
+
+// ===== LẤY ROOM ID =====
+function getRoomId() {
+
     const params = new URLSearchParams(window.location.search);
+
     const r = params.get("r");
-    if(r){
+
+    if (r) {
         const decoded = aesDecrypt(r);
-        if(decoded && /^\d{10,}$/.test(decoded)) return decoded;
+
+        if (decoded && /^\d{10,}$/.test(decoded)) {
+            return decoded;
+        }
     }
+
     return getRoomIdFromUrl(getTikTokUrl());
 }
-function readCache(deviceId){
-    try{
-        const raw = localStorage.getItem(CACHE_KEY);
-        if(!raw) return null;
-        const data = JSON.parse(raw);
-        if(!data || data.deviceId !== deviceId) return null;
-        if(typeof data.perfAt === "number"){
-            if(performance.now() - data.perfAt > CACHE_TTL_MS) return null;
-        }else if(Date.now() - (data.checkedAt || 0) > CACHE_TTL_MS){
-            return null;
-        }
-        return data;
-    }catch(e){ return null; }
-}
-function writeCache(payload){
-    try{
-        payload.perfAt = performance.now();
-        payload.checkedAt = Date.now();
-        localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
-    }catch(e){}
-}
-async function getVietnamNowMs(){
-    try{
-        const t0 = Date.now();
-        const res = await fetch(
-            "https://utctime.app/api/now/Asia/Ho_Chi_Minh?t=" + Date.now(),
-            { method:"GET", cache:"no-store" }
-        );
-        if(!res.ok) throw new Error();
-        const data = await res.json();
-        const t1 = Date.now();
-        const rtt = t1 - t0;
-        return (data.unix_ms || data.unix * 1000) + rtt / 2;
-    }catch(e1){
-        try{
-            const t0 = Date.now();
-            const res = await fetch(
-                "https://worldtime.timezone.io/api/timezone/Asia/Ho_Chi_Minh?t=" + Date.now(),
-                { method:"GET", cache:"no-store" }
-            );
-            if(!res.ok) throw new Error();
-            const data = await res.json();
-            const t1 = Date.now();
-            const rtt = t1 - t0;
-            return data.unixtime * 1000 + rtt / 2;
-        }catch(e2){
-            return Date.now();
-        }
-    }
-}
-function parseCSVLine(line){
-    const result = [];
-    let current = "", inQuotes = false;
-    for(let i = 0; i < line.length; i++){
-        const c = line[i];
-        if(c === '"'){
-            if(inQuotes && line[i+1] === '"'){ current += '"'; i++; }
-            else inQuotes = !inQuotes;
-        }else if(c === ',' && !inQuotes){
-            result.push(current); current = "";
-        }else current += c;
-    }
-    result.push(current);
-    return result;
-}
-async function readGoogleSheet(){
-    const url = "https://docs.google.com/spreadsheets/d/" + SHEET_ID +
-        "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(SHEET_NAME) + "&t=" + Date.now();
-    const res = await fetch(url, { method:"GET", cache:"no-store" });
-    if(!res.ok) throw new Error("sheet");
-    const text = await res.text();
-    const lines = text.trim().split(/\r?\n/);
-    const devices = [];
-    for(let i = 1; i < lines.length; i++){
-        const cols = parseCSVLine(lines[i]);
-        const device = (cols[0] || "").trim();
-        if(!device) continue;
-        devices.push({
-            device: device,
-            note: (cols[1] || "").trim(),
-            expiry: (cols[2] || "").trim()
-        });
-    }
-    return devices;
-}
-function parseExpiry(value){
-    if(!value) return null;
-    const text = String(value).trim();
-    if(!text) return null;
-    function createVNDate(y, m, d, h, mi, s){
-        h = h || 0; mi = mi || 0; s = s || 0;
-        return new Date(Date.UTC(y, m, d, h - 7, mi, s, 0));
-    }
-    let m = text.match(/^Date\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?(?:,\s*(\d+))?(?:,\s*(\d+))?/);
-    if(m) return createVNDate(+m[1], +m[2], +m[3], +(m[4]||0), +(m[5]||0), +(m[6]||0));
-    m = text.match(/^(\d{1,2}):(\d{2})\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if(m){
-        const h = +m[1], mi = +m[2], d = +m[3], mo = +m[4], y = +m[5];
-        if(h>23||mi>59||mo<1||mo>12||d<1||d>31) return null;
-        return createVNDate(y, mo-1, d, h, mi);
-    }
-    m = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})$/);
-    if(m){
-        const d = +m[1], mo = +m[2], y = +m[3], h = +m[4], mi = +m[5];
-        if(h>23||mi>59||mo<1||mo>12||d<1||d>31) return null;
-        return createVNDate(y, mo-1, d, h, mi);
-    }
-    m = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if(m){
-        const d = +m[1], mo = +m[2], y = +m[3];
-        if(mo<1||mo>12||d<1||d>31) return null;
-        return createVNDate(y, mo-1, d, 23, 59, 59);
-    }
-    const native = new Date(text);
-    return isNaN(native.getTime()) ? null : native;
-}
-function formatDate(date){
-    if(!date) return "";
-    const opts = {
-        timeZone: "Asia/Ho_Chi_Minh",
-        hour: "2-digit", minute: "2-digit",
-        day: "2-digit", month: "2-digit", year: "numeric",
-        hour12: false
-    };
-    const parts = new Intl.DateTimeFormat("vi-VN", opts).formatToParts(date);
-    const get = function(t){
-        const p = parts.find(function(x){ return x.type === t; });
-        return p ? p.value : "";
-    };
-    return get("hour") + ":" + get("minute") + " " + get("day") + "/" + get("month") + "/" + get("year");
-}
-function hideAll(){
-    ["loadingBox","deniedBox","approvedBox","expiredBox","errorBox"]
-        .forEach(function(id){ document.getElementById(id).classList.add("hidden"); });
-}
-function showDenied(){
-    hideAll();
-    document.getElementById("deniedBox").classList.remove("hidden");
-}
-function showApproved(note, expiry){
-    hideAll();
-    document.getElementById("approvedBox").classList.remove("hidden");
-    document.getElementById("approvedNote").textContent = note ? "Ghi chú: " + note : "";
-    document.getElementById("expiryBox").innerHTML = expiry
-        ? "Hạn sử dụng: <strong>" + formatDate(expiry) + "</strong>"
-        : "Hạn sử dụng: <strong>VÔ HẠN</strong>";
-}
-function showExpired(note, expiry){
-    hideAll();
-    document.getElementById("expiredBox").classList.remove("hidden");
-    document.getElementById("expiredNote").textContent = note ? "Ghi chú: " + note : "";
-    document.getElementById("expiredDate").innerHTML =
-        "Đã hết hạn lúc: <strong>" + formatDate(expiry) + "</strong>";
-}
-function showError(){
-    hideAll();
-    document.getElementById("errorBox").classList.remove("hidden");
-}
-function closePageAfterOpen(){
-    setTimeout(function(){
-        try{ window.close(); }catch(e){}
-        setTimeout(function(){
-            try{ window.location.replace("about:blank"); }catch(e){}
-        }, 150);
-    }, 400);
-}
-function openTikTok(){
+
+// ===== MỞ TIKTOK =====
+function openTikTok() {
+
     const roomId = getRoomId();
-    if(!roomId) return;
-    window.location.href = "snssdk1180://live?room_id=" + encodeURIComponent(roomId);
-    closePageAfterOpen();
-}
-function showApprovedThenOpen(note, expiry){
-    showApproved(note, expiry);
-    setTimeout(openTikTok, SHOW_APPROVED_MS);
-}
-async function checkFromNetwork(deviceId){
-    const vietnamNowPromise = getVietnamNowMs();
-    const devices = await readGoogleSheet();
-    const found = devices.find(function(item){
-        return item.device.trim() === deviceId.trim();
-    });
-    if(!found){
-        writeCache({ deviceId: deviceId, status: "denied" });
-        showDenied();
+
+    if (!roomId) {
+        showError("Không tìm thấy Room ID!");
         return;
     }
-    if(!found.expiry){
-        writeCache({
-            deviceId: deviceId,
-            status: "approved",
-            note: found.note || "",
-            expiryMs: null
-        });
-        showApprovedThenOpen(found.note, null);
-        return;
-    }
-    const nowMs = await vietnamNowPromise;
-    const expiry = parseExpiry(found.expiry);
-    if(!expiry){
-        showError();
-        return;
-    }
-    if(nowMs > expiry.getTime()){
-        writeCache({
-            deviceId: deviceId,
-            status: "expired",
-            note: found.note || "",
-            expiryMs: expiry.getTime()
-        });
-        showExpired(found.note, expiry);
-    }else{
-        writeCache({
-            deviceId: deviceId,
-            status: "approved",
-            note: found.note || "",
-            expiryMs: expiry.getTime()
-        });
-        showApprovedThenOpen(found.note, expiry);
-    }
+
+    window.location.href =
+        "snssdk1180://live?room_id=" + encodeURIComponent(roomId);
 }
-function checkDevice(){
-    const deviceId = getDeviceId();
-    document.getElementById("deviceCode").textContent = deviceId;
-    document.getElementById("deviceCodeExpired").textContent = deviceId;
-    document.getElementById("deviceCodeApproved").textContent = "(" + deviceId.substring(0,4) + ")";
-    const cached = readCache(deviceId);
-    if(cached && cached.status === "approved"){
-        showApprovedThenOpen(
-            cached.note || "",
-            cached.expiryMs ? new Date(cached.expiryMs) : null
-        );
-        setTimeout(function(){
-            checkFromNetwork(deviceId).catch(function(){});
-        }, RECHECK_DELAY_MS);
+
+// ===== HIỂN THỊ LỖI =====
+function showError(message) {
+
+    const status = document.getElementById("statusBox");
+
+    status.className = "status error";
+    status.textContent = message;
+
+    document.getElementById("roomBox").classList.add("hidden");
+    document.getElementById("openBtn").classList.add("hidden");
+}
+
+// ===== KHỞI CHẠY =====
+function init() {
+
+    const roomId = getRoomId();
+
+    if (!roomId) {
+        showError("Không tìm thấy Room ID!");
         return;
     }
-    if(cached && cached.status === "expired"){
-        showExpired(cached.note || "", cached.expiryMs ? new Date(cached.expiryMs) : null);
-        setTimeout(function(){
-            checkFromNetwork(deviceId).catch(function(){});
-        }, 300);
-        return;
-    }
-    checkFromNetwork(deviceId).catch(function(){
-        if(cached && cached.status === "approved" && !cached.expiryMs){
-            showApprovedThenOpen(cached.note || "", null);
-            return;
-        }
-        showError();
-    });
+
+    document.getElementById("statusBox").className = "status success";
+    document.getElementById("statusBox").textContent =
+        "✓ Đã lấy Room ID thành công";
+
+    document.getElementById("roomId").textContent = roomId;
+
+    document.getElementById("roomBox").classList.remove("hidden");
+    document.getElementById("openBtn").classList.remove("hidden");
 }
-async function copyDevice(){
-    const id = getDeviceId();
-    try{
-        await navigator.clipboard.writeText(id);
-        document.querySelectorAll(".copy-btn").forEach(function(btn){
-            const old = btn.textContent;
-            btn.textContent = "ĐÃ COPY";
-            setTimeout(function(){ btn.textContent = old; }, 1500);
-        });
-    }catch(e){
-        const ta = document.createElement("textarea");
-        ta.value = id;
-        ta.style.cssText = "position:fixed;opacity:0";
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        ta.remove();
-    }
-}
-document.getElementById("copyBtn").addEventListener("click", copyDevice);
-document.getElementById("copyBtnExpired").addEventListener("click", copyDevice);
+
 document.getElementById("openBtn").addEventListener("click", openTikTok);
-checkDevice();
+
+init();
+
 </script>
+
 </body>
 </html>
